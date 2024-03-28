@@ -23,10 +23,16 @@ repositories {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons
+    implementation group: 'org.springframework.data', name: 'spring-data-commons', version: '3.2.4'
+
 }
 
 tasks.named('test') {
