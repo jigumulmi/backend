@@ -7,6 +7,6 @@ import lombok.Getter;
 @Builder
 public class SubwayStationResponseDto {
     private Long id;
-    private String name;
-    private String line;
+    private String stationName;
+    private String lineNumber;
 }
