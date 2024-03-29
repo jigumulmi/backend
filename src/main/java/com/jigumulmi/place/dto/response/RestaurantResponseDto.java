@@ -1,6 +1,6 @@
 package com.jigumulmi.place.dto.response;
 
-import com.jigumulmi.place.domain.SubwayStation;
+import com.jigumulmi.place.domain.Menu;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -20,7 +20,7 @@ public class RestaurantResponseDto {
 
     private String contact;
 
-    private List<String> menuList;
+    private List<Menu> menuList;
 
     private String openingHourSun;
 
@@ -45,6 +45,4 @@ public class RestaurantResponseDto {
     private Double longitude;
 
     private Double latitude;
-
-    private SubwayStation subwayStation;
 }
