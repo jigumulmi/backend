@@ -22,15 +22,15 @@ public class PlaceService {
     private final SubwayStationRepository subwayStationRepository;
     private final RestaurantRepository restaurantRepository;
 
-    public List<SubwayStationResponseDto> getSubwayStationList(String name) {
-        List<SubwayStation> subwayStationList = subwayStationRepository.findAllByNameStartsWith(name, Sort.by(Sort.Direction.ASC, "name"));
+    public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
+        List<SubwayStation> subwayStationList = subwayStationRepository.findAllByStationNameStartsWith(stationName, Sort.by(Sort.Direction.ASC, "stationName"));
 
         ArrayList<SubwayStationResponseDto> responseDtoList = new ArrayList<>();
         for (SubwayStation subwayStation : subwayStationList) {
             SubwayStationResponseDto responseDto = SubwayStationResponseDto.builder()
                     .id(subwayStation.getId())
-                    .name(subwayStation.getName())
-                    .line(subwayStation.getLine()).build();
+                    .stationName(subwayStation.getStationName())
+                    .lineNumber(subwayStation.getLineNumber()).build();
             responseDtoList.add(responseDto);
         }
 

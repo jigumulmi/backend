@@ -18,8 +18,8 @@ public class PlaceController {
     private final PlaceService placeService;
 
     @GetMapping("/subway")
-    public ResponseEntity<?> getSubwayStations(@RequestParam(name = "name") String name) {
-        List<SubwayStationResponseDto> subwayStationList = placeService.getSubwayStationList(name);
+    public ResponseEntity<?> getSubwayStations(@RequestParam(name = "stationName") String stationName) {
+        List<SubwayStationResponseDto> subwayStationList = placeService.getSubwayStationList(stationName);
         return ResponseEntity.ok().body(subwayStationList);
     }
 

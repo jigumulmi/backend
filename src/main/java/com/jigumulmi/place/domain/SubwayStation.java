@@ -18,17 +18,28 @@ public class SubwayStation {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
+    private String stationCode;
+    private String externalCode;
 
-    private String line;
+    private String stationName;
+    private String stationNameEng;
+    private String stationNameJpn;
+    private String stationNameChn;
+
+    private String lineNumber;
 
     @OneToMany(mappedBy = "subwayStation")
     private List<Restaurant> restaurantList = new ArrayList<>();
 
     @Builder
-    public SubwayStation(String name, String line, List<Restaurant> restaurantList) {
-        this.name = name;
-        this.line = line;
+    public SubwayStation(String stationCode, String externalCode, String stationName, String stationNameEng, String stationNameJpn, String stationNameChn, String lineNumber, List<Restaurant> restaurantList) {
+        this.stationCode = stationCode;
+        this.externalCode = externalCode;
+        this.stationName = stationName;
+        this.stationNameEng = stationNameEng;
+        this.stationNameJpn = stationNameJpn;
+        this.stationNameChn = stationNameChn;
+        this.lineNumber = lineNumber;
         this.restaurantList = restaurantList;
     }
 }
