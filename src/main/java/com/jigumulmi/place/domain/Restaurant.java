@@ -2,23 +2,18 @@ package com.jigumulmi.place.domain;
 
 import com.jigumulmi.config.common.Timestamped;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(exclude = {"subwayStation"})
 public class Restaurant extends Timestamped {
 
     @Id
-    @GeneratedValue
-    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -60,7 +55,31 @@ public class Restaurant extends Timestamped {
 
     private Boolean isApproved;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subway_station_id")
     private SubwayStation subwayStation;
+
+    @Builder
+    public Restaurant(String name, String category, String address, String contact, List<String> menuList, String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo, String mainImageUrl, String placeUrl, Double longitude, Double latitude, String registrantComment, Boolean isApproved, SubwayStation subwayStation) {
+        this.name = name;
+        this.category = category;
+        this.address = address;
+        this.contact = contact;
+        this.menuList = menuList;
+        this.openingHourSun = openingHourSun;
+        this.openingHourMon = openingHourMon;
+        this.openingHourTue = openingHourTue;
+        this.openingHourWed = openingHourWed;
+        this.openingHourThu = openingHourThu;
+        this.openingHourFri = openingHourFri;
+        this.openingHourSat = openingHourSat;
+        this.additionalInfo = additionalInfo;
+        this.mainImageUrl = mainImageUrl;
+        this.placeUrl = placeUrl;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.registrantComment = registrantComment;
+        this.isApproved = isApproved;
+        this.subwayStation = subwayStation;
+    }
 }

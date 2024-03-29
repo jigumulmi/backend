@@ -1,7 +1,7 @@
 package com.jigumulmi.place.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,14 +11,11 @@ import java.util.List;
 
 @Entity
 @Getter
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SubwayStation {
 
     @Id
-    @GeneratedValue
-    @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -27,4 +24,11 @@ public class SubwayStation {
 
     @OneToMany(mappedBy = "subwayStation")
     private List<Restaurant> restaurantList = new ArrayList<>();
+
+    @Builder
+    public SubwayStation(String name, String line, List<Restaurant> restaurantList) {
+        this.name = name;
+        this.line = line;
+        this.restaurantList = restaurantList;
+    }
 }
