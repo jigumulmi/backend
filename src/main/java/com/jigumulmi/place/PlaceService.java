@@ -20,8 +20,8 @@ public class PlaceService {
 
     public ArrayList<SubwayStationResponseDto> getSubwayStationList(String name) {
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllByNameStartsWith(name, Sort.by(Sort.Direction.ASC, "name"));
-        ArrayList<SubwayStationResponseDto> responseDtoList = new ArrayList<>();
 
+        ArrayList<SubwayStationResponseDto> responseDtoList = new ArrayList<>();
         for (SubwayStation subwayStation : subwayStationList) {
             SubwayStationResponseDto responseDto = SubwayStationResponseDto.builder()
                     .id(subwayStation.getId())
