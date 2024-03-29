@@ -50,7 +50,7 @@ public class Restaurant extends Timestamped {
 
     private String mainImageUrl;
 
-    private String portalSiteUrl;
+    private String placeUrl;
 
     private Double longitude;
 
