@@ -1,12 +1,12 @@
 package com.jigumulmi.place.dto.request;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Getter
-@Builder
+@NoArgsConstructor
 public class CreatePlaceRequestDto {
     private String name;
     private Long subway_station_id;
