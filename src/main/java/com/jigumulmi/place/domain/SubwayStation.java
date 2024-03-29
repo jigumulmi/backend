@@ -1,13 +1,13 @@
 package com.jigumulmi.place.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -22,6 +22,9 @@ public class SubwayStation {
     private Long id;
 
     private String name;
-    
+
     private String line;
+
+    @OneToMany(mappedBy = "subwayStation")
+    private List<Restaurant> restaurantList = new ArrayList<>();
 }
