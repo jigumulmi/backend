@@ -3,6 +3,7 @@ package com.jigumulmi.place;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class PlaceController {
     }
 
     @PostMapping("")
-    public ResponseEntity<?> registerPlace(@RequestBody CreatePlaceRequestDto requestDto) {
+    public ResponseEntity<?> registerPlace(@Valid @RequestBody CreatePlaceRequestDto requestDto) {
         placeService.registerPlace(requestDto);
         return new ResponseEntity<>("Register success", HttpStatus.CREATED);
     }
