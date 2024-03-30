@@ -56,7 +56,12 @@ public class PlaceService {
     }
 
     public List<RestaurantResponseDto> getPlaceList(Long subwayStationId) {
-        List<Restaurant> restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStationId);
+        List<Restaurant> restaurantList;
+        if (subwayStationId != null) {
+            restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStationId);
+        } else {
+            restaurantList = restaurantRepository.findAllByIsApprovedTrue();
+        }
 
         ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
         for (Restaurant restaurant : restaurantList) {

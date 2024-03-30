@@ -31,7 +31,7 @@ public class PlaceController {
     }
 
     @GetMapping("")
-    public ResponseEntity<?> getPlaceList(@RequestParam(name = "subwayStationId") Long subwayStationId) {
+    public ResponseEntity<?> getPlaceList(@RequestParam(name = "subwayStationId", required = false) Long subwayStationId) {
         List<RestaurantResponseDto> placeList = placeService.getPlaceList(subwayStationId);
         return ResponseEntity.ok().body(placeList);
     }
