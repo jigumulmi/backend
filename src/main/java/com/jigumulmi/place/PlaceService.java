@@ -1,10 +1,12 @@
 package com.jigumulmi.place;
 
+import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Restaurant;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.RestaurantRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class PlaceService {
 
     private final SubwayStationRepository subwayStationRepository;
     private final RestaurantRepository restaurantRepository;
+    private final MenuRepository menuRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllByStationNameStartsWith(stationName, Sort.by(Sort.Direction.ASC, "stationName"));
@@ -40,9 +43,16 @@ public class PlaceService {
     @Transactional
     public void registerPlace(CreatePlaceRequestDto requestDto) {
         SubwayStation subwayStation = subwayStationRepository.findById(requestDto.getSubway_station_id()).orElseThrow(IllegalArgumentException::new);
-        Restaurant newRestaurant = Restaurant.builder().name(requestDto.getName()).subwayStation(subwayStation).menuList(requestDto.getMenuList()).registrantComment(requestDto.getRegistrantComment()).isApproved(false).build();
+        Restaurant newRestaurant = Restaurant.builder().name(requestDto.getName()).subwayStation(subwayStation).registrantComment(requestDto.getRegistrantComment()).isApproved(false).build();
+
+        ArrayList<Menu> menuList = new ArrayList<>();
+        for (String menuName : requestDto.getMenuList()) {
+            Menu menu = Menu.builder().name(menuName).restaurant(newRestaurant).build();
+            menuList.add(menu);
+        }
 
         restaurantRepository.save(newRestaurant);
+        menuRepository.saveAll(menuList);
     }
 
     public List<RestaurantResponseDto> getPlaceList(Long subwayStationId) {
@@ -69,7 +79,6 @@ public class PlaceService {
                     .placeUrl(restaurant.getPlaceUrl())
                     .longitude(restaurant.getLongitude())
                     .latitude(restaurant.getLatitude())
-                    .subwayStation(restaurant.getSubwayStation())
                     .build();
             responseDtoList.add(responseDto);
         }

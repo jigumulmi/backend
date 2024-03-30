@@ -1,9 +1,11 @@
 package com.jigumulmi.place.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.config.common.Timestamped;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -24,8 +26,9 @@ public class Restaurant extends Timestamped {
 
     private String contact;
 
-    @ElementCollection
-    private List<String> menuList;
+    @OneToMany(mappedBy = "restaurant")
+    @JsonManagedReference
+    private List<Menu> menuList = new ArrayList<>();
 
     private String openingHourSun;
 
@@ -60,7 +63,7 @@ public class Restaurant extends Timestamped {
     private SubwayStation subwayStation;
 
     @Builder
-    public Restaurant(String name, String category, String address, String contact, List<String> menuList, String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo, String mainImageUrl, String placeUrl, Double longitude, Double latitude, String registrantComment, Boolean isApproved, SubwayStation subwayStation) {
+    public Restaurant(String name, String category, String address, String contact, List<Menu> menuList, String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo, String mainImageUrl, String placeUrl, Double longitude, Double latitude, String registrantComment, Boolean isApproved, SubwayStation subwayStation) {
         this.name = name;
         this.category = category;
         this.address = address;
