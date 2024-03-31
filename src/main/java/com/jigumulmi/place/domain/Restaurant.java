@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.config.common.Timestamped;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +57,7 @@ public class Restaurant extends Timestamped {
 
     private String registrantComment;
 
+    @ColumnDefault("false")
     private Boolean isApproved;
 
     @ManyToOne(fetch = FetchType.LAZY)
