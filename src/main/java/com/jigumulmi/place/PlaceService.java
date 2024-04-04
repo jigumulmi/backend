@@ -65,6 +65,8 @@ public class PlaceService {
 
         ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
         for (Restaurant restaurant : restaurantList) {
+            SubwayStation subwayStation = restaurant.getSubwayStation();
+
             RestaurantResponseDto responseDto = RestaurantResponseDto.builder()
                     .id(restaurant.getId())
                     .name(restaurant.getName())
@@ -72,19 +74,27 @@ public class PlaceService {
                     .address(restaurant.getAddress())
                     .contact(restaurant.getContact())
                     .menuList(restaurant.getMenuList())
-                    .openingHourSun(restaurant.getOpeningHourSun())
-                    .openingHourMon(restaurant.getOpeningHourMon())
-                    .openingHourTue(restaurant.getOpeningHourTue())
-                    .openingHourWed(restaurant.getOpeningHourWed())
-                    .openingHourThu(restaurant.getOpeningHourThu())
-                    .openingHourFri(restaurant.getOpeningHourFri())
-                    .openingHourSat(restaurant.getOpeningHourSat())
+                    .openingHour(
+                            RestaurantResponseDto.OpeningHourDto.builder().openingHourSun(restaurant.getOpeningHourSun())
+                                    .openingHourMon(restaurant.getOpeningHourMon())
+                                    .openingHourTue(restaurant.getOpeningHourTue())
+                                    .openingHourWed(restaurant.getOpeningHourWed())
+                                    .openingHourThu(restaurant.getOpeningHourThu())
+                                    .openingHourFri(restaurant.getOpeningHourFri())
+                                    .openingHourSat(restaurant.getOpeningHourSat()).build()
+                    )
                     .additionalInfo(restaurant.getAdditionalInfo())
                     .mainImageUrl(restaurant.getMainImageUrl())
                     .placeUrl(restaurant.getPlaceUrl())
-                    .longitude(restaurant.getLongitude())
-                    .latitude(restaurant.getLatitude())
+                    .position(
+                            RestaurantResponseDto.PositionDto.builder().longitude(restaurant.getLongitude())
+                                    .latitude(restaurant.getLatitude()).build()
+                    )
+                    .subwayStation(
+                            SubwayStationResponseDto.builder().id(subwayStation.getId()).stationName(subwayStation.getStationName()).lineNumber(subwayStation.getLineNumber()).build()
+                    )
                     .build();
+
             responseDtoList.add(responseDto);
         }
 

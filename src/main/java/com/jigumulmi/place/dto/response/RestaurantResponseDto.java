@@ -6,9 +6,35 @@ import lombok.Getter;
 
 import java.util.List;
 
+
 @Getter
 @Builder
 public class RestaurantResponseDto {
+    @Getter
+    @Builder
+    public static class OpeningHourDto {
+        private String openingHourSun;
+
+        private String openingHourMon;
+
+        private String openingHourTue;
+
+        private String openingHourWed;
+
+        private String openingHourThu;
+
+        private String openingHourFri;
+
+        private String openingHourSat;
+    }
+
+    @Getter
+    @Builder
+    public static class PositionDto {
+        private Double latitude;
+
+        private Double longitude;
+    }
 
     private Long id;
 
@@ -22,19 +48,7 @@ public class RestaurantResponseDto {
 
     private List<Menu> menuList;
 
-    private String openingHourSun;
-
-    private String openingHourMon;
-
-    private String openingHourTue;
-
-    private String openingHourWed;
-
-    private String openingHourThu;
-
-    private String openingHourFri;
-
-    private String openingHourSat;
+    private OpeningHourDto openingHour;
 
     private String additionalInfo;
 
@@ -42,7 +56,7 @@ public class RestaurantResponseDto {
 
     private String placeUrl;
 
-    private Double longitude;
+    private PositionDto position;
 
-    private Double latitude;
+    private SubwayStationResponseDto subwayStation;
 }
