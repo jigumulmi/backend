@@ -34,6 +34,7 @@ public class PlaceService {
                     .id(subwayStation.getId())
                     .stationName(subwayStation.getStationName())
                     .lineNumber(subwayStation.getLineNumber()).build();
+
             responseDtoList.add(responseDto);
         }
 
@@ -65,26 +66,43 @@ public class PlaceService {
 
         ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
         for (Restaurant restaurant : restaurantList) {
+
+            ArrayList<RestaurantResponseDto.MenuDto> menuDtoList = new ArrayList<>();
+            for (Menu menu : restaurant.getMenuList()) {
+                RestaurantResponseDto.MenuDto menuDto = RestaurantResponseDto.MenuDto.builder().id(menu.getId()).name(menu.getName()).build();
+                menuDtoList.add(menuDto);
+            }
+
+            SubwayStation subwayStation = restaurant.getSubwayStation();
+
             RestaurantResponseDto responseDto = RestaurantResponseDto.builder()
                     .id(restaurant.getId())
                     .name(restaurant.getName())
                     .category(restaurant.getCategory())
                     .address(restaurant.getAddress())
                     .contact(restaurant.getContact())
-                    .menuList(restaurant.getMenuList())
-                    .openingHourSun(restaurant.getOpeningHourSun())
-                    .openingHourMon(restaurant.getOpeningHourMon())
-                    .openingHourTue(restaurant.getOpeningHourTue())
-                    .openingHourWed(restaurant.getOpeningHourWed())
-                    .openingHourThu(restaurant.getOpeningHourThu())
-                    .openingHourFri(restaurant.getOpeningHourFri())
-                    .openingHourSat(restaurant.getOpeningHourSat())
+                    .menuList(menuDtoList)
+                    .openingHour(
+                            RestaurantResponseDto.OpeningHourDto.builder().openingHourSun(restaurant.getOpeningHourSun())
+                                    .openingHourMon(restaurant.getOpeningHourMon())
+                                    .openingHourTue(restaurant.getOpeningHourTue())
+                                    .openingHourWed(restaurant.getOpeningHourWed())
+                                    .openingHourThu(restaurant.getOpeningHourThu())
+                                    .openingHourFri(restaurant.getOpeningHourFri())
+                                    .openingHourSat(restaurant.getOpeningHourSat()).build()
+                    )
                     .additionalInfo(restaurant.getAdditionalInfo())
                     .mainImageUrl(restaurant.getMainImageUrl())
                     .placeUrl(restaurant.getPlaceUrl())
-                    .longitude(restaurant.getLongitude())
-                    .latitude(restaurant.getLatitude())
+                    .position(
+                            RestaurantResponseDto.PositionDto.builder().longitude(restaurant.getLongitude())
+                                    .latitude(restaurant.getLatitude()).build()
+                    )
+                    .subwayStation(
+                            SubwayStationResponseDto.builder().id(subwayStation.getId()).stationName(subwayStation.getStationName()).lineNumber(subwayStation.getLineNumber()).build()
+                    )
                     .build();
+
             responseDtoList.add(responseDto);
         }
 
