@@ -1,6 +1,5 @@
 package com.jigumulmi.place.dto.response;
 
-import com.jigumulmi.place.domain.Menu;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -10,6 +9,14 @@ import java.util.List;
 @Getter
 @Builder
 public class RestaurantResponseDto {
+    @Getter
+    @Builder
+    public static class MenuDto {
+        private Long id;
+
+        private String name;
+    }
+
     @Getter
     @Builder
     public static class OpeningHourDto {
@@ -46,7 +53,7 @@ public class RestaurantResponseDto {
 
     private String contact;
 
-    private List<Menu> menuList;
+    private List<MenuDto> menuList;
 
     private OpeningHourDto openingHour;
 

@@ -34,6 +34,7 @@ public class PlaceService {
                     .id(subwayStation.getId())
                     .stationName(subwayStation.getStationName())
                     .lineNumber(subwayStation.getLineNumber()).build();
+
             responseDtoList.add(responseDto);
         }
 
@@ -65,6 +66,13 @@ public class PlaceService {
 
         ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
         for (Restaurant restaurant : restaurantList) {
+
+            ArrayList<RestaurantResponseDto.MenuDto> menuDtoList = new ArrayList<>();
+            for (Menu menu : restaurant.getMenuList()) {
+                RestaurantResponseDto.MenuDto menuDto = RestaurantResponseDto.MenuDto.builder().id(menu.getId()).name(menu.getName()).build();
+                menuDtoList.add(menuDto);
+            }
+
             SubwayStation subwayStation = restaurant.getSubwayStation();
 
             RestaurantResponseDto responseDto = RestaurantResponseDto.builder()
@@ -73,7 +81,7 @@ public class PlaceService {
                     .category(restaurant.getCategory())
                     .address(restaurant.getAddress())
                     .contact(restaurant.getContact())
-                    .menuList(restaurant.getMenuList())
+                    .menuList(menuDtoList)
                     .openingHour(
                             RestaurantResponseDto.OpeningHourDto.builder().openingHourSun(restaurant.getOpeningHourSun())
                                     .openingHourMon(restaurant.getOpeningHourMon())
