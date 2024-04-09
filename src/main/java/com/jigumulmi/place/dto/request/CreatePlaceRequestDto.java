@@ -16,7 +16,7 @@ public class CreatePlaceRequestDto {
     @NotBlank
     private String name;
     @NotNull
-    private Long subway_station_id;
+    private Long subwayStationId;
     @NotEmpty
     private List<String> menuList;
     @NotBlank

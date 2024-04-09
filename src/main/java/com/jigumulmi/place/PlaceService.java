@@ -43,7 +43,7 @@ public class PlaceService {
 
     @Transactional
     public void registerPlace(CreatePlaceRequestDto requestDto) {
-        SubwayStation subwayStation = subwayStationRepository.findById(requestDto.getSubway_station_id()).orElseThrow(IllegalArgumentException::new);
+        SubwayStation subwayStation = subwayStationRepository.findById(requestDto.getSubwayStationId()).orElseThrow(IllegalArgumentException::new);
         Restaurant newRestaurant = Restaurant.builder().name(requestDto.getName()).subwayStation(subwayStation).registrantComment(requestDto.getRegistrantComment()).isApproved(false).build();
 
         ArrayList<Menu> menuList = new ArrayList<>();
