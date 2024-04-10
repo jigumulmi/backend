@@ -52,9 +52,8 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     private static void logRequest(RequestWrapper request) throws IOException {
         String queryString = request.getQueryString();
-        log.info("Request: {} {} content-type[{}]", request.getMethod(),
-                queryString == null ? request.getRequestURI() : request.getRequestURI() + queryString,
-                request.getContentType());
+        log.info("Request: {} {}", request.getMethod(),
+                queryString == null ? request.getRequestURI() : request.getRequestURI() + "?" + queryString);
 
         logPayload("Request", request.getContentType(), request.getInputStream());
     }
