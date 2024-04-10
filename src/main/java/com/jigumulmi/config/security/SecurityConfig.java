@@ -1,4 +1,4 @@
-package com.jigumulmi.config;
+package com.jigumulmi.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
