@@ -8,6 +8,9 @@ import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.KakaoMemberInfoDto;
 import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.PersistenceUnit;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -38,8 +41,12 @@ public class KakaoService {
 
     @Value("${kakao.redirect.url}")
     private String KAKAO_REDIRECT_URL;
+    
+    @PersistenceUnit
+    private EntityManagerFactory emf;
 
     private final MemberRepository memberRepository;
+
 
     @Transactional
     public KakaoAuthResponseDto authorize(String authorizationCode, HttpSession session) throws JsonProcessingException {
@@ -140,6 +147,9 @@ public class KakaoService {
             //String nickname = kakaoMemberInfo.getNickname();
             kakaoMember = Member.builder().email(kakaoEmail).build();
             memberRepository.save(kakaoMember);
+
+            EntityManager entityManager = emf.createEntityManager();
+            entityManager.flush();
         }
 
         return kakaoMember;
