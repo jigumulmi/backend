@@ -45,7 +45,7 @@ public class LoggingFilter extends OncePerRequestFilter {
             response.setHeader("X-RESPONSE-TIME", String.valueOf(responseTime));
             log.info("Response Time: {}ms ", responseTime);
 
-            logResponse(response);
+            //logResponse(response);
             response.copyBodyToResponse();
         }
     }

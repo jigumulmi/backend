@@ -7,6 +7,7 @@ import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.KakaoMemberInfoDto;
+import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -39,7 +41,8 @@ public class KakaoService {
 
     private final MemberRepository memberRepository;
 
-    public void authorize(String authorizationCode, HttpSession session) throws JsonProcessingException {
+    @Transactional
+    public KakaoAuthResponseDto authorize(String authorizationCode, HttpSession session) throws JsonProcessingException {
         String accessToken = getAccessToken(authorizationCode);
 
         KakaoMemberInfoDto kakaoMemberInfo = getKakaoMemberInfo(accessToken);
@@ -47,6 +50,18 @@ public class KakaoService {
         Member member = registerKakaoUserIfNeeded(kakaoMemberInfo);
 
         forceLogin(member, session);
+
+        String nicknameFromDb = member.getNickname();
+        if (nicknameFromDb == null) { // 신규 회원
+            Long id = member.getId();
+            String email = member.getEmail();
+            String[] splitEmail = email.split("@");
+            String tempNickname = splitEmail[0] + 134 + id;
+            return KakaoAuthResponseDto.builder().hasRegistered(false).nickname(tempNickname).build();
+        } else { // 기존 회원
+            return KakaoAuthResponseDto.builder().hasRegistered(true).nickname(nicknameFromDb).build();
+        }
+
     }
 
     /**
@@ -81,8 +96,6 @@ public class KakaoService {
                 kakaoTokenRequest,
                 String.class
         );
-
-        System.out.println("response = " + response);
 
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         // ObjectMapper : json을 자바 객체로.
