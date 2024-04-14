@@ -42,9 +42,11 @@ jobs:
 
       ## deploy.sh 생성
       - name: make deploy.sh
-        run:
-          touch ./deploy.sh
-          echo "${{ secrets.DEV_DEPLOY_SH_SCRIPT }}" > ./deploy.sh
+        run: touch ./deploy.sh
+        shell: bash
+
+      - name: deliver deploy.sh
+        run: echo "${{ secrets.DEV_DEPLOY_SH_SCRIPT }}" > ./deploy.sh
         shell: bash
 
       # Gradle build (Test 제외)
