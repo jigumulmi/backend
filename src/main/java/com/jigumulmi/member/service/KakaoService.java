@@ -14,10 +14,7 @@ import jakarta.persistence.PersistenceUnit;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -39,9 +36,12 @@ public class KakaoService {
     @Value("${kakao.client.secret}")
     private String KAKAO_CLIENT_SECRET;
 
+    @Value("${kakao.admin.key}")
+    private String KAKAO_ADMIN_KEY;
+
     @Value("${kakao.redirect.url}")
     private String KAKAO_REDIRECT_URL;
-    
+
     @PersistenceUnit
     private EntityManagerFactory emf;
 
@@ -54,18 +54,18 @@ public class KakaoService {
 
         KakaoMemberInfoDto kakaoMemberInfo = getKakaoMemberInfo(accessToken);
 
-        Member member = registerKakaoUserIfNeeded(kakaoMemberInfo);
+        Member member = registerKakaoUserIfNeeded(kakaoMemberInfo, accessToken);
 
         forceLogin(member, session);
 
         String nicknameFromDb = member.getNickname();
-        if (nicknameFromDb == null) { // 신규 회원
+        if (nicknameFromDb == null) { // 신규 회원 -> 회원가입
             Long id = member.getId();
             String email = member.getEmail();
             String[] splitEmail = email.split("@");
-            String tempNickname = splitEmail[0] + 134 + id;
+            String tempNickname = splitEmail[0] + 739 + id;
             return KakaoAuthResponseDto.builder().hasRegistered(false).nickname(tempNickname).build();
-        } else { // 기존 회원
+        } else { // 기존 회원 -> 로그인
             return KakaoAuthResponseDto.builder().hasRegistered(true).nickname(nicknameFromDb).build();
         }
 
@@ -139,13 +139,36 @@ public class KakaoService {
         return KakaoMemberInfoDto.builder().email(email).build();
     }
 
-    private Member registerKakaoUserIfNeeded(KakaoMemberInfoDto kakaoMemberInfo) {
+    private Long getKakaoUserId(String accessToken) throws JsonProcessingException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenInfoRequest = new HttpEntity<>(headers);
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<String> response = rt.exchange(
+                "https://kapi.kakao.com/v1/user/access_token_info",
+                HttpMethod.GET,
+                kakaoTokenInfoRequest,
+                String.class
+        );
+
+        String responseBody = response.getBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+        Long id = jsonNode.get("id").asLong();
+
+        return id;
+    }
+
+    private Member registerKakaoUserIfNeeded(KakaoMemberInfoDto kakaoMemberInfo, String accessToken) throws JsonProcessingException {
         String kakaoEmail = kakaoMemberInfo.getEmail();
         Member kakaoMember = memberRepository.findByEmail(kakaoEmail).orElse(null);
 
         if (kakaoMember == null) {
+            Long kakaoUserId = getKakaoUserId(accessToken);
+
             //String nickname = kakaoMemberInfo.getNickname();
-            kakaoMember = Member.builder().email(kakaoEmail).build();
+            kakaoMember = Member.builder().email(kakaoEmail).kakaoUserId(kakaoUserId).build();
             memberRepository.save(kakaoMember);
 
             EntityManager entityManager = emf.createEntityManager();
@@ -163,5 +186,27 @@ public class KakaoService {
         securityContext.setAuthentication(authentication);
 
         session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
+    }
+
+    public void unlink(UserDetailsImpl userDetails) {
+        Member member = userDetails.getMember();
+        Long kakaoUserId = member.getKakaoUserId();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "KakaoAK " + KAKAO_ADMIN_KEY);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("target_id_type", "user_id");
+        body.add("target_id", kakaoUserId);
+
+        HttpEntity<MultiValueMap<String, Object>> kakaoUnlinkRequest = new HttpEntity<>(body, headers);
+
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<String> response = rt.exchange(
+                "https://kapi.kakao.com/v1/user/unlink",
+                HttpMethod.POST,
+                kakaoUnlinkRequest,
+                String.class
+        );
     }
 }
