@@ -38,3 +38,4 @@ out/
 
 ### my ignore ###
 /src/**/*.properties
+scripts/*.sh
