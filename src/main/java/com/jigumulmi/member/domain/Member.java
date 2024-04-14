@@ -19,10 +19,12 @@ public class Member extends Timestamped {
 
     private String nickname;
     private String email;
+    private Long kakaoUserId;
 
     @Builder
-    public Member(String nickname, String email) {
+    public Member(String nickname, String email, Long kakaoUserId) {
         this.nickname = nickname;
         this.email = email;
+        this.kakaoUserId = kakaoUserId;
     }
 }
