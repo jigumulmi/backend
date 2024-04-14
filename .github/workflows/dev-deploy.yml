@@ -3,7 +3,7 @@ name: Deploy to Amazon EC2
 on:
   push:
     branches:
-      - dev
+      - deploy
 
 permissions:
   contents: read
@@ -12,7 +12,6 @@ jobs:
   deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
       # 기본 체크아웃
@@ -50,7 +49,7 @@ jobs:
       - name: Execute Gradle build
         run: ./gradlew build
 
-      - name: Deliver File
+      - name: Deliver Jar File
         uses: appleboy/scp-action@master
         with:
           key: ${{ secrets.EC2_SSH_KEY }}
