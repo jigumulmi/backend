@@ -37,4 +37,5 @@ out/
 .vscode/
 
 ### my ignore ###
-*.properties
+/src/**/*.properties
+scripts/*.sh
