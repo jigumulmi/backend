@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
@@ -37,17 +38,26 @@ public class LoggingFilter extends OncePerRequestFilter {
         Instant start = Instant.now();
         try {
             filterChain.doFilter(request, response);
-            logRequest(request);
+            //logRequest(request);
         } finally {
             Instant end = Instant.now();
             long responseTime = Duration.between(start, end).toMillis();
-
             response.setHeader("X-RESPONSE-TIME", String.valueOf(responseTime));
-            log.info("Response Time: {}ms ", responseTime);
 
+            log(request, response, responseTime);
             //logResponse(response);
             response.copyBodyToResponse();
         }
+    }
+
+    private static void log(RequestWrapper request, ContentCachingResponseWrapper response, long responseTime) {
+        String queryString = request.getQueryString();
+
+        int statusCode = response.getStatus();
+        HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
+
+        log.info("{} {} {} {} {}ms ", request.getMethod(),
+                queryString == null ? request.getRequestURI() : request.getRequestURI() + "?" + queryString, statusCode, httpStatus.getReasonPhrase(), responseTime);
     }
 
     private static void logRequest(RequestWrapper request) throws IOException {
