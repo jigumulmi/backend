@@ -8,18 +8,19 @@ import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.KakaoMemberInfoDto;
 import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.PersistenceUnit;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -42,9 +43,6 @@ public class KakaoService {
     @Value("${kakao.redirect.url}")
     private String KAKAO_REDIRECT_URL;
 
-    @PersistenceUnit
-    private EntityManagerFactory emf;
-
     private final MemberRepository memberRepository;
 
 
@@ -64,6 +62,10 @@ public class KakaoService {
             String email = member.getEmail();
             String[] splitEmail = email.split("@");
             String tempNickname = splitEmail[0] + 739 + id;
+
+            member.updateNickname(tempNickname);
+            memberRepository.save(member);
+
             return KakaoAuthResponseDto.builder().hasRegistered(false).nickname(tempNickname).build();
         } else { // 기존 회원 -> 로그인
             return KakaoAuthResponseDto.builder().hasRegistered(true).nickname(nicknameFromDb).build();
@@ -166,13 +168,9 @@ public class KakaoService {
 
         if (kakaoMember == null) {
             Long kakaoUserId = getKakaoUserId(accessToken);
-
             //String nickname = kakaoMemberInfo.getNickname();
             kakaoMember = Member.builder().email(kakaoEmail).kakaoUserId(kakaoUserId).build();
             memberRepository.save(kakaoMember);
-
-            EntityManager entityManager = emf.createEntityManager();
-            entityManager.flush();
         }
 
         return kakaoMember;
@@ -185,7 +183,7 @@ public class KakaoService {
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authentication);
 
-        session.setAttribute("SPRING_SECURITY_CONTEXT", securityContext);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
     }
 
     public void unlink(UserDetailsImpl userDetails) {

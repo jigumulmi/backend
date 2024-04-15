@@ -27,4 +27,8 @@ public class Member extends Timestamped {
         this.email = email;
         this.kakaoUserId = kakaoUserId;
     }
+
+    public void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
 }
