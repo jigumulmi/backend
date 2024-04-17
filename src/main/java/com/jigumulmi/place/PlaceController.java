@@ -48,8 +48,11 @@ public class PlaceController {
             value = {@ApiResponse(responseCode = "200", content = {@Content(array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))})}
     )
     @GetMapping("")
-    public ResponseEntity<?> getPlaceList(@RequestParam(name = "subwayStationId", required = false) Long subwayStationId) {
-        List<RestaurantResponseDto> placeList = placeService.getPlaceList(subwayStationId);
+    public ResponseEntity<?> getPlaceList(
+            @RequestParam(name = "subwayStationId", required = false) Long subwayStationId,
+            @RequestParam(name = "placeId", required = false) Long placeId
+    ) {
+        List<RestaurantResponseDto> placeList = placeService.getPlaceList(subwayStationId, placeId);
         return ResponseEntity.ok().body(placeList);
     }
 
@@ -57,8 +60,8 @@ public class PlaceController {
     @ApiResponses(
             value = {@ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = RestaurantDetailResponseDto.class))})}
     )
-    @GetMapping("/detail")
-    public ResponseEntity<?> getPlaceDetail(@RequestParam(name = "placeId") Long placeId) {
+    @GetMapping("/detail/{placeId}")
+    public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
         RestaurantDetailResponseDto placeDetail = placeService.getPlaceDetail(placeId);
         return ResponseEntity.ok().body(placeDetail);
     }

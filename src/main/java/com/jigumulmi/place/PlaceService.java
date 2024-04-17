@@ -57,12 +57,17 @@ public class PlaceService {
         menuRepository.saveAll(menuList);
     }
 
-    public List<RestaurantResponseDto> getPlaceList(Long subwayStationId) {
+    public List<RestaurantResponseDto> getPlaceList(Long subwayStationId, Long placeId) {
         List<Restaurant> restaurantList;
-        if (subwayStationId != null) {
+        if (subwayStationId != null & placeId == null) {
             restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStationId);
-        } else {
+        } else if (subwayStationId == null & placeId == null) {
             restaurantList = restaurantRepository.findAllByIsApprovedTrue();
+        } else if (subwayStationId == null & placeId != null) {
+            SubwayStation subwayStation = restaurantRepository.findSubwayStationById(placeId);
+            restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStation.getId());
+        } else {
+            throw new IllegalArgumentException();
         }
 
         ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
