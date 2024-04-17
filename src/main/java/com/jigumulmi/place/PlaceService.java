@@ -4,6 +4,7 @@ import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Restaurant;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
+import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.repository.MenuRepository;
@@ -56,44 +57,27 @@ public class PlaceService {
         menuRepository.saveAll(menuList);
     }
 
-    public List<RestaurantResponseDto> getPlaceList(Long subwayStationId) {
+    public List<RestaurantResponseDto> getPlaceList(Long subwayStationId, Long placeId) {
         List<Restaurant> restaurantList;
-        if (subwayStationId != null) {
+        if (subwayStationId != null & placeId == null) {
             restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStationId);
-        } else {
+        } else if (subwayStationId == null & placeId == null) {
             restaurantList = restaurantRepository.findAllByIsApprovedTrue();
+        } else if (subwayStationId == null & placeId != null) {
+            SubwayStation subwayStation = restaurantRepository.findSubwayStationById(placeId);
+            restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStation.getId());
+        } else {
+            throw new IllegalArgumentException();
         }
 
         ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
         for (Restaurant restaurant : restaurantList) {
-
-            ArrayList<RestaurantResponseDto.MenuDto> menuDtoList = new ArrayList<>();
-            for (Menu menu : restaurant.getMenuList()) {
-                RestaurantResponseDto.MenuDto menuDto = RestaurantResponseDto.MenuDto.builder().id(menu.getId()).name(menu.getName()).build();
-                menuDtoList.add(menuDto);
-            }
-
             SubwayStation subwayStation = restaurant.getSubwayStation();
 
             RestaurantResponseDto responseDto = RestaurantResponseDto.builder()
                     .id(restaurant.getId())
                     .name(restaurant.getName())
-                    .category(restaurant.getCategory())
-                    .address(restaurant.getAddress())
-                    .contact(restaurant.getContact())
-                    .menuList(menuDtoList)
-                    .openingHour(
-                            RestaurantResponseDto.OpeningHourDto.builder().openingHourSun(restaurant.getOpeningHourSun())
-                                    .openingHourMon(restaurant.getOpeningHourMon())
-                                    .openingHourTue(restaurant.getOpeningHourTue())
-                                    .openingHourWed(restaurant.getOpeningHourWed())
-                                    .openingHourThu(restaurant.getOpeningHourThu())
-                                    .openingHourFri(restaurant.getOpeningHourFri())
-                                    .openingHourSat(restaurant.getOpeningHourSat()).build()
-                    )
-                    .additionalInfo(restaurant.getAdditionalInfo())
                     .mainImageUrl(restaurant.getMainImageUrl())
-                    .placeUrl(restaurant.getPlaceUrl())
                     .position(
                             RestaurantResponseDto.PositionDto.builder().longitude(restaurant.getLongitude())
                                     .latitude(restaurant.getLatitude()).build()
@@ -107,5 +91,51 @@ public class PlaceService {
         }
 
         return responseDtoList;
+    }
+
+    public RestaurantDetailResponseDto getPlaceDetail(Long placeId) {
+        Restaurant restaurant = restaurantRepository.findByIdAndIsApprovedTrue(placeId);
+        SubwayStation subwayStation = restaurant.getSubwayStation();
+
+        ArrayList<RestaurantDetailResponseDto.MenuDto> menuDtoList = new ArrayList<>();
+        for (Menu menu : restaurant.getMenuList()) {
+            RestaurantDetailResponseDto.MenuDto menuDto = RestaurantDetailResponseDto.MenuDto.builder().id(menu.getId()).name(menu.getName()).build();
+            menuDtoList.add(menuDto);
+        }
+
+        return RestaurantDetailResponseDto.builder()
+                .id(restaurant.getId())
+                .name(restaurant.getName())
+                .mainImageUrl(restaurant.getMainImageUrl())
+                .position(
+                        RestaurantResponseDto.PositionDto.builder()
+                                .latitude(restaurant.getLatitude())
+                                .longitude(restaurant.getLongitude())
+                                .build()
+                )
+                .subwayStation(
+                        SubwayStationResponseDto.builder()
+                                .id(subwayStation.getId())
+                                .lineNumber(subwayStation.getLineNumber())
+                                .stationName(subwayStation.getStationName())
+                                .build()
+                )
+                .category(restaurant.getCategory())
+                .address(restaurant.getAddress())
+                .contact(restaurant.getContact())
+                .menuList(menuDtoList)
+                .openingHour(
+                        RestaurantDetailResponseDto.OpeningHourDto.builder()
+                                .openingHourSun(restaurant.getOpeningHourSun())
+                                .openingHourMon(restaurant.getOpeningHourMon())
+                                .openingHourTue(restaurant.getOpeningHourTue())
+                                .openingHourWed(restaurant.getOpeningHourWed())
+                                .openingHourThu(restaurant.getOpeningHourThu())
+                                .openingHourFri(restaurant.getOpeningHourFri())
+                                .openingHourSat(restaurant.getOpeningHourSat())
+                                .build()
+                )
+                .additionalInfo(restaurant.getAdditionalInfo())
+                .build();
     }
 }
