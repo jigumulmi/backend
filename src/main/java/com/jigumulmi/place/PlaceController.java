@@ -1,6 +1,7 @@
 package com.jigumulmi.place;
 
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
+import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,5 +51,15 @@ public class PlaceController {
     public ResponseEntity<?> getPlaceList(@RequestParam(name = "subwayStationId", required = false) Long subwayStationId) {
         List<RestaurantResponseDto> placeList = placeService.getPlaceList(subwayStationId);
         return ResponseEntity.ok().body(placeList);
+    }
+
+    @Operation(summary = "장소 상세 조회")
+    @ApiResponses(
+            value = {@ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = RestaurantDetailResponseDto.class))})}
+    )
+    @GetMapping("/detail")
+    public ResponseEntity<?> getPlaceDetail(@RequestParam(name = "placeId") Long placeId) {
+        RestaurantDetailResponseDto placeDetail = placeService.getPlaceDetail(placeId);
+        return ResponseEntity.ok().body(placeDetail);
     }
 }
