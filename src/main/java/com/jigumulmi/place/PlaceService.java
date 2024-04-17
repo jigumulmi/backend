@@ -4,6 +4,7 @@ import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Restaurant;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
+import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -12,8 +13,10 @@ import com.jigumulmi.place.repository.RestaurantRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +60,10 @@ public class PlaceService {
         menuRepository.saveAll(menuList);
     }
 
-    public List<RestaurantResponseDto> getPlaceList(Long subwayStationId, Long placeId) {
+    public List<RestaurantResponseDto> getPlaceList(GetPlaceListRequestDto requestDto) {
+        Long subwayStationId = requestDto.getSubwayStationId();
+        Long placeId = requestDto.getPlaceId();
+
         List<Restaurant> restaurantList;
         if (subwayStationId != null & placeId == null) {
             restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStationId);
@@ -67,7 +73,7 @@ public class PlaceService {
             SubwayStation subwayStation = restaurantRepository.findSubwayStationById(placeId);
             restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStation.getId());
         } else {
-            throw new IllegalArgumentException();
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
         ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
