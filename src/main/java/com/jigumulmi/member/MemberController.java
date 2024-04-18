@@ -5,6 +5,7 @@ import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.dto.request.KakaoAuthorizationRequestDto;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
 import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
+import com.jigumulmi.member.dto.response.UserDetailResponseDto;
 import com.jigumulmi.member.service.KakaoService;
 import com.jigumulmi.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,10 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -68,5 +66,15 @@ public class MemberController {
     public ResponseEntity<?> setNickname(@AuthenticationPrincipal UserDetailsImpl userDetails, @Valid @RequestBody SetNicknameRequestDto requestDto) {
         memberService.createNickname(userDetails, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Set nickname success");
+    }
+
+    @Operation(summary = "유저 상세 정보 조회")
+    @ApiResponses(
+            value = {@ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = UserDetailResponseDto.class))})}
+    )
+    @GetMapping("/detail")
+    public ResponseEntity<?> getUserDetail(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        UserDetailResponseDto userDetail = memberService.getUserDetail(userDetails);
+        return ResponseEntity.ok().body(userDetail);
     }
 }
