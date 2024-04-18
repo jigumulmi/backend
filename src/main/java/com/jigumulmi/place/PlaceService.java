@@ -1,5 +1,6 @@
 package com.jigumulmi.place;
 
+import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Restaurant;
 import com.jigumulmi.place.domain.SubwayStation;
@@ -73,7 +74,7 @@ public class PlaceService {
             SubwayStation subwayStation = restaurantRepository.findSubwayStationById(placeId);
             restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStation.getId());
         } else {
-            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+            throw new IllegalArgumentException(CommonErrorCode.INVALID_PARAMETER.name());
         }
 
         ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
