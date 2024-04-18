@@ -1,5 +1,6 @@
 package com.jigumulmi.place;
 
+import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Restaurant;
@@ -74,7 +75,7 @@ public class PlaceService {
             SubwayStation subwayStation = restaurantRepository.findSubwayStationById(placeId);
             restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStation.getId());
         } else {
-            throw new IllegalArgumentException(CommonErrorCode.UNPROCESSABLE_ENTITY.name());
+            throw new CustomException(CommonErrorCode.UNPROCESSABLE_ENTITY);
         }
 
         ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
