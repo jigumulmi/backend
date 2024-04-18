@@ -1,6 +1,7 @@
 package com.jigumulmi.place;
 
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
+import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,11 +50,8 @@ public class PlaceController {
             value = {@ApiResponse(responseCode = "200", content = {@Content(array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))})}
     )
     @GetMapping("")
-    public ResponseEntity<?> getPlaceList(
-            @RequestParam(name = "subwayStationId", required = false) Long subwayStationId,
-            @RequestParam(name = "placeId", required = false) Long placeId
-    ) {
-        List<RestaurantResponseDto> placeList = placeService.getPlaceList(subwayStationId, placeId);
+    public ResponseEntity<?> getPlaceList(@ParameterObject @ModelAttribute GetPlaceListRequestDto requestDto) {
+        List<RestaurantResponseDto> placeList = placeService.getPlaceList(requestDto);
         return ResponseEntity.ok().body(placeList);
     }
 
