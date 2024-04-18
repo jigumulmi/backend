@@ -68,7 +68,7 @@ public class PlaceService {
             SubwayStation subwayStation = restaurantRepository.findSubwayStationById(placeId);
             restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStation.getId());
         } else {
-            throw new IllegalArgumentException(CommonErrorCode.INVALID_PARAMETER.name());
+            throw new IllegalArgumentException(CommonErrorCode.UNPROCESSABLE_ENTITY.name());
         }
 
         ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
