@@ -65,7 +65,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
             MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status, WebRequest request
     ) {
         log.warn("handleMethodArgumentNotValid: " + e.getMessage());
-        ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
+        ErrorCode errorCode = CommonErrorCode.UNPROCESSABLE_ENTITY;
         return handleExceptionInternal(e, errorCode);
     }
 
