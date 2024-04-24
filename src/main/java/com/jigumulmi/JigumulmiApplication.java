@@ -10,6 +10,7 @@ import java.util.TimeZone;
 @SpringBootApplication
 @EnableJpaAuditing
 public class JigumulmiApplication {
+
     @PostConstruct
     void setTimeZone() {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));

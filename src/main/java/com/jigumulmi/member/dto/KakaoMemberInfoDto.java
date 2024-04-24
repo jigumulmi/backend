@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class KakaoMemberInfoDto {
+
     //private String nickname;
     private String email;
 }

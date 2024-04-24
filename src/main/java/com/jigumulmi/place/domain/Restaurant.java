@@ -69,7 +69,12 @@ public class Restaurant extends Timestamped {
     private List<Review> reviewList = new ArrayList<>();
 
     @Builder
-    public Restaurant(String name, String category, String address, String contact, List<Menu> menuList, String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo, String mainImageUrl, String placeUrl, Double longitude, Double latitude, String registrantComment, Boolean isApproved, SubwayStation subwayStation, List<Review> reviewList) {
+    public Restaurant(String name, String category, String address, String contact,
+        List<Menu> menuList, String openingHourSun, String openingHourMon, String openingHourTue,
+        String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat,
+        String additionalInfo, String mainImageUrl, String placeUrl, Double longitude,
+        Double latitude, String registrantComment, Boolean isApproved, SubwayStation subwayStation,
+        List<Review> reviewList) {
         this.name = name;
         this.category = category;
         this.address = address;

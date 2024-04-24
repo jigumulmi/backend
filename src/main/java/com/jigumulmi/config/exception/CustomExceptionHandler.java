@@ -21,36 +21,37 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode) {
         return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(ErrorResponseDto.builder()
-                        .code(errorCode.name())
-                        .message(errorCode.getMessage())
-                        .build()
-                );
+            .body(ErrorResponseDto.builder()
+                .code(errorCode.name())
+                .message(errorCode.getMessage())
+                .build()
+            );
     }
 
     private ResponseEntity<Object> handleExceptionInternal(ErrorCode errorCode, String message) {
         return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(ErrorResponseDto.builder()
-                        .code(errorCode.name())
-                        .message(message)
-                        .build()
-                );
+            .body(ErrorResponseDto.builder()
+                .code(errorCode.name())
+                .message(message)
+                .build()
+            );
     }
 
-    private ResponseEntity<Object> handleExceptionInternal(MethodArgumentNotValidException e, ErrorCode errorCode) {
+    private ResponseEntity<Object> handleExceptionInternal(MethodArgumentNotValidException e,
+        ErrorCode errorCode) {
         List<ErrorResponseDto.ValidationError> validationErrorList = e.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(ErrorResponseDto.ValidationError::of)
-                .collect(Collectors.toList());
+            .getFieldErrors()
+            .stream()
+            .map(ErrorResponseDto.ValidationError::of)
+            .collect(Collectors.toList());
 
         return ResponseEntity.status(errorCode.getHttpStatus())
-                .body(ErrorResponseDto.builder()
-                        .code(errorCode.name())
-                        .message(errorCode.getMessage())
-                        .errors(validationErrorList)
-                        .build()
-                );
+            .body(ErrorResponseDto.builder()
+                .code(errorCode.name())
+                .message(errorCode.getMessage())
+                .errors(validationErrorList)
+                .build()
+            );
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -62,7 +63,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     public ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status, WebRequest request
+        MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status,
+        WebRequest request
     ) {
         log.warn("handleMethodArgumentNotValid: " + e.getMessage());
         ErrorCode errorCode = CommonErrorCode.UNPROCESSABLE_ENTITY;

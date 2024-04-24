@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class CreateReviewRequestDto {
+
     @NotNull
     private Long placeId;
     @NotNull

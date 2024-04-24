@@ -32,7 +32,9 @@ public class SubwayStation {
     private List<Restaurant> restaurantList = new ArrayList<>();
 
     @Builder
-    public SubwayStation(String stationCode, String externalCode, String stationName, String stationNameEng, String stationNameJpn, String stationNameChn, String lineNumber, List<Restaurant> restaurantList) {
+    public SubwayStation(String stationCode, String externalCode, String stationName,
+        String stationNameEng, String stationNameJpn, String stationNameChn, String lineNumber,
+        List<Restaurant> restaurantList) {
         this.stationCode = stationCode;
         this.externalCode = externalCode;
         this.stationName = stationName;

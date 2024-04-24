@@ -8,9 +8,11 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 public class RestaurantResponseDto {
+
     @Getter
     @Builder
     public static class PositionDto {
+
         private Double latitude;
 
         private Double longitude;

@@ -13,6 +13,7 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 public class CreatePlaceRequestDto {
+
     @NotBlank
     private String name;
     @NotNull

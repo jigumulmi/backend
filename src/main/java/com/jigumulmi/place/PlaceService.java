@@ -37,14 +37,15 @@ public class PlaceService {
     private final ReviewRepository reviewRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
-        List<SubwayStation> subwayStationList = subwayStationRepository.findAllByStationNameStartsWith(stationName, Sort.by(Sort.Direction.ASC, "stationName"));
+        List<SubwayStation> subwayStationList = subwayStationRepository.findAllByStationNameStartsWith(
+            stationName, Sort.by(Sort.Direction.ASC, "stationName"));
 
         ArrayList<SubwayStationResponseDto> responseDtoList = new ArrayList<>();
         for (SubwayStation subwayStation : subwayStationList) {
             SubwayStationResponseDto responseDto = SubwayStationResponseDto.builder()
-                    .id(subwayStation.getId())
-                    .stationName(subwayStation.getStationName())
-                    .lineNumber(subwayStation.getLineNumber()).build();
+                .id(subwayStation.getId())
+                .stationName(subwayStation.getStationName())
+                .lineNumber(subwayStation.getLineNumber()).build();
 
             responseDtoList.add(responseDto);
         }
@@ -54,8 +55,12 @@ public class PlaceService {
 
     @Transactional
     public void registerPlace(CreatePlaceRequestDto requestDto) {
-        SubwayStation subwayStation = subwayStationRepository.findById(requestDto.getSubwayStationId()).orElseThrow(IllegalArgumentException::new);
-        Restaurant newRestaurant = Restaurant.builder().name(requestDto.getName()).subwayStation(subwayStation).registrantComment(requestDto.getRegistrantComment()).isApproved(false).build();
+        SubwayStation subwayStation = subwayStationRepository.findById(
+                requestDto.getSubwayStationId())
+            .orElseThrow(IllegalArgumentException::new);
+        Restaurant newRestaurant = Restaurant.builder().name(requestDto.getName())
+            .subwayStation(subwayStation).registrantComment(requestDto.getRegistrantComment())
+            .isApproved(false).build();
 
         ArrayList<Menu> menuList = new ArrayList<>();
         for (String menuName : requestDto.getMenuList()) {
@@ -73,12 +78,14 @@ public class PlaceService {
 
         List<Restaurant> restaurantList;
         if (subwayStationId != null & placeId == null) {
-            restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStationId);
+            restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(
+                subwayStationId);
         } else if (subwayStationId == null & placeId == null) {
             restaurantList = restaurantRepository.findAllByIsApprovedTrue();
         } else if (subwayStationId == null & placeId != null) {
             SubwayStation subwayStation = restaurantRepository.findSubwayStationById(placeId);
-            restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(subwayStation.getId());
+            restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(
+                subwayStation.getId());
         } else {
             throw new CustomException(CommonErrorCode.UNPROCESSABLE_ENTITY);
         }
@@ -88,17 +95,19 @@ public class PlaceService {
             SubwayStation subwayStation = restaurant.getSubwayStation();
 
             RestaurantResponseDto responseDto = RestaurantResponseDto.builder()
-                    .id(restaurant.getId())
-                    .name(restaurant.getName())
-                    .mainImageUrl(restaurant.getMainImageUrl())
-                    .position(
-                            RestaurantResponseDto.PositionDto.builder().longitude(restaurant.getLongitude())
-                                    .latitude(restaurant.getLatitude()).build()
-                    )
-                    .subwayStation(
-                            SubwayStationResponseDto.builder().id(subwayStation.getId()).stationName(subwayStation.getStationName()).lineNumber(subwayStation.getLineNumber()).build()
-                    )
-                    .build();
+                .id(restaurant.getId())
+                .name(restaurant.getName())
+                .mainImageUrl(restaurant.getMainImageUrl())
+                .position(
+                    RestaurantResponseDto.PositionDto.builder().longitude(restaurant.getLongitude())
+                        .latitude(restaurant.getLatitude()).build()
+                )
+                .subwayStation(
+                    SubwayStationResponseDto.builder().id(subwayStation.getId())
+                        .stationName(subwayStation.getStationName())
+                        .lineNumber(subwayStation.getLineNumber()).build()
+                )
+                .build();
 
             responseDtoList.add(responseDto);
         }
@@ -112,57 +121,58 @@ public class PlaceService {
 
         ArrayList<RestaurantDetailResponseDto.MenuDto> menuDtoList = new ArrayList<>();
         for (Menu menu : restaurant.getMenuList()) {
-            RestaurantDetailResponseDto.MenuDto menuDto = RestaurantDetailResponseDto.MenuDto.builder().id(menu.getId()).name(menu.getName()).build();
+            RestaurantDetailResponseDto.MenuDto menuDto = RestaurantDetailResponseDto.MenuDto.builder()
+                .id(menu.getId()).name(menu.getName()).build();
             menuDtoList.add(menuDto);
         }
 
         return RestaurantDetailResponseDto.builder()
-                .id(restaurant.getId())
-                .name(restaurant.getName())
-                .mainImageUrl(restaurant.getMainImageUrl())
-                .position(
-                        RestaurantResponseDto.PositionDto.builder()
-                                .latitude(restaurant.getLatitude())
-                                .longitude(restaurant.getLongitude())
-                                .build()
-                )
-                .subwayStation(
-                        SubwayStationResponseDto.builder()
-                                .id(subwayStation.getId())
-                                .lineNumber(subwayStation.getLineNumber())
-                                .stationName(subwayStation.getStationName())
-                                .build()
-                )
-                .category(restaurant.getCategory())
-                .address(restaurant.getAddress())
-                .contact(restaurant.getContact())
-                .menuList(menuDtoList)
-                .openingHour(
-                        RestaurantDetailResponseDto.OpeningHourDto.builder()
-                                .openingHourSun(restaurant.getOpeningHourSun())
-                                .openingHourMon(restaurant.getOpeningHourMon())
-                                .openingHourTue(restaurant.getOpeningHourTue())
-                                .openingHourWed(restaurant.getOpeningHourWed())
-                                .openingHourThu(restaurant.getOpeningHourThu())
-                                .openingHourFri(restaurant.getOpeningHourFri())
-                                .openingHourSat(restaurant.getOpeningHourSat())
-                                .build()
-                )
-                .additionalInfo(restaurant.getAdditionalInfo())
-                .build();
+            .id(restaurant.getId())
+            .name(restaurant.getName())
+            .mainImageUrl(restaurant.getMainImageUrl())
+            .position(
+                RestaurantResponseDto.PositionDto.builder()
+                    .latitude(restaurant.getLatitude())
+                    .longitude(restaurant.getLongitude())
+                    .build()
+            )
+            .subwayStation(
+                SubwayStationResponseDto.builder()
+                    .id(subwayStation.getId())
+                    .lineNumber(subwayStation.getLineNumber())
+                    .stationName(subwayStation.getStationName())
+                    .build()
+            )
+            .category(restaurant.getCategory())
+            .address(restaurant.getAddress())
+            .contact(restaurant.getContact())
+            .menuList(menuDtoList)
+            .openingHour(
+                RestaurantDetailResponseDto.OpeningHourDto.builder()
+                    .openingHourSun(restaurant.getOpeningHourSun())
+                    .openingHourMon(restaurant.getOpeningHourMon())
+                    .openingHourTue(restaurant.getOpeningHourTue())
+                    .openingHourWed(restaurant.getOpeningHourWed())
+                    .openingHourThu(restaurant.getOpeningHourThu())
+                    .openingHourFri(restaurant.getOpeningHourFri())
+                    .openingHourSat(restaurant.getOpeningHourSat())
+                    .build()
+            )
+            .additionalInfo(restaurant.getAdditionalInfo())
+            .build();
     }
 
     public void postReview(CreateReviewRequestDto requestDto, UserDetailsImpl userDetails) {
         Member member = userDetails.getMember();
         Restaurant restaurant = restaurantRepository.findById(requestDto.getPlaceId())
-                .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
         Review review = Review.builder()
-                .restaurant(restaurant)
-                .content(requestDto.getContent())
-                .rating(requestDto.getRating())
-                .member(member)
-                .reviewReplyList(Collections.emptyList())
-                .build();
+            .restaurant(restaurant)
+            .content(requestDto.getContent())
+            .rating(requestDto.getRating())
+            .member(member)
+            .reviewReplyList(Collections.emptyList())
+            .build();
 
         reviewRepository.save(review);
     }

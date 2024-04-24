@@ -37,7 +37,8 @@ public class Review extends Timestamped {
     private List<ReviewReply> reviewReplyList = new ArrayList<>();
 
     @Builder
-    public Review(Integer rating, String content, Member member, Restaurant restaurant, List<ReviewReply> reviewReplyList) {
+    public Review(Integer rating, String content, Member member, Restaurant restaurant,
+        List<ReviewReply> reviewReplyList) {
         this.rating = rating;
         this.content = content;
         this.member = member;

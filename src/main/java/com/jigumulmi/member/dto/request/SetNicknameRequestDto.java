@@ -9,6 +9,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class SetNicknameRequestDto {
+
     @NotBlank
     private String nickname;
 }

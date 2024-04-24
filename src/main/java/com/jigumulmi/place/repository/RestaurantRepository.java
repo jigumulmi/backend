@@ -10,11 +10,13 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface RestaurantRepository extends JpaRepository<Restaurant, Long> {
+
     @EntityGraph(attributePaths = {"subwayStation"})
     List<Restaurant> findAllByIsApprovedTrue();
 
     @EntityGraph(attributePaths = {"subwayStation"})
-    List<Restaurant> findAllBySubwayStationIdAndIsApprovedTrue(@Param("subwayStationId") Long subwayStationId);
+    List<Restaurant> findAllBySubwayStationIdAndIsApprovedTrue(
+        @Param("subwayStationId") Long subwayStationId);
 
     @EntityGraph(attributePaths = {"menuList", "subwayStation"})
     Restaurant findByIdAndIsApprovedTrue(@Param("id") Long restaurantId);

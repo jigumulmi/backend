@@ -32,11 +32,14 @@ public class PlaceController {
 
     @Operation(summary = "지하철역 조회")
     @ApiResponses(
-            value = {@ApiResponse(responseCode = "200", content = {@Content(array = @ArraySchema(schema = @Schema(implementation = SubwayStationResponseDto.class)))})}
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = SubwayStationResponseDto.class)))})}
     )
     @GetMapping("/subway")
-    public ResponseEntity<?> getSubwayStations(@RequestParam(name = "stationName") String stationName) {
-        List<SubwayStationResponseDto> subwayStationList = placeService.getSubwayStationList(stationName);
+    public ResponseEntity<?> getSubwayStations(
+        @RequestParam(name = "stationName") String stationName) {
+        List<SubwayStationResponseDto> subwayStationList = placeService.getSubwayStationList(
+            stationName);
         return ResponseEntity.ok().body(subwayStationList);
     }
 
@@ -50,17 +53,20 @@ public class PlaceController {
 
     @Operation(summary = "장소 리스트 조회")
     @ApiResponses(
-            value = {@ApiResponse(responseCode = "200", content = {@Content(array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))})}
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))})}
     )
     @GetMapping("")
-    public ResponseEntity<?> getPlaceList(@ParameterObject @ModelAttribute GetPlaceListRequestDto requestDto) {
+    public ResponseEntity<?> getPlaceList(
+        @ParameterObject @ModelAttribute GetPlaceListRequestDto requestDto) {
         List<RestaurantResponseDto> placeList = placeService.getPlaceList(requestDto);
         return ResponseEntity.ok().body(placeList);
     }
 
     @Operation(summary = "장소 상세 조회")
     @ApiResponses(
-            value = {@ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = RestaurantDetailResponseDto.class))})}
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(schema = @Schema(implementation = RestaurantDetailResponseDto.class))})}
     )
     @GetMapping("/detail/{placeId}")
     public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
@@ -71,7 +77,8 @@ public class PlaceController {
     @Operation(summary = "리뷰 등록")
     @ApiResponse(responseCode = "201")
     @PostMapping("/review")
-    public ResponseEntity<?> postReview(@Valid @RequestBody CreateReviewRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<?> postReview(@Valid @RequestBody CreateReviewRequestDto requestDto,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         placeService.postReview(requestDto, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
     }

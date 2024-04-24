@@ -32,10 +32,10 @@ public class MemberService {
     public UserDetailResponseDto getUserDetail(UserDetailsImpl userDetails) {
         Member member = userDetails.getMember();
         return UserDetailResponseDto.builder()
-                .createdAt(member.getCreatedAt())
-                .id(member.getId())
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .build();
+            .createdAt(member.getCreatedAt())
+            .id(member.getId())
+            .email(member.getEmail())
+            .nickname(member.getNickname())
+            .build();
     }
 }
