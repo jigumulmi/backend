@@ -1,6 +1,8 @@
 package com.jigumulmi.place;
 
+import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
+import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -42,7 +45,7 @@ public class PlaceController {
     @PostMapping("")
     public ResponseEntity<?> registerPlace(@Valid @RequestBody CreatePlaceRequestDto requestDto) {
         placeService.registerPlace(requestDto);
-        return new ResponseEntity<>("Register success", HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Register success");
     }
 
     @Operation(summary = "장소 리스트 조회")
@@ -63,5 +66,13 @@ public class PlaceController {
     public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
         RestaurantDetailResponseDto placeDetail = placeService.getPlaceDetail(placeId);
         return ResponseEntity.ok().body(placeDetail);
+    }
+
+    @Operation(summary = "리뷰 등록")
+    @ApiResponse(responseCode = "201")
+    @PostMapping("/review")
+    public ResponseEntity<?> postReview(@Valid @RequestBody CreateReviewRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        placeService.postReview(requestDto, userDetails);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
     }
 }

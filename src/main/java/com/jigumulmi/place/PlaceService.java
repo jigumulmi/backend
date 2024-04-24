@@ -2,25 +2,29 @@ package com.jigumulmi.place;
 
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
+import com.jigumulmi.config.security.UserDetailsImpl;
+import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Restaurant;
+import com.jigumulmi.place.domain.Review;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
+import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.RestaurantRepository;
+import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -30,6 +34,7 @@ public class PlaceService {
     private final SubwayStationRepository subwayStationRepository;
     private final RestaurantRepository restaurantRepository;
     private final MenuRepository menuRepository;
+    private final ReviewRepository reviewRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllByStationNameStartsWith(stationName, Sort.by(Sort.Direction.ASC, "stationName"));
@@ -145,5 +150,20 @@ public class PlaceService {
                 )
                 .additionalInfo(restaurant.getAdditionalInfo())
                 .build();
+    }
+
+    public void postReview(CreateReviewRequestDto requestDto, UserDetailsImpl userDetails) {
+        Member member = userDetails.getMember();
+        Restaurant restaurant = restaurantRepository.findById(requestDto.getPlaceId())
+                .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+        Review review = Review.builder()
+                .restaurant(restaurant)
+                .content(requestDto.getContent())
+                .rating(requestDto.getRating())
+                .member(member)
+                .reviewReplyList(Collections.emptyList())
+                .build();
+
+        reviewRepository.save(review);
     }
 }
