@@ -24,17 +24,19 @@ import java.util.List;
 public class LoggingFilter extends OncePerRequestFilter {
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
+        FilterChain filterChain)
+        throws ServletException, IOException {
         if (isAsyncDispatch(request)) {
             filterChain.doFilter(request, response);
         } else {
-            doFilterWrapped(new RequestWrapper(request), new ContentCachingResponseWrapper(response), filterChain);
+            doFilterWrapped(new RequestWrapper(request),
+                new ContentCachingResponseWrapper(response), filterChain);
         }
     }
 
     protected void doFilterWrapped(RequestWrapper request, ContentCachingResponseWrapper response,
-                                   FilterChain filterChain) throws IOException, ServletException {
+        FilterChain filterChain) throws IOException, ServletException {
         Instant start = Instant.now();
         try {
             filterChain.doFilter(request, response);
@@ -50,20 +52,24 @@ public class LoggingFilter extends OncePerRequestFilter {
         }
     }
 
-    private static void log(RequestWrapper request, ContentCachingResponseWrapper response, long responseTime) {
+    private static void log(RequestWrapper request, ContentCachingResponseWrapper response,
+        long responseTime) {
         String queryString = request.getQueryString();
 
         int statusCode = response.getStatus();
         HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
 
         log.info("{} {} {} {} {}ms ", request.getMethod(),
-                queryString == null ? request.getRequestURI() : request.getRequestURI() + "?" + queryString, statusCode, httpStatus.getReasonPhrase(), responseTime);
+            queryString == null ? request.getRequestURI()
+                : request.getRequestURI() + "?" + queryString, statusCode,
+            httpStatus.getReasonPhrase(), responseTime);
     }
 
     private static void logRequest(RequestWrapper request) throws IOException {
         String queryString = request.getQueryString();
         log.info("Request: {} {}", request.getMethod(),
-                queryString == null ? request.getRequestURI() : request.getRequestURI() + "?" + queryString);
+            queryString == null ? request.getRequestURI()
+                : request.getRequestURI() + "?" + queryString);
 
         logPayload("Request", request.getContentType(), request.getInputStream());
     }
@@ -72,8 +78,10 @@ public class LoggingFilter extends OncePerRequestFilter {
         logPayload("Response", response.getContentType(), response.getContentInputStream());
     }
 
-    private static void logPayload(String prefix, String contentType, InputStream inputStream) throws IOException {
-        boolean visible = isVisible(MediaType.valueOf(contentType == null ? "application/json" : contentType));
+    private static void logPayload(String prefix, String contentType, InputStream inputStream)
+        throws IOException {
+        boolean visible = isVisible(
+            MediaType.valueOf(contentType == null ? "application/json" : contentType));
 
         if (visible) {
             byte[] content = StreamUtils.copyToByteArray(inputStream);
@@ -88,16 +96,16 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     private static boolean isVisible(MediaType mediaType) {
         final List<MediaType> VISIBLE_TYPES = Arrays.asList(
-                MediaType.valueOf("text/*"),
-                MediaType.APPLICATION_FORM_URLENCODED,
-                MediaType.APPLICATION_JSON,
-                MediaType.APPLICATION_XML,
-                MediaType.valueOf("application/*+json"),
-                MediaType.valueOf("application/*+xml"),
-                MediaType.MULTIPART_FORM_DATA
+            MediaType.valueOf("text/*"),
+            MediaType.APPLICATION_FORM_URLENCODED,
+            MediaType.APPLICATION_JSON,
+            MediaType.APPLICATION_XML,
+            MediaType.valueOf("application/*+json"),
+            MediaType.valueOf("application/*+xml"),
+            MediaType.MULTIPART_FORM_DATA
         );
 
         return VISIBLE_TYPES.stream()
-                .anyMatch(visibleType -> visibleType.includes(mediaType));
+            .anyMatch(visibleType -> visibleType.includes(mediaType));
     }
 }

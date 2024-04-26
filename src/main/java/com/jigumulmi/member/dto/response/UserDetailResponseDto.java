@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class UserDetailResponseDto {
+
     private LocalDateTime createdAt;
     private Long id;
     private String nickname;

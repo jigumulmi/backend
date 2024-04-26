@@ -64,8 +64,17 @@ public class Restaurant extends Timestamped {
     @JoinColumn(name = "subway_station_id")
     private SubwayStation subwayStation;
 
+    @OneToMany(mappedBy = "restaurant")
+    @JsonManagedReference
+    private List<Review> reviewList = new ArrayList<>();
+
     @Builder
-    public Restaurant(String name, String category, String address, String contact, List<Menu> menuList, String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo, String mainImageUrl, String placeUrl, Double longitude, Double latitude, String registrantComment, Boolean isApproved, SubwayStation subwayStation) {
+    public Restaurant(String name, String category, String address, String contact,
+        List<Menu> menuList, String openingHourSun, String openingHourMon, String openingHourTue,
+        String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat,
+        String additionalInfo, String mainImageUrl, String placeUrl, Double longitude,
+        Double latitude, String registrantComment, Boolean isApproved, SubwayStation subwayStation,
+        List<Review> reviewList) {
         this.name = name;
         this.category = category;
         this.address = address;
@@ -86,5 +95,6 @@ public class Restaurant extends Timestamped {
         this.registrantComment = registrantComment;
         this.isApproved = isApproved;
         this.subwayStation = subwayStation;
+        this.reviewList = reviewList;
     }
 }

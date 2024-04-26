@@ -33,10 +33,13 @@ public class MemberController {
 
     @Operation(summary = "카카오 인증(로그인 및 회원가입)")
     @ApiResponses(
-            value = {@ApiResponse(responseCode = "201", content = {@Content(schema = @Schema(implementation = KakaoAuthResponseDto.class))})}
+        value = {@ApiResponse(responseCode = "201", content = {
+            @Content(schema = @Schema(implementation = KakaoAuthResponseDto.class))})}
     )
     @PostMapping("/oauth/kakao/login")
-    public ResponseEntity<?> kakaoAuthorization(@Valid @RequestBody KakaoAuthorizationRequestDto requestDto, HttpSession session) throws JsonProcessingException {
+    public ResponseEntity<?> kakaoAuthorization(
+        @Valid @RequestBody KakaoAuthorizationRequestDto requestDto, HttpSession session)
+        throws JsonProcessingException {
         KakaoAuthResponseDto response = kakaoService.authorize(requestDto.getCode(), session);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -53,7 +56,8 @@ public class MemberController {
     @Operation(summary = "회원 탈퇴")
     @ApiResponse(responseCode = "201")
     @PostMapping("/deregister")
-    public ResponseEntity<?> deregister(HttpSession session, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<?> deregister(HttpSession session,
+        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         session.invalidate();
         kakaoService.unlink(userDetails);
         memberService.removeMember(userDetails);
@@ -63,14 +67,16 @@ public class MemberController {
     @Operation(summary = "닉네임 수정(생성)")
     @ApiResponse(responseCode = "201")
     @PutMapping("/nickname")
-    public ResponseEntity<?> setNickname(@AuthenticationPrincipal UserDetailsImpl userDetails, @Valid @RequestBody SetNicknameRequestDto requestDto) {
+    public ResponseEntity<?> setNickname(@AuthenticationPrincipal UserDetailsImpl userDetails,
+        @Valid @RequestBody SetNicknameRequestDto requestDto) {
         memberService.createNickname(userDetails, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Set nickname success");
     }
 
     @Operation(summary = "유저 상세 정보 조회")
     @ApiResponses(
-            value = {@ApiResponse(responseCode = "200", content = {@Content(schema = @Schema(implementation = UserDetailResponseDto.class))})}
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(schema = @Schema(implementation = UserDetailResponseDto.class))})}
     )
     @GetMapping("/detail")
     public ResponseEntity<?> getUserDetail(@AuthenticationPrincipal UserDetailsImpl userDetails) {

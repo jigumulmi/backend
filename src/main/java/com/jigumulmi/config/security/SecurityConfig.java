@@ -18,6 +18,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
     private final String[] origins = new String[]{"http://localhost:3000", "https://jigumulmi.com"};
 
     @Bean
@@ -44,9 +45,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity.httpBasic(HttpBasicConfigurer::disable)
-                .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+            .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
+            .csrf(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
 
         return httpSecurity.build();
     }

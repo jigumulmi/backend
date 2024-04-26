@@ -9,9 +9,11 @@ import java.util.List;
 @Getter
 @SuperBuilder
 public class RestaurantDetailResponseDto extends RestaurantResponseDto {
+
     @Getter
     @Builder
     public static class MenuDto {
+
         private Long id;
 
         private String name;
@@ -20,6 +22,7 @@ public class RestaurantDetailResponseDto extends RestaurantResponseDto {
     @Getter
     @Builder
     public static class OpeningHourDto {
+
         private String openingHourSun;
 
         private String openingHourMon;
@@ -46,4 +49,6 @@ public class RestaurantDetailResponseDto extends RestaurantResponseDto {
     private RestaurantDetailResponseDto.OpeningHourDto openingHour;
 
     private String additionalInfo;
+
+    private OverallReviewResponseDto overallReview;
 }

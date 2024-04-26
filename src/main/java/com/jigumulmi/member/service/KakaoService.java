@@ -47,7 +47,8 @@ public class KakaoService {
 
 
     @Transactional
-    public KakaoAuthResponseDto authorize(String authorizationCode, HttpSession session) throws JsonProcessingException {
+    public KakaoAuthResponseDto authorize(String authorizationCode, HttpSession session)
+        throws JsonProcessingException {
         String accessToken = getAccessToken(authorizationCode);
 
         KakaoMemberInfoDto kakaoMemberInfo = getKakaoMemberInfo(accessToken);
@@ -66,9 +67,11 @@ public class KakaoService {
             member.updateNickname(tempNickname);
             memberRepository.save(member);
 
-            return KakaoAuthResponseDto.builder().hasRegistered(false).nickname(tempNickname).build();
+            return KakaoAuthResponseDto.builder().hasRegistered(false).nickname(tempNickname)
+                .build();
         } else { // 기존 회원 -> 로그인
-            return KakaoAuthResponseDto.builder().hasRegistered(true).nickname(nicknameFromDb).build();
+            return KakaoAuthResponseDto.builder().hasRegistered(true).nickname(nicknameFromDb)
+                .build();
         }
 
     }
@@ -94,16 +97,17 @@ public class KakaoService {
         body.add("code", authorizationCode);
 
         // Http Header와 Http Body를 하나의 오브젝트에 담기
-        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body, headers);
+        HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body,
+            headers);
 
         // HTTP 요청 보내기 그리고 response의 응답 받기
         // RestTemplate : 간편하게 rest API 호출할 수 있는 스프링 내장 클래스
         RestTemplate rt = new RestTemplate();
         ResponseEntity<String> response = rt.exchange(
-                "https://kauth.kakao.com/oauth/token",
-                HttpMethod.POST,
-                kakaoTokenRequest,
-                String.class
+            "https://kauth.kakao.com/oauth/token",
+            HttpMethod.POST,
+            kakaoTokenRequest,
+            String.class
         );
 
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
@@ -116,20 +120,22 @@ public class KakaoService {
         return accessToken;
     }
 
-    private KakaoMemberInfoDto getKakaoMemberInfo(String accessToken) throws JsonProcessingException {
+    private KakaoMemberInfoDto getKakaoMemberInfo(String accessToken)
+        throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         // 토큰으로 카카오 API 호출
         // HTTP Header 생성
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
         // HTTP 요청 보내기
-        HttpEntity<MultiValueMap<String, String>> kakaoMemberInfoRequest = new HttpEntity<>(headers);
+        HttpEntity<MultiValueMap<String, String>> kakaoMemberInfoRequest = new HttpEntity<>(
+            headers);
         RestTemplate rt = new RestTemplate();
         ResponseEntity<String> response = rt.exchange(
-                "https://kapi.kakao.com/v2/user/me",
-                HttpMethod.POST,
-                kakaoMemberInfoRequest,
-                String.class
+            "https://kapi.kakao.com/v2/user/me",
+            HttpMethod.POST,
+            kakaoMemberInfoRequest,
+            String.class
         );
 
         String responseBody = response.getBody();
@@ -148,10 +154,10 @@ public class KakaoService {
         HttpEntity<MultiValueMap<String, String>> kakaoTokenInfoRequest = new HttpEntity<>(headers);
         RestTemplate rt = new RestTemplate();
         ResponseEntity<String> response = rt.exchange(
-                "https://kapi.kakao.com/v1/user/access_token_info",
-                HttpMethod.GET,
-                kakaoTokenInfoRequest,
-                String.class
+            "https://kapi.kakao.com/v1/user/access_token_info",
+            HttpMethod.GET,
+            kakaoTokenInfoRequest,
+            String.class
         );
 
         String responseBody = response.getBody();
@@ -162,7 +168,8 @@ public class KakaoService {
         return id;
     }
 
-    private Member registerKakaoUserIfNeeded(KakaoMemberInfoDto kakaoMemberInfo, String accessToken) throws JsonProcessingException {
+    private Member registerKakaoUserIfNeeded(KakaoMemberInfoDto kakaoMemberInfo, String accessToken)
+        throws JsonProcessingException {
         String kakaoEmail = kakaoMemberInfo.getEmail();
         Member kakaoMember = memberRepository.findByEmail(kakaoEmail).orElse(null);
 
@@ -178,12 +185,14 @@ public class KakaoService {
 
     private void forceLogin(Member kakaoMember, HttpSession session) {
         UserDetails userDetails = new UserDetailsImpl(kakaoMember);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
+            userDetails.getAuthorities());
 
         SecurityContext securityContext = SecurityContextHolder.getContext();
         securityContext.setAuthentication(authentication);
 
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, securityContext);
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
+            securityContext);
     }
 
     public void unlink(UserDetailsImpl userDetails) {
@@ -197,14 +206,15 @@ public class KakaoService {
         body.add("target_id_type", "user_id");
         body.add("target_id", kakaoUserId);
 
-        HttpEntity<MultiValueMap<String, Object>> kakaoUnlinkRequest = new HttpEntity<>(body, headers);
+        HttpEntity<MultiValueMap<String, Object>> kakaoUnlinkRequest = new HttpEntity<>(body,
+            headers);
 
         RestTemplate rt = new RestTemplate();
         ResponseEntity<String> response = rt.exchange(
-                "https://kapi.kakao.com/v1/user/unlink",
-                HttpMethod.POST,
-                kakaoUnlinkRequest,
-                String.class
+            "https://kapi.kakao.com/v1/user/unlink",
+            HttpMethod.POST,
+            kakaoUnlinkRequest,
+            String.class
         );
     }
 }

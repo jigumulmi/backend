@@ -10,6 +10,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 public class GetPlaceListRequestDto {
+
     private Long subwayStationId;
     private Long placeId;
 }

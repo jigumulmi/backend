@@ -6,6 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class KakaoAuthResponseDto {
+
     private boolean hasRegistered;
     private String nickname;
 }

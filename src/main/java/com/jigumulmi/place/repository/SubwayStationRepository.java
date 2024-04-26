@@ -7,5 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SubwayStationRepository extends JpaRepository<SubwayStation, Long> {
+
     List<SubwayStation> findAllByStationNameStartsWith(String name, Sort sort);
 }

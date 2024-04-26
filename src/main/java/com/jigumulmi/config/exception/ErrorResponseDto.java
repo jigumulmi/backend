@@ -12,6 +12,7 @@ import java.util.List;
 @Builder
 @RequiredArgsConstructor
 public class ErrorResponseDto {
+
     private final String code;
     private final String message;
 
@@ -28,9 +29,9 @@ public class ErrorResponseDto {
 
         public static ValidationError of(final FieldError fieldError) {
             return ValidationError.builder()
-                    .field(fieldError.getField())
-                    .message(fieldError.getDefaultMessage())
-                    .build();
+                .field(fieldError.getField())
+                .message(fieldError.getDefaultMessage())
+                .build();
         }
     }
 }

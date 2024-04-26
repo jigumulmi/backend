@@ -15,18 +15,18 @@ public class SwaggerConfig {
     public OpenAPI openAPI() {
 
         Info info = new Info()
-                .title("Jigumulmi API")
-                .description("지구멀미")
-                .version("0.1.0");
+            .title("Jigumulmi API")
+            .description("지구멀미")
+            .version("0.1.0");
 
         SecurityScheme auth = new SecurityScheme()
-                .type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.COOKIE).name("JSESSIONID");
+            .type(SecurityScheme.Type.APIKEY).in(SecurityScheme.In.COOKIE).name("JSESSIONID");
 
         SecurityRequirement securityRequirement = new SecurityRequirement().addList("basicAuth");
 
         return new OpenAPI()
-                .components(new Components().addSecuritySchemes("basicAuth", auth))
-                .addSecurityItem(securityRequirement)
-                .info(info);
+            .components(new Components().addSecuritySchemes("basicAuth", auth))
+            .addSecurityItem(securityRequirement)
+            .info(info);
     }
 }
