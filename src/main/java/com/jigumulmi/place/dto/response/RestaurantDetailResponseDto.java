@@ -49,4 +49,6 @@ public class RestaurantDetailResponseDto extends RestaurantResponseDto {
     private RestaurantDetailResponseDto.OpeningHourDto openingHour;
 
     private String additionalInfo;
+
+    private OverallReviewResponseDto overallReview;
 }

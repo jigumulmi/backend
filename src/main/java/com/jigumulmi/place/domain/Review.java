@@ -14,6 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "restaurant_id"})})
 public class Review extends Timestamped {
 
     @Id
@@ -21,6 +22,7 @@ public class Review extends Timestamped {
     private Long id;
 
     private Integer rating;
+    @Column(length = 400)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -16,6 +16,7 @@ public class ReviewReply extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 400)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
