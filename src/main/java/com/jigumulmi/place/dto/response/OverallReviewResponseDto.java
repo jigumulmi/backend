@@ -17,7 +17,7 @@ public class OverallReviewResponseDto {
     }
 
     private Double averageRating;
-    private Long reviewCount;
+    private Long totalCount;
     private List<ReviewRatingStatsDto> statistics;
 
 }
