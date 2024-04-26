@@ -130,10 +130,10 @@ public class PlaceService {
         Double averageRating = restaurantRepository.getAverageRatingByPlaceId(placeId);
         List<ReviewRatingStatsDto> reviewRatingStats = restaurantRepository.getReviewRatingStatsByPlaceId(
             placeId);
-        Long reviewCount = reviewRepository.countByRestaurantId(placeId);
+        Long totalCount = reviewRepository.countByRestaurantId(placeId);
         OverallReviewResponseDto overallReviewResponseDto = OverallReviewResponseDto.builder()
             .averageRating(averageRating)
-            .reviewCount(reviewCount)
+            .totalCount(totalCount)
             .statistics(reviewRatingStats)
             .build();
 
