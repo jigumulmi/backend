@@ -1,13 +1,14 @@
 package com.jigumulmi.member.dto.response;
 
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-@Builder
-public class UserDetailResponseDto {
+@NoArgsConstructor
+@AllArgsConstructor
+public class MemberDetailResponseDto {
 
     private LocalDateTime createdAt;
     private Long id;
