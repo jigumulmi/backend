@@ -19,6 +19,7 @@ import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.RestaurantRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
@@ -41,6 +42,7 @@ public class PlaceService {
     private final RestaurantRepository restaurantRepository;
     private final MenuRepository menuRepository;
     private final ReviewRepository reviewRepository;
+    private final CustomPlaceRepository customPlaceRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllByStationNameStartsWith(
@@ -132,9 +134,9 @@ public class PlaceService {
             menuDtoList.add(menuDto);
         }
 
-        Double averageRating = restaurantRepository.getAverageRatingByPlaceId(placeId);
+        Double averageRating = customPlaceRepository.getAverageRatingByPlaceId(placeId);
         Long totalCount = reviewRepository.countByRestaurantId(placeId);
-        Map<Integer, Long> reviewRatingStatMap = restaurantRepository.getReviewRatingStatsByPlaceId(
+        Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
             placeId);
         for (int i = 1; i <= 5; i++) {
             reviewRatingStatMap.putIfAbsent(i, 0L);
@@ -204,6 +206,6 @@ public class PlaceService {
             requestMemberId = userDetails.getMember().getId();
         }
 
-        return reviewRepository.getReviewListByPlaceId(placeId, requestMemberId);
+        return customPlaceRepository.getReviewListByPlaceId(placeId, requestMemberId);
     }
 }
