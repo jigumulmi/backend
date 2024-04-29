@@ -13,8 +13,13 @@ import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
+import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto.MenuDto;
+import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
+import com.jigumulmi.place.dto.response.RestaurantResponseDto.PositionDto;
+import com.jigumulmi.place.dto.response.ReviewListResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.RestaurantRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
@@ -25,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,10 +42,11 @@ public class PlaceService {
     private final RestaurantRepository restaurantRepository;
     private final MenuRepository menuRepository;
     private final ReviewRepository reviewRepository;
+    private final CustomPlaceRepository customPlaceRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllByStationNameStartsWith(
-            stationName, Sort.by(Sort.Direction.ASC, "stationName"));
+            stationName, Sort.by(Direction.ASC, "stationName"));
 
         ArrayList<SubwayStationResponseDto> responseDtoList = new ArrayList<>();
         for (SubwayStation subwayStation : subwayStationList) {
@@ -100,7 +107,7 @@ public class PlaceService {
                 .name(restaurant.getName())
                 .mainImageUrl(restaurant.getMainImageUrl())
                 .position(
-                    RestaurantResponseDto.PositionDto.builder().longitude(restaurant.getLongitude())
+                    PositionDto.builder().longitude(restaurant.getLongitude())
                         .latitude(restaurant.getLatitude()).build()
                 )
                 .subwayStation(
@@ -120,16 +127,16 @@ public class PlaceService {
         Restaurant restaurant = restaurantRepository.findByIdAndIsApprovedTrue(placeId);
         SubwayStation subwayStation = restaurant.getSubwayStation();
 
-        ArrayList<RestaurantDetailResponseDto.MenuDto> menuDtoList = new ArrayList<>();
+        ArrayList<MenuDto> menuDtoList = new ArrayList<>();
         for (Menu menu : restaurant.getMenuList()) {
-            RestaurantDetailResponseDto.MenuDto menuDto = RestaurantDetailResponseDto.MenuDto.builder()
+            MenuDto menuDto = MenuDto.builder()
                 .id(menu.getId()).name(menu.getName()).build();
             menuDtoList.add(menuDto);
         }
 
-        Double averageRating = restaurantRepository.getAverageRatingByPlaceId(placeId);
+        Double averageRating = customPlaceRepository.getAverageRatingByPlaceId(placeId);
         Long totalCount = reviewRepository.countByRestaurantId(placeId);
-        Map<Integer, Long> reviewRatingStatMap = restaurantRepository.getReviewRatingStatsByPlaceId(
+        Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
             placeId);
         for (int i = 1; i <= 5; i++) {
             reviewRatingStatMap.putIfAbsent(i, 0L);
@@ -146,7 +153,7 @@ public class PlaceService {
             .name(restaurant.getName())
             .mainImageUrl(restaurant.getMainImageUrl())
             .position(
-                RestaurantResponseDto.PositionDto.builder()
+                PositionDto.builder()
                     .latitude(restaurant.getLatitude())
                     .longitude(restaurant.getLongitude())
                     .build()
@@ -163,7 +170,7 @@ public class PlaceService {
             .contact(restaurant.getContact())
             .menuList(menuDtoList)
             .openingHour(
-                RestaurantDetailResponseDto.OpeningHourDto.builder()
+                OpeningHourDto.builder()
                     .openingHourSun(restaurant.getOpeningHourSun())
                     .openingHourMon(restaurant.getOpeningHourMon())
                     .openingHourTue(restaurant.getOpeningHourTue())
@@ -191,5 +198,14 @@ public class PlaceService {
             .build();
 
         reviewRepository.save(review);
+    }
+
+    public List<ReviewListResponseDto> gerReviewList(UserDetailsImpl userDetails, Long placeId) {
+        Long requestMemberId = -1L;
+        if (userDetails != null) {
+            requestMemberId = userDetails.getMember().getId();
+        }
+
+        return customPlaceRepository.getReviewListByPlaceId(placeId, requestMemberId);
     }
 }

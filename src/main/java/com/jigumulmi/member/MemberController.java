@@ -5,7 +5,7 @@ import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.dto.request.KakaoAuthorizationRequestDto;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
 import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
-import com.jigumulmi.member.dto.response.UserDetailResponseDto;
+import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.member.service.KakaoService;
 import com.jigumulmi.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,11 +76,11 @@ public class MemberController {
     @Operation(summary = "유저 상세 정보 조회")
     @ApiResponses(
         value = {@ApiResponse(responseCode = "200", content = {
-            @Content(schema = @Schema(implementation = UserDetailResponseDto.class))})}
+            @Content(schema = @Schema(implementation = MemberDetailResponseDto.class))})}
     )
     @GetMapping("/detail")
     public ResponseEntity<?> getUserDetail(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        UserDetailResponseDto userDetail = memberService.getUserDetail(userDetails);
+        MemberDetailResponseDto userDetail = memberService.getUserDetail(userDetails);
         return ResponseEntity.ok().body(userDetail);
     }
 }

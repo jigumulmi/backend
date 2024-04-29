@@ -6,6 +6,7 @@ import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
+import com.jigumulmi.place.dto.response.ReviewListResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -81,5 +82,18 @@ public class PlaceController {
         @AuthenticationPrincipal UserDetailsImpl userDetails) {
         placeService.postReview(requestDto, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
+    }
+
+    @Operation(summary = "리뷰 리스트 조회")
+    @ApiResponses(
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewListResponseDto.class)))})}
+    )
+    @GetMapping("/review")
+    public ResponseEntity<?> getReviewList(@AuthenticationPrincipal UserDetailsImpl userDetails,
+        @RequestParam(name = "placeId") Long placeId) {
+        List<ReviewListResponseDto> reviewList = placeService.gerReviewList(userDetails,
+            placeId);
+        return ResponseEntity.ok().body(reviewList);
     }
 }
