@@ -12,7 +12,6 @@ import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
-import com.jigumulmi.place.dto.response.OverallReviewResponseDto.ReviewRatingStatsDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -23,6 +22,7 @@ import com.jigumulmi.place.repository.SubwayStationRepository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -128,13 +128,17 @@ public class PlaceService {
         }
 
         Double averageRating = restaurantRepository.getAverageRatingByPlaceId(placeId);
-        List<ReviewRatingStatsDto> reviewRatingStats = restaurantRepository.getReviewRatingStatsByPlaceId(
-            placeId);
         Long totalCount = reviewRepository.countByRestaurantId(placeId);
+        Map<Integer, Long> reviewRatingStatMap = restaurantRepository.getReviewRatingStatsByPlaceId(
+            placeId);
+        for (int i = 1; i <= 5; i++) {
+            reviewRatingStatMap.putIfAbsent(i, 0L);
+        }
+
         OverallReviewResponseDto overallReviewResponseDto = OverallReviewResponseDto.builder()
             .averageRating(averageRating)
             .totalCount(totalCount)
-            .statistics(reviewRatingStats)
+            .statistics(reviewRatingStatMap)
             .build();
 
         return RestaurantDetailResponseDto.builder()

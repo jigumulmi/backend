@@ -1,6 +1,6 @@
 package com.jigumulmi.place.dto.response;
 
-import java.util.List;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -8,16 +8,7 @@ import lombok.Getter;
 @Builder
 public class OverallReviewResponseDto {
 
-    @Getter
-    //Builder 있으면 에러 발생
-    public static class ReviewRatingStatsDto {
-
-        private int rating;
-        private long count;
-    }
-
     private Double averageRating;
     private Long totalCount;
-    private List<ReviewRatingStatsDto> statistics;
-
+    private Map<Integer, Long> statistics; // {별점: 개수}
 }

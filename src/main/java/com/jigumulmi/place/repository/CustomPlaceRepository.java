@@ -1,11 +1,10 @@
 package com.jigumulmi.place.repository;
 
-import com.jigumulmi.place.dto.response.OverallReviewResponseDto.ReviewRatingStatsDto;
-import java.util.List;
+import java.util.Map;
 
 public interface CustomPlaceRepository {
 
-    List<ReviewRatingStatsDto> getReviewRatingStatsByPlaceId(Long placeId);
+    Map<Integer, Long> getReviewRatingStatsByPlaceId(Long placeId);
 
     Double getAverageRatingByPlaceId(Long placeId);
 }

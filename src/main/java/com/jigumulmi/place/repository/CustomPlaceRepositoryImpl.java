@@ -2,13 +2,11 @@ package com.jigumulmi.place.repository;
 
 
 import static com.jigumulmi.place.domain.QReview.review;
+import static com.querydsl.core.group.GroupBy.groupBy;
 
-import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
-import com.jigumulmi.place.dto.response.OverallReviewResponseDto.ReviewRatingStatsDto;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.MathExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -17,16 +15,13 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<ReviewRatingStatsDto> getReviewRatingStatsByPlaceId(Long placeId) {
+    public Map<Integer, Long> getReviewRatingStatsByPlaceId(Long placeId) {
+
         return queryFactory
-            .select(Projections.fields(OverallReviewResponseDto.ReviewRatingStatsDto.class,
-                review.rating, review.rating.count().as("count")
-            ))
             .from(review)
             .where(review.restaurant.id.eq(placeId))
             .groupBy(review.rating)
-            .orderBy(review.rating.asc())
-            .fetch();
+            .transform(groupBy(review.rating).as(review.rating.count()));
     }
 
     @Override
