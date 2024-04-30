@@ -9,6 +9,7 @@ import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
+import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -113,5 +114,19 @@ public class PlaceController {
         List<ReviewListResponseDto> reviewList = placeService.gerReviewList(userDetails,
             placeId);
         return ResponseEntity.ok().body(reviewList);
+    }
+
+    @Operation(summary = "대댓글 리스트 조회")
+    @ApiResponses(
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewReplyResponseDto.class)))})}
+    )
+    @GetMapping("/review/reply")
+    public ResponseEntity<?> getReviewReplyList(
+        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @RequestParam(name = "reviewId") Long reviewId) {
+        List<ReviewReplyResponseDto> reviewReplyList = placeService.gerReviewReplyList(userDetails,
+            reviewId);
+        return ResponseEntity.ok().body(reviewReplyList);
     }
 }

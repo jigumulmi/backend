@@ -20,6 +20,7 @@ import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto.OpeningHourD
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
+import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
@@ -204,15 +205,6 @@ public class PlaceService {
         reviewRepository.save(review);
     }
 
-    public List<ReviewListResponseDto> gerReviewList(UserDetailsImpl userDetails, Long placeId) {
-        Long requestMemberId = -1L;
-        if (userDetails != null) {
-            requestMemberId = userDetails.getMember().getId();
-        }
-
-        return customPlaceRepository.getReviewListByPlaceId(placeId, requestMemberId);
-    }
-
     public void postReviewReply(CreateReviewReplyRequestDto requestDto,
         UserDetailsImpl userDetails) {
 
@@ -225,5 +217,26 @@ public class PlaceService {
             .build();
 
         reviewReplyRepository.save(reviewReply);
+    }
+
+    public List<ReviewListResponseDto> gerReviewList(UserDetailsImpl userDetails, Long placeId) {
+        Long requestMemberId = -1L;
+        if (userDetails != null) {
+            requestMemberId = userDetails.getMember().getId();
+        }
+
+        return customPlaceRepository.getReviewListByPlaceId(placeId, requestMemberId);
+    }
+
+
+    public List<ReviewReplyResponseDto> gerReviewReplyList(UserDetailsImpl userDetails,
+        Long reviewId) {
+        Long requestMemberId = -1L;
+        if (userDetails != null) {
+            requestMemberId = userDetails.getMember().getId();
+        }
+
+        return customPlaceRepository.getReviewReplyListByReviewId(requestMemberId, reviewId);
+
     }
 }
