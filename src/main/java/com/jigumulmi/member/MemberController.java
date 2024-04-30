@@ -1,6 +1,7 @@
 package com.jigumulmi.member;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jigumulmi.config.security.AuthUser;
 import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.dto.request.KakaoAuthorizationRequestDto;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
@@ -18,10 +19,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequiredArgsConstructor
@@ -57,7 +61,7 @@ public class MemberController {
     @ApiResponse(responseCode = "201")
     @PostMapping("/deregister")
     public ResponseEntity<?> deregister(HttpSession session,
-        @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        @AuthUser UserDetailsImpl userDetails) {
         session.invalidate();
         kakaoService.unlink(userDetails);
         memberService.removeMember(userDetails);
@@ -67,7 +71,7 @@ public class MemberController {
     @Operation(summary = "닉네임 수정(생성)")
     @ApiResponse(responseCode = "201")
     @PutMapping("/nickname")
-    public ResponseEntity<?> setNickname(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<?> setNickname(@AuthUser UserDetailsImpl userDetails,
         @Valid @RequestBody SetNicknameRequestDto requestDto) {
         memberService.createNickname(userDetails, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Set nickname success");
@@ -79,7 +83,7 @@ public class MemberController {
             @Content(schema = @Schema(implementation = MemberDetailResponseDto.class))})}
     )
     @GetMapping("/detail")
-    public ResponseEntity<?> getUserDetail(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<?> getUserDetail(@AuthUser UserDetailsImpl userDetails) {
         MemberDetailResponseDto userDetail = memberService.getUserDetail(userDetails);
         return ResponseEntity.ok().body(userDetail);
     }
