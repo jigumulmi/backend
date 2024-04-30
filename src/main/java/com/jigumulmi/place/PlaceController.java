@@ -6,6 +6,8 @@ import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
+import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
+import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -128,5 +131,24 @@ public class PlaceController {
         List<ReviewReplyResponseDto> reviewReplyList = placeService.gerReviewReplyList(userDetails,
             reviewId);
         return ResponseEntity.ok().body(reviewReplyList);
+    }
+
+    @Operation(summary = "리뷰 수정", description = "rating과 content 중 수정하지 않는 값은 null로 부탁드립니다")
+    @ApiResponse(responseCode = "201")
+    @PutMapping("/review")
+    public ResponseEntity<?> updateReview(@Valid @RequestBody UpdateReviewRequestDto requestDto,
+        @SecureAuthUser UserDetailsImpl userDetails) {
+        placeService.updateReview(requestDto, userDetails);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Update review success");
+    }
+
+    @Operation(summary = "대댓글 수정")
+    @ApiResponse(responseCode = "201")
+    @PutMapping("/review/reply")
+    public ResponseEntity<?> updateReviewReply(
+        @Valid @RequestBody UpdateReviewReplyRequestDto requestDto,
+        @SecureAuthUser UserDetailsImpl userDetails) {
+        placeService.updateReviewReply(requestDto, userDetails);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Update review reply success");
     }
 }

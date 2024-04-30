@@ -47,4 +47,13 @@ public class Review extends Timestamped {
         this.restaurant = restaurant;
         this.reviewReplyList = reviewReplyList;
     }
+
+    public void updateReview(Integer rating, String content) {
+        if (rating != null) {
+            this.rating = rating;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+    }
 }

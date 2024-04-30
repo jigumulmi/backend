@@ -8,7 +8,6 @@ import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,13 +15,11 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    @Transactional
     public void removeMember(UserDetailsImpl userDetails) {
         Member member = userDetails.getMember();
         memberRepository.delete(member);
     }
 
-    @Transactional
     public void createNickname(UserDetailsImpl userDetails, SetNicknameRequestDto requestDto) {
         Member member = userDetails.getMember();
         member.updateNickname(requestDto.getNickname());
