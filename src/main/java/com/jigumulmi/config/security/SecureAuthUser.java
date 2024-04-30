@@ -9,6 +9,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 @AuthenticationPrincipal(expression = "T(com.jigumulmi.config.security.SecurityUtils).checkAuthenticationPrincipal(#this)")
-public @interface AuthUser {
+public @interface SecureAuthUser {
 
 }

@@ -1,8 +1,9 @@
 package com.jigumulmi.place;
 
-import com.jigumulmi.config.security.AuthUser;
+import com.jigumulmi.config.security.SecureAuthUser;
 import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
+import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -85,9 +87,19 @@ public class PlaceController {
     @ApiResponse(responseCode = "201")
     @PostMapping("/review")
     public ResponseEntity<?> postReview(@Valid @RequestBody CreateReviewRequestDto requestDto,
-        @AuthUser UserDetailsImpl userDetails) {
+        @SecureAuthUser UserDetailsImpl userDetails) {
         placeService.postReview(requestDto, userDetails);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
+    }
+
+    @Operation(summary = "리뷰의 대댓글 등록")
+    @ApiResponse(responseCode = "201")
+    @PostMapping("/review/reply")
+    public ResponseEntity<?> postReviewReply(
+        @Valid @RequestBody CreateReviewReplyRequestDto requestDto,
+        @SecureAuthUser UserDetailsImpl userDetails) {
+        placeService.postReviewReply(requestDto, userDetails);
+        return ResponseEntity.status(HttpStatus.CREATED).body("Post review reply success");
     }
 
     @Operation(summary = "리뷰 리스트 조회")
@@ -96,7 +108,7 @@ public class PlaceController {
             @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewListResponseDto.class)))})}
     )
     @GetMapping("/review")
-    public ResponseEntity<?> getReviewList(@AuthUser UserDetailsImpl userDetails,
+    public ResponseEntity<?> getReviewList(@AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam(name = "placeId") Long placeId) {
         List<ReviewListResponseDto> reviewList = placeService.gerReviewList(userDetails,
             placeId);
