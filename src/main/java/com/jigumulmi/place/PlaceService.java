@@ -257,4 +257,17 @@ public class PlaceService {
         reviewReply.updateReviewReply(requestDto.getContent());
         reviewReplyRepository.save(reviewReply);
     }
+
+    public void deleteReview(Long reviewId, UserDetailsImpl userDetails) {
+        Review review = reviewRepository.findByIdAndMember(reviewId,
+            userDetails.getMember());
+        reviewRepository.delete(review);
+    }
+
+    public void deleteReviewReply(Long reviewReplyId, UserDetailsImpl userDetails) {
+        ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(
+            reviewReplyId,
+            userDetails.getMember());
+        reviewReplyRepository.delete(reviewReply);
+    }
 }
