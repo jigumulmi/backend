@@ -34,4 +34,8 @@ public class ReviewReply extends Timestamped {
         this.review = review;
         this.member = member;
     }
+
+    public void updateReviewReply(String content) {
+        this.content = content;
+    }
 }

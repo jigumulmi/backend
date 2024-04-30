@@ -6,6 +6,8 @@ import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
+import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
+import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
@@ -24,10 +26,12 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -128,5 +132,43 @@ public class PlaceController {
         List<ReviewReplyResponseDto> reviewReplyList = placeService.gerReviewReplyList(userDetails,
             reviewId);
         return ResponseEntity.ok().body(reviewReplyList);
+    }
+
+    @Operation(summary = "리뷰 수정", description = "rating과 content 중 수정하지 않는 값은 null로 부탁드립니다")
+    @ApiResponse(responseCode = "204")
+    @PutMapping("/review")
+    public ResponseEntity<?> updateReview(@Valid @RequestBody UpdateReviewRequestDto requestDto,
+        @SecureAuthUser UserDetailsImpl userDetails) {
+        placeService.updateReview(requestDto, userDetails);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update review success");
+    }
+
+    @Operation(summary = "대댓글 수정")
+    @ApiResponse(responseCode = "204")
+    @PutMapping("/review/reply")
+    public ResponseEntity<?> updateReviewReply(
+        @Valid @RequestBody UpdateReviewReplyRequestDto requestDto,
+        @SecureAuthUser UserDetailsImpl userDetails) {
+        placeService.updateReviewReply(requestDto, userDetails);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update review reply success");
+    }
+
+    @Operation(summary = "리뷰 삭제")
+    @ApiResponse(responseCode = "204")
+    @DeleteMapping("/review/{reviewId}")
+    public ResponseEntity<?> deleteReview(@PathVariable(name = "reviewId") Long reviewId,
+        @SecureAuthUser UserDetailsImpl userDetails) {
+        placeService.deleteReview(reviewId, userDetails);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review success");
+    }
+
+    @Operation(summary = "대댓글 삭제")
+    @ApiResponse(responseCode = "204")
+    @DeleteMapping("/review/reply/{reviewReplyId}")
+    public ResponseEntity<?> deleteReviewReply(
+        @PathVariable(name = "reviewReplyId") Long reviewReplyId,
+        @SecureAuthUser UserDetailsImpl userDetails) {
+        placeService.deleteReviewReply(reviewReplyId, userDetails);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review reply success");
     }
 }

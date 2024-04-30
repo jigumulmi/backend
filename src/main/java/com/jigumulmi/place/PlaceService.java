@@ -13,6 +13,8 @@ import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
+import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
+import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto.MenuDto;
@@ -238,5 +240,34 @@ public class PlaceService {
 
         return customPlaceRepository.getReviewReplyListByReviewId(requestMemberId, reviewId);
 
+    }
+
+    public void updateReview(UpdateReviewRequestDto requestDto, UserDetailsImpl userDetails) {
+        Review review = reviewRepository.findByIdAndMember(requestDto.getReviewId(),
+            userDetails.getMember());
+        review.updateReview(requestDto.getRating(), requestDto.getContent());
+        reviewRepository.save(review);
+    }
+
+    public void updateReviewReply(UpdateReviewReplyRequestDto requestDto,
+        UserDetailsImpl userDetails) {
+        ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(
+            requestDto.getReviewReplyId(),
+            userDetails.getMember());
+        reviewReply.updateReviewReply(requestDto.getContent());
+        reviewReplyRepository.save(reviewReply);
+    }
+
+    public void deleteReview(Long reviewId, UserDetailsImpl userDetails) {
+        Review review = reviewRepository.findByIdAndMember(reviewId,
+            userDetails.getMember());
+        reviewRepository.delete(review);
+    }
+
+    public void deleteReviewReply(Long reviewReplyId, UserDetailsImpl userDetails) {
+        ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(
+            reviewReplyId,
+            userDetails.getMember());
+        reviewReplyRepository.delete(reviewReply);
     }
 }
