@@ -1,7 +1,7 @@
 package com.jigumulmi.member;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jigumulmi.config.security.AuthUser;
+import com.jigumulmi.config.security.SecureAuthUser;
 import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.dto.request.KakaoAuthorizationRequestDto;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
@@ -51,7 +51,8 @@ public class MemberController {
     @Operation(summary = "로그아웃")
     @ApiResponse(responseCode = "201")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session) {
+    public ResponseEntity<?> logout(HttpSession session,
+        @SecureAuthUser UserDetailsImpl userDetails) {
         session.invalidate();
         SecurityContextHolder.clearContext();
         return ResponseEntity.status(HttpStatus.CREATED).body("Logout success");
@@ -61,7 +62,7 @@ public class MemberController {
     @ApiResponse(responseCode = "201")
     @PostMapping("/deregister")
     public ResponseEntity<?> deregister(HttpSession session,
-        @AuthUser UserDetailsImpl userDetails) {
+        @SecureAuthUser UserDetailsImpl userDetails) {
         session.invalidate();
         kakaoService.unlink(userDetails);
         memberService.removeMember(userDetails);
@@ -71,7 +72,7 @@ public class MemberController {
     @Operation(summary = "닉네임 수정(생성)")
     @ApiResponse(responseCode = "201")
     @PutMapping("/nickname")
-    public ResponseEntity<?> setNickname(@AuthUser UserDetailsImpl userDetails,
+    public ResponseEntity<?> setNickname(@SecureAuthUser UserDetailsImpl userDetails,
         @Valid @RequestBody SetNicknameRequestDto requestDto) {
         memberService.createNickname(userDetails, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Set nickname success");
@@ -83,7 +84,7 @@ public class MemberController {
             @Content(schema = @Schema(implementation = MemberDetailResponseDto.class))})}
     )
     @GetMapping("/detail")
-    public ResponseEntity<?> getUserDetail(@AuthUser UserDetailsImpl userDetails) {
+    public ResponseEntity<?> getUserDetail(@SecureAuthUser UserDetailsImpl userDetails) {
         MemberDetailResponseDto userDetail = memberService.getUserDetail(userDetails);
         return ResponseEntity.ok().body(userDetail);
     }

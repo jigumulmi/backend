@@ -7,8 +7,10 @@ import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Restaurant;
 import com.jigumulmi.place.domain.Review;
+import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
+import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
@@ -18,10 +20,12 @@ import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto.OpeningHourD
 import com.jigumulmi.place.dto.response.RestaurantResponseDto;
 import com.jigumulmi.place.dto.response.RestaurantResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
+import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.RestaurantRepository;
+import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import java.util.ArrayList;
@@ -42,6 +46,7 @@ public class PlaceService {
     private final RestaurantRepository restaurantRepository;
     private final MenuRepository menuRepository;
     private final ReviewRepository reviewRepository;
+    private final ReviewReplyRepository reviewReplyRepository;
     private final CustomPlaceRepository customPlaceRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
@@ -200,6 +205,20 @@ public class PlaceService {
         reviewRepository.save(review);
     }
 
+    public void postReviewReply(CreateReviewReplyRequestDto requestDto,
+        UserDetailsImpl userDetails) {
+
+        Review review = reviewRepository.findById(requestDto.getReviewId())
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+        ReviewReply reviewReply = ReviewReply.builder()
+            .review(review)
+            .content(requestDto.getContent())
+            .member(userDetails.getMember())
+            .build();
+
+        reviewReplyRepository.save(reviewReply);
+    }
+
     public List<ReviewListResponseDto> gerReviewList(UserDetailsImpl userDetails, Long placeId) {
         Long requestMemberId = -1L;
         if (userDetails != null) {
@@ -207,5 +226,17 @@ public class PlaceService {
         }
 
         return customPlaceRepository.getReviewListByPlaceId(placeId, requestMemberId);
+    }
+
+
+    public List<ReviewReplyResponseDto> gerReviewReplyList(UserDetailsImpl userDetails,
+        Long reviewId) {
+        Long requestMemberId = -1L;
+        if (userDetails != null) {
+            requestMemberId = userDetails.getMember().getId();
+        }
+
+        return customPlaceRepository.getReviewReplyListByReviewId(requestMemberId, reviewId);
+
     }
 }

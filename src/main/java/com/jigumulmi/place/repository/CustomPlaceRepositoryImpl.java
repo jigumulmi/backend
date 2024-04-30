@@ -2,11 +2,13 @@ package com.jigumulmi.place.repository;
 
 
 import static com.jigumulmi.place.domain.QReview.review;
+import static com.jigumulmi.place.domain.QReviewReply.reviewReply;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
+import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -72,6 +74,37 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             .leftJoin(review.reviewReplyList)
             .where(review.restaurant.id.eq(placeId))
             .orderBy(review.modifiedAt.desc())
+            .fetch();
+    }
+
+    @Override
+    public List<ReviewReplyResponseDto> getReviewReplyListByReviewId(Long requestMemberId,
+        Long reviewId) {
+
+        return queryFactory
+            .select(
+                Projections.fields(
+                    ReviewReplyResponseDto.class,
+                    stringTemplate(
+                        "DATE_FORMAT({0}, {1})",
+                        reviewReply.modifiedAt,
+                        ConstantImpl.create("%Y.%m.%d")
+                    ).as("repliedAt"),
+                    reviewReply.id,
+                    reviewReply.content,
+                    new CaseBuilder()
+                        .when(review.member.id.eq(requestMemberId)).then(true)
+                        .otherwise(false).as("isEditable"),
+                    Projections.fields(MemberDetailResponseDto.class,
+                        review.member.createdAt,
+                        review.member.id,
+                        review.member.nickname,
+                        review.member.email).as("member"))
+            )
+            .from(reviewReply)
+            .where(reviewReply.review.id.eq(reviewId))
+            .join(reviewReply.member)
+            .orderBy(reviewReply.modifiedAt.desc())
             .fetch();
     }
 
