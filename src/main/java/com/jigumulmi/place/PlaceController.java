@@ -115,7 +115,7 @@ public class PlaceController {
     @GetMapping("/review")
     public ResponseEntity<?> getReviewList(@AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam(name = "placeId") Long placeId) {
-        List<ReviewListResponseDto> reviewList = placeService.gerReviewList(userDetails,
+        List<ReviewListResponseDto> reviewList = placeService.getReviewList(userDetails,
             placeId);
         return ResponseEntity.ok().body(reviewList);
     }
@@ -129,7 +129,7 @@ public class PlaceController {
     public ResponseEntity<?> getReviewReplyList(
         @AuthenticationPrincipal UserDetailsImpl userDetails,
         @RequestParam(name = "reviewId") Long reviewId) {
-        List<ReviewReplyResponseDto> reviewReplyList = placeService.gerReviewReplyList(userDetails,
+        List<ReviewReplyResponseDto> reviewReplyList = placeService.getReviewReplyList(userDetails,
             reviewId);
         return ResponseEntity.ok().body(reviewReplyList);
     }
