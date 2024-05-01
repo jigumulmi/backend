@@ -221,7 +221,7 @@ public class PlaceService {
         reviewReplyRepository.save(reviewReply);
     }
 
-    public List<ReviewListResponseDto> gerReviewList(UserDetailsImpl userDetails, Long placeId) {
+    public List<ReviewListResponseDto> getReviewList(UserDetailsImpl userDetails, Long placeId) {
         Long requestMemberId = -1L;
         if (userDetails != null) {
             requestMemberId = userDetails.getMember().getId();
@@ -231,7 +231,7 @@ public class PlaceService {
     }
 
 
-    public List<ReviewReplyResponseDto> gerReviewReplyList(UserDetailsImpl userDetails,
+    public List<ReviewReplyResponseDto> getReviewReplyList(UserDetailsImpl userDetails,
         Long reviewId) {
         Long requestMemberId = -1L;
         if (userDetails != null) {

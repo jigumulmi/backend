@@ -68,7 +68,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         review.member.id,
                         review.member.nickname,
                         review.member.email).as("member"))
-            )
+            ).distinct()
             .from(review)
             .join(review.member)
             .leftJoin(review.reviewReplyList)
@@ -100,7 +100,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         review.member.id,
                         review.member.nickname,
                         review.member.email).as("member"))
-            )
+            ).distinct()
             .from(reviewReply)
             .where(reviewReply.review.id.eq(reviewId))
             .join(reviewReply.member)
