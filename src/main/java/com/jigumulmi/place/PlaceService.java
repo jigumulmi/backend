@@ -2,7 +2,6 @@ package com.jigumulmi.place;
 
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
-import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Restaurant;
@@ -192,8 +191,7 @@ public class PlaceService {
             .build();
     }
 
-    public void postReview(CreateReviewRequestDto requestDto, UserDetailsImpl userDetails) {
-        Member member = userDetails.getMember();
+    public void postReview(CreateReviewRequestDto requestDto, Member member) {
         Restaurant restaurant = restaurantRepository.findById(requestDto.getPlaceId())
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
         Review review = Review.builder()
@@ -207,60 +205,43 @@ public class PlaceService {
         reviewRepository.save(review);
     }
 
-    public void postReviewReply(CreateReviewReplyRequestDto requestDto,
-        UserDetailsImpl userDetails) {
+    public void postReviewReply(CreateReviewReplyRequestDto requestDto, Member member) {
 
         Review review = reviewRepository.findById(requestDto.getReviewId())
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
         ReviewReply reviewReply = ReviewReply.builder()
             .review(review)
             .content(requestDto.getContent())
-            .member(userDetails.getMember())
+            .member(member)
             .build();
 
         reviewReplyRepository.save(reviewReply);
     }
 
-    public List<ReviewListResponseDto> getReviewList(UserDetailsImpl userDetails, Long placeId) {
-        Long requestMemberId = -1L;
-        if (userDetails != null) {
-            requestMemberId = userDetails.getMember().getId();
-        }
-
-        return customPlaceRepository.getReviewListByPlaceId(placeId, requestMemberId);
+    public List<ReviewListResponseDto> getReviewList(Member member, Long placeId) {
+        return customPlaceRepository.getReviewListByPlaceId(placeId, member.getId());
     }
 
 
-    public List<ReviewReplyResponseDto> getReviewReplyList(UserDetailsImpl userDetails,
-        Long reviewId) {
-        Long requestMemberId = -1L;
-        if (userDetails != null) {
-            requestMemberId = userDetails.getMember().getId();
-        }
-
-        return customPlaceRepository.getReviewReplyListByReviewId(requestMemberId, reviewId);
-
+    public List<ReviewReplyResponseDto> getReviewReplyList(Member member, Long reviewId) {
+        return customPlaceRepository.getReviewReplyListByReviewId(member.getId(), reviewId);
     }
 
-    public void updateReview(UpdateReviewRequestDto requestDto, UserDetailsImpl userDetails) {
-        Review review = reviewRepository.findByIdAndMember(requestDto.getReviewId(),
-            userDetails.getMember());
+    public void updateReview(UpdateReviewRequestDto requestDto, Member member) {
+        Review review = reviewRepository.findByIdAndMember(requestDto.getReviewId(), member);
         review.updateReview(requestDto.getRating(), requestDto.getContent());
         reviewRepository.save(review);
     }
 
-    public void updateReviewReply(UpdateReviewReplyRequestDto requestDto,
-        UserDetailsImpl userDetails) {
+    public void updateReviewReply(UpdateReviewReplyRequestDto requestDto, Member member) {
         ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(
-            requestDto.getReviewReplyId(),
-            userDetails.getMember());
+            requestDto.getReviewReplyId(), member);
         reviewReply.updateReviewReply(requestDto.getContent());
         reviewReplyRepository.save(reviewReply);
     }
 
-    public void deleteReview(Long reviewId, UserDetailsImpl userDetails) {
-        Review review = reviewRepository.findByIdAndMember(reviewId,
-            userDetails.getMember());
+    public void deleteReview(Long reviewId, Member member) {
+        Review review = reviewRepository.findByIdAndMember(reviewId, member);
 
         List<ReviewReply> reviewReplyList = review.getReviewReplyList();
         if (reviewReplyList.isEmpty()) {
@@ -270,10 +251,8 @@ public class PlaceService {
         }
     }
 
-    public void deleteReviewReply(Long reviewReplyId, UserDetailsImpl userDetails) {
-        ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(
-            reviewReplyId,
-            userDetails.getMember());
+    public void deleteReviewReply(Long reviewReplyId, Member member) {
+        ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(reviewReplyId, member);
         reviewReplyRepository.delete(reviewReply);
     }
 }

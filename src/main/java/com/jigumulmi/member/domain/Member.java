@@ -39,6 +39,15 @@ public class Member extends Timestamped {
         this.deregisteredAt = deregisteredAt;
     }
 
+    /**
+     * 선택적으로 사용자 인증을 하는 api에서 인증되지 않은 요청의 경우 생성되는 가짜 사용자
+     *
+     * @param fakeId 가짜 사용자를 생성하기 위한 존재하지 않는 memberId
+     */
+    public Member(Long fakeId) {
+        this.id = fakeId;
+    }
+
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }

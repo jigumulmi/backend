@@ -11,7 +11,7 @@ public interface CustomPlaceRepository {
 
     Double getAverageRatingByPlaceId(Long placeId);
 
-    List<ReviewListResponseDto> getReviewListByPlaceId(Long placeId, Long requestMember);
+    List<ReviewListResponseDto> getReviewListByPlaceId(Long placeId, Long requestMemberId);
 
     List<ReviewReplyResponseDto> getReviewReplyListByReviewId(Long requestMemberId, Long reviewId);
 }

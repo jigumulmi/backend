@@ -1,8 +1,8 @@
 package com.jigumulmi.member;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jigumulmi.config.security.SecureAuthUser;
-import com.jigumulmi.config.security.UserDetailsImpl;
+import com.jigumulmi.config.security.RequiredAuthUser;
+import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.request.KakaoAuthorizationRequestDto;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
 import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
@@ -51,8 +51,7 @@ public class MemberController {
     @Operation(summary = "로그아웃")
     @ApiResponse(responseCode = "201")
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpSession session,
-        @SecureAuthUser UserDetailsImpl userDetails) {
+    public ResponseEntity<?> logout(HttpSession session, @RequiredAuthUser Member member) {
         session.invalidate();
         SecurityContextHolder.clearContext();
         return ResponseEntity.status(HttpStatus.CREATED).body("Logout success");
@@ -61,20 +60,19 @@ public class MemberController {
     @Operation(summary = "회원 탈퇴")
     @ApiResponse(responseCode = "201")
     @PostMapping("/deregister")
-    public ResponseEntity<?> deregister(HttpSession session,
-        @SecureAuthUser UserDetailsImpl userDetails) {
+    public ResponseEntity<?> deregister(HttpSession session, @RequiredAuthUser Member member) {
         session.invalidate();
-        kakaoService.unlink(userDetails);
-        memberService.removeMember(userDetails);
+        kakaoService.unlink(member);
+        memberService.removeMember(member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Deregister success");
     }
 
     @Operation(summary = "닉네임 수정(생성)")
     @ApiResponse(responseCode = "201")
     @PutMapping("/nickname")
-    public ResponseEntity<?> setNickname(@SecureAuthUser UserDetailsImpl userDetails,
+    public ResponseEntity<?> setNickname(@RequiredAuthUser Member member,
         @Valid @RequestBody SetNicknameRequestDto requestDto) {
-        memberService.createNickname(userDetails, requestDto);
+        memberService.createNickname(member, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Set nickname success");
     }
 
@@ -84,8 +82,8 @@ public class MemberController {
             @Content(schema = @Schema(implementation = MemberDetailResponseDto.class))})}
     )
     @GetMapping("/detail")
-    public ResponseEntity<?> getUserDetail(@SecureAuthUser UserDetailsImpl userDetails) {
-        MemberDetailResponseDto userDetail = memberService.getUserDetail(userDetails);
+    public ResponseEntity<?> getUserDetail(@RequiredAuthUser Member member) {
+        MemberDetailResponseDto userDetail = memberService.getUserDetail(member);
         return ResponseEntity.ok().body(userDetail);
     }
 }

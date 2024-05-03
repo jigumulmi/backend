@@ -79,9 +79,9 @@ public class KakaoService {
     /**
      * "인가 코드"로 "액세스 토큰" 요청
      *
-     * @param authorizationCode: 카카오 서버 제공 인가코드
-     * @return accessToken: 인가코드로 얻은 엑세스 토큰
-     * @throws JsonProcessingException
+     * @param authorizationCode 카카오 서버 제공 인가코드
+     * @return accessToken 인가코드로 얻은 엑세스 토큰
+     * @throws JsonProcessingException 카카오 API 응답 본문 파싱 에러
      */
     private String getAccessToken(String authorizationCode) throws JsonProcessingException {
         // HTTP Header 생성
@@ -195,8 +195,7 @@ public class KakaoService {
             securityContext);
     }
 
-    public void unlink(UserDetailsImpl userDetails) {
-        Member member = userDetails.getMember();
+    public void unlink(Member member) {
         Long kakaoUserId = member.getKakaoUserId();
 
         HttpHeaders headers = new HttpHeaders();
