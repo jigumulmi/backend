@@ -16,6 +16,7 @@ public class MemberService {
 
     public void removeMember(Member member) {
         member.deregister();
+        memberRepository.save(member);
     }
 
     public void createNickname(Member member, SetNicknameRequestDto requestDto) {

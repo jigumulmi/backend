@@ -240,6 +240,7 @@ public class PlaceService {
         reviewReplyRepository.save(reviewReply);
     }
 
+    @Transactional
     public void deleteReview(Long reviewId, Member member) {
         Review review = reviewRepository.findByIdAndMember(reviewId, member);
 
@@ -248,6 +249,7 @@ public class PlaceService {
             reviewRepository.delete(review);
         } else {
             review.deleteReviewWithReplies();
+            reviewRepository.save(review);
         }
     }
 
