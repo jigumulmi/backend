@@ -1,7 +1,8 @@
 package com.jigumulmi.place;
 
-import com.jigumulmi.config.security.SecureAuthUser;
-import com.jigumulmi.config.security.UserDetailsImpl;
+import com.jigumulmi.config.security.OptionalAuthUser;
+import com.jigumulmi.config.security.RequiredAuthUser;
+import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
@@ -25,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -92,8 +92,8 @@ public class PlaceController {
     @ApiResponse(responseCode = "201")
     @PostMapping("/review")
     public ResponseEntity<?> postReview(@Valid @RequestBody CreateReviewRequestDto requestDto,
-        @SecureAuthUser UserDetailsImpl userDetails) {
-        placeService.postReview(requestDto, userDetails);
+        @RequiredAuthUser Member member) {
+        placeService.postReview(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
     }
 
@@ -102,8 +102,8 @@ public class PlaceController {
     @PostMapping("/review/reply")
     public ResponseEntity<?> postReviewReply(
         @Valid @RequestBody CreateReviewReplyRequestDto requestDto,
-        @SecureAuthUser UserDetailsImpl userDetails) {
-        placeService.postReviewReply(requestDto, userDetails);
+        @RequiredAuthUser Member member) {
+        placeService.postReviewReply(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review reply success");
     }
 
@@ -113,10 +113,9 @@ public class PlaceController {
             @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewListResponseDto.class)))})}
     )
     @GetMapping("/review")
-    public ResponseEntity<?> getReviewList(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public ResponseEntity<?> getReviewList(@OptionalAuthUser Member member,
         @RequestParam(name = "placeId") Long placeId) {
-        List<ReviewListResponseDto> reviewList = placeService.getReviewList(userDetails,
-            placeId);
+        List<ReviewListResponseDto> reviewList = placeService.getReviewList(member, placeId);
         return ResponseEntity.ok().body(reviewList);
     }
 
@@ -127,9 +126,9 @@ public class PlaceController {
     )
     @GetMapping("/review/reply")
     public ResponseEntity<?> getReviewReplyList(
-        @AuthenticationPrincipal UserDetailsImpl userDetails,
+        @OptionalAuthUser Member member,
         @RequestParam(name = "reviewId") Long reviewId) {
-        List<ReviewReplyResponseDto> reviewReplyList = placeService.getReviewReplyList(userDetails,
+        List<ReviewReplyResponseDto> reviewReplyList = placeService.getReviewReplyList(member,
             reviewId);
         return ResponseEntity.ok().body(reviewReplyList);
     }
@@ -138,8 +137,8 @@ public class PlaceController {
     @ApiResponse(responseCode = "204")
     @PutMapping("/review")
     public ResponseEntity<?> updateReview(@Valid @RequestBody UpdateReviewRequestDto requestDto,
-        @SecureAuthUser UserDetailsImpl userDetails) {
-        placeService.updateReview(requestDto, userDetails);
+        @RequiredAuthUser Member member) {
+        placeService.updateReview(requestDto, member);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update review success");
     }
 
@@ -148,8 +147,8 @@ public class PlaceController {
     @PutMapping("/review/reply")
     public ResponseEntity<?> updateReviewReply(
         @Valid @RequestBody UpdateReviewReplyRequestDto requestDto,
-        @SecureAuthUser UserDetailsImpl userDetails) {
-        placeService.updateReviewReply(requestDto, userDetails);
+        @RequiredAuthUser Member member) {
+        placeService.updateReviewReply(requestDto, member);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update review reply success");
     }
 
@@ -157,8 +156,8 @@ public class PlaceController {
     @ApiResponse(responseCode = "204")
     @DeleteMapping("/review/{reviewId}")
     public ResponseEntity<?> deleteReview(@PathVariable(name = "reviewId") Long reviewId,
-        @SecureAuthUser UserDetailsImpl userDetails) {
-        placeService.deleteReview(reviewId, userDetails);
+        @RequiredAuthUser Member member) {
+        placeService.deleteReview(reviewId, member);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review success");
     }
 
@@ -167,8 +166,8 @@ public class PlaceController {
     @DeleteMapping("/review/reply/{reviewReplyId}")
     public ResponseEntity<?> deleteReviewReply(
         @PathVariable(name = "reviewReplyId") Long reviewReplyId,
-        @SecureAuthUser UserDetailsImpl userDetails) {
-        placeService.deleteReviewReply(reviewReplyId, userDetails);
+        @RequiredAuthUser Member member) {
+        placeService.deleteReviewReply(reviewReplyId, member);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review reply success");
     }
 }

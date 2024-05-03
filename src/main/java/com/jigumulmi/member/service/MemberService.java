@@ -1,7 +1,6 @@
 package com.jigumulmi.member.service;
 
 
-import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
@@ -15,19 +14,16 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public void removeMember(UserDetailsImpl userDetails) {
-        Member member = userDetails.getMember();
+    public void removeMember(Member member) {
         member.deregister();
     }
 
-    public void createNickname(UserDetailsImpl userDetails, SetNicknameRequestDto requestDto) {
-        Member member = userDetails.getMember();
+    public void createNickname(Member member, SetNicknameRequestDto requestDto) {
         member.updateNickname(requestDto.getNickname());
         memberRepository.save(member);
     }
 
-    public MemberDetailResponseDto getUserDetail(UserDetailsImpl userDetails) {
-        Member member = userDetails.getMember();
+    public MemberDetailResponseDto getUserDetail(Member member) {
         return new MemberDetailResponseDto(
             member.getCreatedAt(), member.getDeregisteredAt(), member.getId(), member.getNickname(),
             member.getEmail()
