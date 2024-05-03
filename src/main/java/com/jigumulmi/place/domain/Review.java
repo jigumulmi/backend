@@ -1,10 +1,13 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -38,14 +41,18 @@ public class Review extends Timestamped {
     @JsonManagedReference
     private List<ReviewReply> reviewReplyList = new ArrayList<>();
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private LocalDateTime deletedAt;
+
     @Builder
     public Review(Integer rating, String content, Member member, Restaurant restaurant,
-        List<ReviewReply> reviewReplyList) {
+        List<ReviewReply> reviewReplyList, LocalDateTime deletedAt) {
         this.rating = rating;
         this.content = content;
         this.member = member;
         this.restaurant = restaurant;
         this.reviewReplyList = reviewReplyList;
+        this.deletedAt = deletedAt;
     }
 
     public void updateReview(Integer rating, String content) {
@@ -55,5 +62,9 @@ public class Review extends Timestamped {
         if (content != null) {
             this.content = content;
         }
+    }
+
+    public void deleteReviewWithReplies() {
+        this.deletedAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     }
 }

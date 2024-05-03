@@ -261,7 +261,13 @@ public class PlaceService {
     public void deleteReview(Long reviewId, UserDetailsImpl userDetails) {
         Review review = reviewRepository.findByIdAndMember(reviewId,
             userDetails.getMember());
-        reviewRepository.delete(review);
+
+        List<ReviewReply> reviewReplyList = review.getReviewReplyList();
+        if (reviewReplyList.isEmpty()) {
+            reviewRepository.delete(review);
+        } else {
+            review.deleteReviewWithReplies();
+        }
     }
 
     public void deleteReviewReply(Long reviewReplyId, UserDetailsImpl userDetails) {

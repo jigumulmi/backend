@@ -17,7 +17,7 @@ public class MemberService {
 
     public void removeMember(UserDetailsImpl userDetails) {
         Member member = userDetails.getMember();
-        memberRepository.delete(member);
+        member.deregister();
     }
 
     public void createNickname(UserDetailsImpl userDetails, SetNicknameRequestDto requestDto) {
