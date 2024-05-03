@@ -17,7 +17,7 @@ public class MemberService {
 
     public void removeMember(UserDetailsImpl userDetails) {
         Member member = userDetails.getMember();
-        memberRepository.delete(member);
+        member.deregister();
     }
 
     public void createNickname(UserDetailsImpl userDetails, SetNicknameRequestDto requestDto) {
@@ -29,7 +29,8 @@ public class MemberService {
     public MemberDetailResponseDto getUserDetail(UserDetailsImpl userDetails) {
         Member member = userDetails.getMember();
         return new MemberDetailResponseDto(
-            member.getCreatedAt(), member.getId(), member.getNickname(), member.getEmail()
+            member.getCreatedAt(), member.getDeregisteredAt(), member.getId(), member.getNickname(),
+            member.getEmail()
         );
     }
 }

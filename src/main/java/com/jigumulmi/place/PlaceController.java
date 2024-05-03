@@ -97,7 +97,7 @@ public class PlaceController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
     }
 
-    @Operation(summary = "리뷰의 대댓글 등록")
+    @Operation(summary = "리뷰의 답글 등록")
     @ApiResponse(responseCode = "201")
     @PostMapping("/review/reply")
     public ResponseEntity<?> postReviewReply(
@@ -120,7 +120,7 @@ public class PlaceController {
         return ResponseEntity.ok().body(reviewList);
     }
 
-    @Operation(summary = "대댓글 리스트 조회")
+    @Operation(summary = "답글 리스트 조회")
     @ApiResponses(
         value = {@ApiResponse(responseCode = "200", content = {
             @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewReplyResponseDto.class)))})}
@@ -143,7 +143,7 @@ public class PlaceController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update review success");
     }
 
-    @Operation(summary = "대댓글 수정")
+    @Operation(summary = "답글 수정")
     @ApiResponse(responseCode = "204")
     @PutMapping("/review/reply")
     public ResponseEntity<?> updateReviewReply(
@@ -162,7 +162,7 @@ public class PlaceController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review success");
     }
 
-    @Operation(summary = "대댓글 삭제")
+    @Operation(summary = "답글 삭제")
     @ApiResponse(responseCode = "204")
     @DeleteMapping("/review/reply/{reviewReplyId}")
     public ResponseEntity<?> deleteReviewReply(

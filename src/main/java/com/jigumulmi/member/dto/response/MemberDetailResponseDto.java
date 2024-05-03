@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 public class MemberDetailResponseDto {
 
     private LocalDateTime createdAt;
+    private LocalDateTime deregisteredAt;
     private Long id;
     private String nickname;
     private String email;
