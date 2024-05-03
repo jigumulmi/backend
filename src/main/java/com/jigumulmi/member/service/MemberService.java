@@ -29,7 +29,8 @@ public class MemberService {
     public MemberDetailResponseDto getUserDetail(UserDetailsImpl userDetails) {
         Member member = userDetails.getMember();
         return new MemberDetailResponseDto(
-            member.getCreatedAt(), member.getId(), member.getNickname(), member.getEmail()
+            member.getCreatedAt(), member.getDeregisteredAt(), member.getId(), member.getNickname(),
+            member.getEmail()
         );
     }
 }

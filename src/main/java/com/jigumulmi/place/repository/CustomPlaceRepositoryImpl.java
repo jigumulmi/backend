@@ -56,6 +56,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         review.modifiedAt,
                         ConstantImpl.create("%Y.%m.%d")
                     ).as("reviewedAt"),
+                    review.deletedAt,
                     review.id,
                     review.rating,
                     review.content,
@@ -65,6 +66,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         .otherwise(false).as("isEditable"),
                     Projections.fields(MemberDetailResponseDto.class,
                         review.member.createdAt,
+                        review.member.deregisteredAt,
                         review.member.id,
                         review.member.nickname,
                         review.member.email).as("member"))
