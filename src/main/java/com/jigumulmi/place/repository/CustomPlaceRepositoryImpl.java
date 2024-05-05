@@ -95,13 +95,13 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                     reviewReply.id,
                     reviewReply.content,
                     new CaseBuilder()
-                        .when(review.member.id.eq(requestMemberId)).then(true)
+                        .when(reviewReply.member.id.eq(requestMemberId)).then(true)
                         .otherwise(false).as("isEditable"),
                     Projections.fields(MemberDetailResponseDto.class,
-                        review.member.createdAt,
-                        review.member.id,
-                        review.member.nickname,
-                        review.member.email).as("member"))
+                        reviewReply.member.createdAt,
+                        reviewReply.member.id,
+                        reviewReply.member.nickname,
+                        reviewReply.member.email).as("member"))
             ).distinct()
             .from(reviewReply)
             .where(reviewReply.review.id.eq(reviewId))
