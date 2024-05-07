@@ -7,6 +7,7 @@ import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.KakaoMemberInfoDto;
+import com.jigumulmi.member.dto.request.KakaoAuthorizationRequestDto;
 import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
@@ -40,16 +41,14 @@ public class KakaoService {
     @Value("${kakao.admin.key}")
     private String KAKAO_ADMIN_KEY;
 
-    @Value("${kakao.redirect.url}")
-    private String KAKAO_REDIRECT_URL;
-
     private final MemberRepository memberRepository;
 
 
     @Transactional
-    public KakaoAuthResponseDto authorize(String authorizationCode, HttpSession session)
+    public KakaoAuthResponseDto authorize(KakaoAuthorizationRequestDto requestDto,
+        HttpSession session)
         throws JsonProcessingException {
-        String accessToken = getAccessToken(authorizationCode);
+        String accessToken = getAccessToken(requestDto);
 
         KakaoMemberInfoDto kakaoMemberInfo = getKakaoMemberInfo(accessToken);
 
@@ -79,11 +78,12 @@ public class KakaoService {
     /**
      * "인가 코드"로 "액세스 토큰" 요청
      *
-     * @param authorizationCode 카카오 서버 제공 인가코드
+     * @param requestDto 카카오 서버 제공 인가코드, 프론트 서버 제공 리다이렉트 URL
      * @return accessToken 인가코드로 얻은 엑세스 토큰
      * @throws JsonProcessingException 카카오 API 응답 본문 파싱 에러
      */
-    private String getAccessToken(String authorizationCode) throws JsonProcessingException {
+    private String getAccessToken(KakaoAuthorizationRequestDto requestDto)
+        throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
@@ -93,8 +93,8 @@ public class KakaoService {
         body.add("grant_type", "authorization_code");
         body.add("client_id", KAKAO_CLIENT_ID);
         body.add("client_secret", KAKAO_CLIENT_SECRET);
-        body.add("redirect_uri", KAKAO_REDIRECT_URL);
-        body.add("code", authorizationCode);
+        body.add("redirect_uri", requestDto.getRedirectUrl());
+        body.add("code", requestDto.getCode());
 
         // Http Header와 Http Body를 하나의 오브젝트에 담기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body,

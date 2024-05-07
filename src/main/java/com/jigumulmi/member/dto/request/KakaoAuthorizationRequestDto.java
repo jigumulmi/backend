@@ -12,4 +12,6 @@ public class KakaoAuthorizationRequestDto {
 
     @NotBlank
     private String code;
+    @NotBlank
+    private String redirectUrl;
 }

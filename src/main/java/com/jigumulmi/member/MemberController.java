@@ -44,7 +44,7 @@ public class MemberController {
     public ResponseEntity<?> kakaoAuthorization(
         @Valid @RequestBody KakaoAuthorizationRequestDto requestDto, HttpSession session)
         throws JsonProcessingException {
-        KakaoAuthResponseDto response = kakaoService.authorize(requestDto.getCode(), session);
+        KakaoAuthResponseDto response = kakaoService.authorize(requestDto, session);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
