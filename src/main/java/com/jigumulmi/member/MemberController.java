@@ -70,9 +70,9 @@ public class MemberController {
     @Operation(summary = "닉네임 수정(생성)")
     @ApiResponse(responseCode = "201")
     @PutMapping("/nickname")
-    public ResponseEntity<?> setNickname(@RequiredAuthUser Member member,
+    public ResponseEntity<?> setNickname(HttpSession session, @RequiredAuthUser Member member,
         @Valid @RequestBody SetNicknameRequestDto requestDto) {
-        memberService.createNickname(member, requestDto);
+        memberService.createNickname(session, member, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Set nickname success");
     }
 

@@ -3,7 +3,7 @@ package com.jigumulmi.member.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jigumulmi.config.security.UserDetailsImpl;
+import com.jigumulmi.config.security.UserDetailsServiceImpl;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.KakaoMemberInfoDto;
@@ -16,12 +16,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -54,7 +48,7 @@ public class KakaoService {
 
         Member member = registerKakaoUserIfNeeded(kakaoMemberInfo, accessToken);
 
-        forceLogin(member, session);
+        UserDetailsServiceImpl.setSecurityContextAndSession(member, session);
 
         String nicknameFromDb = member.getNickname();
         if (nicknameFromDb == null) { // 신규 회원 -> 회원가입
@@ -181,18 +175,6 @@ public class KakaoService {
         }
 
         return kakaoMember;
-    }
-
-    private void forceLogin(Member kakaoMember, HttpSession session) {
-        UserDetails userDetails = new UserDetailsImpl(kakaoMember);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null,
-            userDetails.getAuthorities());
-
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        securityContext.setAuthentication(authentication);
-
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
-            securityContext);
     }
 
     public void unlink(Member member) {
