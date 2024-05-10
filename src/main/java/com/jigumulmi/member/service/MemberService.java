@@ -1,10 +1,12 @@
 package com.jigumulmi.member.service;
 
 
+import com.jigumulmi.config.security.UserDetailsServiceImpl;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,9 +21,12 @@ public class MemberService {
         memberRepository.save(member);
     }
 
-    public void createNickname(Member member, SetNicknameRequestDto requestDto) {
+    public void createNickname(HttpSession session, Member member,
+        SetNicknameRequestDto requestDto) {
         member.updateNickname(requestDto.getNickname());
         memberRepository.save(member);
+
+        UserDetailsServiceImpl.setSecurityContextAndSession(member, session);
     }
 
     public MemberDetailResponseDto getUserDetail(Member member) {
