@@ -19,7 +19,8 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final String[] origins = new String[]{"http://localhost:3000", "https://jigumulmi.com"};
+    private final String[] origins = new String[]{"http://localhost:3000", "https://jigumulmi.com",
+        "https://www.jigumulmi.com"};
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
