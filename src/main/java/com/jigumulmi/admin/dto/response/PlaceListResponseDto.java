@@ -59,5 +59,5 @@ public class PlaceListResponseDto {
     }
 
     private List<PlaceDto> data;
-    private Long totalCount;
+    private PageDto page;
 }

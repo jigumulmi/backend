@@ -33,5 +33,5 @@ public class MemberListResponseDto {
     }
 
     private List<MemberDto> data;
-    private Long totalCount;
+    private PageDto page;
 }
