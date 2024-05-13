@@ -32,6 +32,6 @@ public class MemberListResponseDto {
 
     }
 
-    private List<MemberDto> memberList;
-    private int totalCount;
+    private List<MemberDto> data;
+    private Long totalCount;
 }

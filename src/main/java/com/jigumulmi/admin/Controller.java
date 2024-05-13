@@ -1,7 +1,9 @@
 package com.jigumulmi.admin;
 
 import com.jigumulmi.admin.dto.request.GetMemberListRequestDto;
+import com.jigumulmi.admin.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.response.MemberListResponseDto;
+import com.jigumulmi.admin.dto.response.PlaceListResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,5 +32,16 @@ public class Controller {
     public ResponseEntity<?> getMemberList(@ModelAttribute GetMemberListRequestDto requestDto) {
         MemberListResponseDto memberList = service.getMemberList(requestDto);
         return ResponseEntity.ok().body(memberList);
+    }
+
+    @Operation(summary = "장소 리스트 조회")
+    @ApiResponses(
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(schema = @Schema(implementation = PlaceListResponseDto.class))})}
+    )
+    @GetMapping("/place")
+    public ResponseEntity<?> getPlaceList(@ModelAttribute GetPlaceListRequestDto requestDto) {
+        PlaceListResponseDto placeList = service.getPlaceList(requestDto);
+        return ResponseEntity.ok().body(placeList);
     }
 }
