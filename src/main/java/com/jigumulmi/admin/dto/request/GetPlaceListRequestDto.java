@@ -1,0 +1,27 @@
+package com.jigumulmi.admin.dto.request;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Sort.Direction;
+
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@ParameterObject
+public class GetPlaceListRequestDto {
+
+    @Parameter(description = "0부터 시작하는 페이지 번호")
+    @Schema(defaultValue = "0")
+    private int page = 0;
+
+    @Parameter(description = "id 기준 오름차순/내림차순")
+    @Schema(defaultValue = "ASC")
+    private Direction direction = Direction.ASC;
+
+}
