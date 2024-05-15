@@ -14,12 +14,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 
-@org.springframework.stereotype.Service
+@Service
 @RequiredArgsConstructor
-public class Service {
+public class AdminService {
 
     private final int DEFAULT_PAGE_SIZE = 15;
+    
     private final MemberRepository memberRepository;
     private final RestaurantRepository restaurantRepository;
 
