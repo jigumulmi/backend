@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin")
-@Tag(name = "admin")
-public class Controller {
+public class AdminController {
 
-    private final Service service;
+    private final AdminService adminService;
 
     @Operation(summary = "멤버 리스트 조회")
     @ApiResponses(
@@ -32,9 +30,10 @@ public class Controller {
     )
     @GetMapping("/member")
     public ResponseEntity<?> getMemberList(@ModelAttribute GetMemberListRequestDto requestDto) {
-        MemberListResponseDto memberList = service.getMemberList(requestDto);
+        MemberListResponseDto memberList = adminService.getMemberList(requestDto);
         return ResponseEntity.ok().body(memberList);
     }
+
 
     @Operation(summary = "장소 리스트 조회")
     @ApiResponses(
@@ -43,7 +42,7 @@ public class Controller {
     )
     @GetMapping("/place")
     public ResponseEntity<?> getPlaceList(@ModelAttribute GetPlaceListRequestDto requestDto) {
-        PlaceListResponseDto placeList = service.getPlaceList(requestDto);
+        PlaceListResponseDto placeList = adminService.getPlaceList(requestDto);
         return ResponseEntity.ok().body(placeList);
     }
 }
