@@ -133,12 +133,7 @@ public class PlaceService {
         Restaurant restaurant = restaurantRepository.findByIdAndIsApprovedTrue(placeId);
         SubwayStation subwayStation = restaurant.getSubwayStation();
 
-        ArrayList<MenuDto> menuDtoList = new ArrayList<>();
-        for (Menu menu : restaurant.getMenuList()) {
-            MenuDto menuDto = MenuDto.builder()
-                .id(menu.getId()).name(menu.getName()).build();
-            menuDtoList.add(menuDto);
-        }
+        List<MenuDto> menuList = restaurant.getMenuList().stream().map(MenuDto::from).toList();
 
         Double averageRating = customPlaceRepository.getAverageRatingByPlaceId(placeId);
         Long totalCount = reviewRepository.countByRestaurantId(placeId);
@@ -174,7 +169,7 @@ public class PlaceService {
             .category(restaurant.getCategory())
             .address(restaurant.getAddress())
             .contact(restaurant.getContact())
-            .menuList(menuDtoList)
+            .menuList(menuList)
             .openingHour(
                 OpeningHourDto.builder()
                     .openingHourSun(restaurant.getOpeningHourSun())

@@ -7,6 +7,8 @@ import com.jigumulmi.admin.dto.response.MemberListResponseDto.MemberDto;
 import com.jigumulmi.admin.dto.response.PageDto;
 import com.jigumulmi.admin.dto.response.PlaceListResponseDto;
 import com.jigumulmi.admin.dto.response.PlaceListResponseDto.PlaceDto;
+import com.jigumulmi.config.exception.CustomException;
+import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.place.repository.RestaurantRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,13 +17,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class AdminService {
 
     private final int DEFAULT_PAGE_SIZE = 15;
-    
+
     private final MemberRepository memberRepository;
     private final RestaurantRepository restaurantRepository;
 
@@ -55,5 +58,13 @@ public class AdminService {
                 .totalPage(placePage.getTotalPages())
                 .build())
             .build();
+    }
+
+    @Transactional(readOnly = true)
+    public PlaceDto getPlaceDetail(Long placeId) {
+        return restaurantRepository.findById(placeId).map(PlaceDto::detailedFrom)
+            .orElseThrow(() -> new CustomException(
+                CommonErrorCode.RESOURCE_NOT_FOUND));
+
     }
 }
