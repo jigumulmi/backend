@@ -1,5 +1,6 @@
 package com.jigumulmi.place.dto.response;
 
+import com.jigumulmi.place.domain.Menu;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
@@ -17,6 +18,13 @@ public class RestaurantDetailResponseDto extends RestaurantResponseDto {
         private Long id;
 
         private String name;
+
+        public static MenuDto from(Menu menu) {
+            return MenuDto.builder()
+                .id(menu.getId())
+                .name(menu.getName())
+                .build();
+        }
     }
 
     @Getter
