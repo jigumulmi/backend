@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @Builder
-public class MemberListResponseDto {
+public class AdminMemberListResponseDto {
 
     @Getter
     @SuperBuilder

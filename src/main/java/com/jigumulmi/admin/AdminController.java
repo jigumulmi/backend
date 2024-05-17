@@ -1,19 +1,25 @@
 package com.jigumulmi.admin;
 
-import com.jigumulmi.admin.dto.request.GetMemberListRequestDto;
-import com.jigumulmi.admin.dto.request.GetPlaceListRequestDto;
-import com.jigumulmi.admin.dto.response.MemberListResponseDto;
-import com.jigumulmi.admin.dto.response.PlaceListResponseDto;
-import com.jigumulmi.admin.dto.response.PlaceListResponseDto.PlaceDto;
+import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
+import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDtoAdmin;
+import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
+import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
+import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +34,12 @@ public class AdminController {
     @Operation(summary = "멤버 리스트 조회")
     @ApiResponses(
         value = {@ApiResponse(responseCode = "200", content = {
-            @Content(schema = @Schema(implementation = MemberListResponseDto.class))})}
+            @Content(schema = @Schema(implementation = AdminMemberListResponseDto.class))})}
     )
     @GetMapping("/member")
-    public ResponseEntity<?> getMemberList(@ModelAttribute GetMemberListRequestDto requestDto) {
-        MemberListResponseDto memberList = adminService.getMemberList(requestDto);
+    public ResponseEntity<?> getMemberList(
+        @ModelAttribute AdminGetMemberListRequestDto requestDto) {
+        AdminMemberListResponseDto memberList = adminService.getMemberList(requestDto);
         return ResponseEntity.ok().body(memberList);
     }
 
@@ -40,11 +47,11 @@ public class AdminController {
     @Operation(summary = "장소 리스트 조회")
     @ApiResponses(
         value = {@ApiResponse(responseCode = "200", content = {
-            @Content(schema = @Schema(implementation = PlaceListResponseDto.class))})}
+            @Content(schema = @Schema(implementation = AdminPlaceListResponseDto.class))})}
     )
     @GetMapping("/place")
-    public ResponseEntity<?> getPlaceList(@ModelAttribute GetPlaceListRequestDto requestDto) {
-        PlaceListResponseDto placeList = adminService.getPlaceList(requestDto);
+    public ResponseEntity<?> getPlaceList(@ModelAttribute AdminGetPlaceListRequestDto requestDto) {
+        AdminPlaceListResponseDto placeList = adminService.getPlaceList(requestDto);
         return ResponseEntity.ok().body(placeList);
     }
 
@@ -57,5 +64,26 @@ public class AdminController {
     public ResponseEntity<?> getPlaceDetail(@RequestParam(name = "placeId") Long placeId) {
         PlaceDto placeDetail = adminService.getPlaceDetail(placeId);
         return ResponseEntity.ok().body(placeDetail);
+    }
+
+    @Operation(summary = "장소 등록")
+    @ApiResponse(responseCode = "204")
+    @PostMapping("/place")
+    public ResponseEntity<?> updatePlaceDetail(@RequestBody AdminCreatePlaceRequestDto requestDto) {
+        adminService.createPlace(requestDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Create Success");
+    }
+
+    @Operation(summary = "장소 수정", description = """
+        수정하지 않은 항목은 기존 조회된 데이터를 꼭 담아주세요
+                
+        menuList는 메뉴 전체를 덮어쓰기하는 경우에만 보내주세요
+        """)
+    @ApiResponse(responseCode = "204")
+    @PutMapping("/place")
+    public ResponseEntity<?> updatePlaceDetail(
+        @RequestBody AdminUpdatePlaceRequestDtoAdmin requestDto) {
+        adminService.updatePlaceDetail(requestDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update Success");
     }
 }

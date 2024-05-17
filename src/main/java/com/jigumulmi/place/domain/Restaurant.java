@@ -1,6 +1,7 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDtoAdmin;
 import com.jigumulmi.config.common.Timestamped;
 import jakarta.persistence.*;
 import lombok.*;
@@ -96,5 +97,31 @@ public class Restaurant extends Timestamped {
         this.isApproved = isApproved;
         this.subwayStation = subwayStation;
         this.reviewList = reviewList;
+    }
+
+    public void updatePlace(AdminUpdatePlaceRequestDtoAdmin requestDto, SubwayStation subwayStation,
+        List<Menu> menuList) {
+        this.name = requestDto.getName();
+        this.category = requestDto.getCategory();
+        this.address = requestDto.getAddress();
+        this.contact = requestDto.getContact();
+        if (!menuList.isEmpty()) {
+            this.menuList = menuList;
+        }
+        this.openingHourSun = requestDto.getOpeningHourSun();
+        this.openingHourMon = requestDto.getOpeningHourMon();
+        this.openingHourTue = requestDto.getOpeningHourTue();
+        this.openingHourWed = requestDto.getOpeningHourWed();
+        this.openingHourThu = requestDto.getOpeningHourThu();
+        this.openingHourFri = requestDto.getOpeningHourFri();
+        this.openingHourSat = requestDto.getOpeningHourSat();
+        this.additionalInfo = requestDto.getAdditionalInfo();
+        this.mainImageUrl = requestDto.getMainImageUrl();
+        this.placeUrl = requestDto.getPlaceUrl();
+        this.longitude = requestDto.getLongitude();
+        this.latitude = requestDto.getLatitude();
+        this.registrantComment = requestDto.getRegistrantComment();
+        this.isApproved = requestDto.getIsApproved();
+        this.subwayStation = subwayStation;
     }
 }
