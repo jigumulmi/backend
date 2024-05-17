@@ -14,7 +14,7 @@ import org.springframework.data.domain.Sort.Direction;
 @ToString
 @NoArgsConstructor
 @ParameterObject
-public class GetMemberListRequestDto {
+public class AdminGetMemberListRequestDto {
 
     @Parameter(description = "1부터 시작하는 페이지 번호")
     @Schema(defaultValue = "1")

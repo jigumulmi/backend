@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @Builder
-public class PlaceListResponseDto {
+public class AdminPlaceListResponseDto {
 
     @Getter
     @SuperBuilder
@@ -37,6 +37,7 @@ public class PlaceListResponseDto {
                 .mainImageUrl(restaurant.getMainImageUrl())
                 .registrantComment(restaurant.getRegistrantComment())
                 .isApproved(restaurant.getIsApproved())
+                .additionalInfo(restaurant.getAdditionalInfo())
                 .position(
                     PositionDto.builder()
                         .longitude(restaurant.getLongitude())
@@ -79,6 +80,7 @@ public class PlaceListResponseDto {
                 .mainImageUrl(restaurant.getMainImageUrl())
                 .registrantComment(restaurant.getRegistrantComment())
                 .isApproved(restaurant.getIsApproved())
+                .additionalInfo(restaurant.getAdditionalInfo())
                 .position(
                     PositionDto.builder()
                         .longitude(restaurant.getLongitude())
