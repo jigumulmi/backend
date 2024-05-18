@@ -1,8 +1,10 @@
 package com.jigumulmi.place.dto.response;
 
 import com.jigumulmi.place.domain.Menu;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -29,6 +31,8 @@ public class RestaurantDetailResponseDto extends RestaurantResponseDto {
 
     @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class OpeningHourDto {
 
         private String openingHourSun;
