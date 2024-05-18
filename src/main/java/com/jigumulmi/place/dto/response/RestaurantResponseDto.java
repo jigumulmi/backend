@@ -1,7 +1,9 @@
 package com.jigumulmi.place.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 
@@ -11,6 +13,8 @@ public class RestaurantResponseDto {
 
     @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class PositionDto {
 
         private Double latitude;

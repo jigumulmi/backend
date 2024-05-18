@@ -1,8 +1,10 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDtoAdmin;
+import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.config.common.Timestamped;
+import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto.OpeningHourDto;
+import com.jigumulmi.place.dto.response.RestaurantResponseDto.PositionDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
@@ -99,27 +101,28 @@ public class Restaurant extends Timestamped {
         this.reviewList = reviewList;
     }
 
-    public void updatePlace(AdminUpdatePlaceRequestDtoAdmin requestDto, SubwayStation subwayStation,
+    public void adminUpdate(AdminUpdatePlaceRequestDto requestDto, SubwayStation subwayStation,
         List<Menu> menuList) {
+        OpeningHourDto openingHour = requestDto.getOpeningHour();
+        PositionDto position = requestDto.getPosition();
+
         this.name = requestDto.getName();
         this.category = requestDto.getCategory();
         this.address = requestDto.getAddress();
         this.contact = requestDto.getContact();
-        if (!menuList.isEmpty()) {
-            this.menuList = menuList;
-        }
-        this.openingHourSun = requestDto.getOpeningHourSun();
-        this.openingHourMon = requestDto.getOpeningHourMon();
-        this.openingHourTue = requestDto.getOpeningHourTue();
-        this.openingHourWed = requestDto.getOpeningHourWed();
-        this.openingHourThu = requestDto.getOpeningHourThu();
-        this.openingHourFri = requestDto.getOpeningHourFri();
-        this.openingHourSat = requestDto.getOpeningHourSat();
+        this.menuList = menuList;
+        this.openingHourSun = openingHour.getOpeningHourSun();
+        this.openingHourMon = openingHour.getOpeningHourMon();
+        this.openingHourTue = openingHour.getOpeningHourTue();
+        this.openingHourWed = openingHour.getOpeningHourWed();
+        this.openingHourThu = openingHour.getOpeningHourThu();
+        this.openingHourFri = openingHour.getOpeningHourFri();
+        this.openingHourSat = openingHour.getOpeningHourSat();
         this.additionalInfo = requestDto.getAdditionalInfo();
         this.mainImageUrl = requestDto.getMainImageUrl();
         this.placeUrl = requestDto.getPlaceUrl();
-        this.longitude = requestDto.getLongitude();
-        this.latitude = requestDto.getLatitude();
+        this.longitude = position.getLongitude();
+        this.latitude = position.getLatitude();
         this.registrantComment = requestDto.getRegistrantComment();
         this.isApproved = requestDto.getIsApproved();
         this.subwayStation = subwayStation;
