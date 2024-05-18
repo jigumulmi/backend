@@ -17,11 +17,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -60,8 +60,8 @@ public class AdminController {
         value = {@ApiResponse(responseCode = "200", content = {
             @Content(schema = @Schema(implementation = PlaceDto.class))})}
     )
-    @GetMapping("/place/detail")
-    public ResponseEntity<?> getPlaceDetail(@RequestParam(name = "placeId") Long placeId) {
+    @GetMapping("/place/detail/{placeId}")
+    public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
         PlaceDto placeDetail = adminService.getPlaceDetail(placeId);
         return ResponseEntity.ok().body(placeDetail);
     }
