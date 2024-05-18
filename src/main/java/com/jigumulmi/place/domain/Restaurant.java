@@ -1,7 +1,7 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDtoAdmin;
+import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.config.common.Timestamped;
 import jakarta.persistence.*;
 import lombok.*;
@@ -99,15 +99,13 @@ public class Restaurant extends Timestamped {
         this.reviewList = reviewList;
     }
 
-    public void updatePlace(AdminUpdatePlaceRequestDtoAdmin requestDto, SubwayStation subwayStation,
+    public void adminUpdate(AdminUpdatePlaceRequestDto requestDto, SubwayStation subwayStation,
         List<Menu> menuList) {
         this.name = requestDto.getName();
         this.category = requestDto.getCategory();
         this.address = requestDto.getAddress();
         this.contact = requestDto.getContact();
-        if (!menuList.isEmpty()) {
-            this.menuList = menuList;
-        }
+        this.menuList = menuList;
         this.openingHourSun = requestDto.getOpeningHourSun();
         this.openingHourMon = requestDto.getOpeningHourMon();
         this.openingHourTue = requestDto.getOpeningHourTue();

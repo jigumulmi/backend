@@ -3,12 +3,12 @@ package com.jigumulmi.admin;
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDtoAdmin;
+import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto.MemberDto;
-import com.jigumulmi.admin.dto.response.PageDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
+import com.jigumulmi.admin.dto.response.PageDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
@@ -117,7 +117,7 @@ public class AdminService {
     }
 
     @Transactional
-    public void updatePlaceDetail(AdminUpdatePlaceRequestDtoAdmin requestDto) {
+    public void updatePlaceDetail(AdminUpdatePlaceRequestDto requestDto) {
 
         Restaurant restaurant = restaurantRepository.findById(requestDto.getPlaceId())
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
@@ -132,7 +132,7 @@ public class AdminService {
             menuList.add(menu);
         }
 
-        restaurant.updatePlace(requestDto, subwayStation, menuList);
+        restaurant.adminUpdate(requestDto, subwayStation, menuList);
 
         menuRepository.deleteAllByRestaurantId(requestDto.getPlaceId());
         menuRepository.saveAll(menuList);

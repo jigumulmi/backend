@@ -7,8 +7,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AdminUpdatePlaceRequestDtoAdmin extends AdminCreatePlaceRequestDto {
-    
+public class AdminUpdatePlaceRequestDto extends AdminCreatePlaceRequestDto {
+
     private Long placeId;
 
 }

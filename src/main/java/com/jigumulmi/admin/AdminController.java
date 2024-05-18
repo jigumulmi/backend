@@ -3,7 +3,7 @@ package com.jigumulmi.admin;
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDtoAdmin;
+import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
@@ -74,15 +74,11 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Create Success");
     }
 
-    @Operation(summary = "장소 수정", description = """
-        수정하지 않은 항목은 기존 조회된 데이터를 꼭 담아주세요
-                
-        menuList는 메뉴 전체를 덮어쓰기하는 경우에만 보내주세요
-        """)
+    @Operation(summary = "장소 수정", description = "덮어쓰는 로직이므로 수정하지 않은 항목은 기존 조회된 데이터를 꼭 담아주세요")
     @ApiResponse(responseCode = "204")
     @PutMapping("/place")
     public ResponseEntity<?> updatePlaceDetail(
-        @RequestBody AdminUpdatePlaceRequestDtoAdmin requestDto) {
+        @RequestBody AdminUpdatePlaceRequestDto requestDto) {
         adminService.updatePlaceDetail(requestDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update Success");
     }
