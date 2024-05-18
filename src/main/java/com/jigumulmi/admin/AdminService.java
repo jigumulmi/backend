@@ -15,6 +15,8 @@ import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Restaurant;
 import com.jigumulmi.place.domain.SubwayStation;
+import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto.OpeningHourDto;
+import com.jigumulmi.place.dto.response.RestaurantResponseDto.PositionDto;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.RestaurantRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
@@ -80,6 +82,9 @@ public class AdminService {
 
     @Transactional
     public void createPlace(AdminCreatePlaceRequestDto requestDto) {
+        OpeningHourDto openingHour = requestDto.getOpeningHour();
+        PositionDto position = requestDto.getPosition();
+
         SubwayStation subwayStation = subwayStationRepository.findById(
                 requestDto.getSubwayStationId())
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
@@ -89,18 +94,18 @@ public class AdminService {
             .category(requestDto.getCategory())
             .address(requestDto.getAddress())
             .contact(requestDto.getContact())
-            .contact(requestDto.getContact())
-            .openingHourSun(requestDto.getOpeningHourSun())
-            .openingHourMon(requestDto.getOpeningHourMon())
-            .openingHourTue(requestDto.getOpeningHourTue())
-            .openingHourWed(requestDto.getOpeningHourWed())
-            .openingHourThu(requestDto.getOpeningHourThu())
-            .openingHourFri(requestDto.getOpeningHourFri())
-            .openingHourSat(requestDto.getOpeningHourSat())
+            .openingHourSun(openingHour.getOpeningHourSun())
+            .openingHourMon(openingHour.getOpeningHourMon())
+            .openingHourTue(openingHour.getOpeningHourTue())
+            .openingHourWed(openingHour.getOpeningHourWed())
+            .openingHourThu(openingHour.getOpeningHourThu())
+            .openingHourFri(openingHour.getOpeningHourFri())
+            .openingHourSat(openingHour.getOpeningHourSat())
+            .additionalInfo(requestDto.getAdditionalInfo())
             .mainImageUrl(requestDto.getMainImageUrl())
             .placeUrl(requestDto.getPlaceUrl())
-            .longitude(requestDto.getLongitude())
-            .latitude(requestDto.getLatitude())
+            .longitude(position.getLongitude())
+            .latitude(position.getLatitude())
             .registrantComment(requestDto.getRegistrantComment())
             .isApproved(requestDto.getIsApproved())
             .subwayStation(subwayStation)

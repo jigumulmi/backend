@@ -74,7 +74,7 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Create Success");
     }
 
-    @Operation(summary = "장소 수정", description = "덮어쓰는 로직이므로 수정하지 않은 항목은 기존 조회된 데이터를 꼭 담아주세요")
+    @Operation(summary = "장소 수정", description = "덮어쓰는 로직이므로 수정하지 않은 항목도 기존 조회된 데이터를 꼭 담아주세요")
     @ApiResponse(responseCode = "204")
     @PutMapping("/place")
     public ResponseEntity<?> updatePlaceDetail(
