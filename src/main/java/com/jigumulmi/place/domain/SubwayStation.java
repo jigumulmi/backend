@@ -1,5 +1,6 @@
 package com.jigumulmi.place.domain;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -29,12 +30,13 @@ public class SubwayStation {
     private String lineNumber;
 
     @OneToMany(mappedBy = "subwayStation")
-    private List<Restaurant> restaurantList = new ArrayList<>();
+    @JsonManagedReference
+    private List<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
 
     @Builder
     public SubwayStation(String stationCode, String externalCode, String stationName,
         String stationNameEng, String stationNameJpn, String stationNameChn, String lineNumber,
-        List<Restaurant> restaurantList) {
+        List<SubwayStationPlace> subwayStationPlaceList) {
         this.stationCode = stationCode;
         this.externalCode = externalCode;
         this.stationName = stationName;
@@ -42,6 +44,6 @@ public class SubwayStation {
         this.stationNameJpn = stationNameJpn;
         this.stationNameChn = stationNameChn;
         this.lineNumber = lineNumber;
-        this.restaurantList = restaurantList;
+        this.subwayStationPlaceList = subwayStationPlaceList;
     }
 }

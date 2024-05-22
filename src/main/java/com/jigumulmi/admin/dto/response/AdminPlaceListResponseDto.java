@@ -2,9 +2,11 @@ package com.jigumulmi.admin.dto.response;
 
 import com.jigumulmi.place.domain.Restaurant;
 import com.jigumulmi.place.domain.SubwayStation;
+import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,7 +26,18 @@ public class AdminPlaceListResponseDto {
         private Boolean isApproved;
 
         public static PlaceDto from(Restaurant restaurant) {
-            SubwayStation subwayStation = restaurant.getSubwayStation();
+            List<SubwayStationPlace> subwayStationPlaceList = restaurant.getSubwayStationPlaceList();
+            List<SubwayStationResponseDto> subwayStationDtoList = new ArrayList<>();
+            for (SubwayStationPlace subwayStationPlace : subwayStationPlaceList) {
+                SubwayStation subwayStation = subwayStationPlace.getSubwayStation();
+                subwayStationDtoList.add(
+                    SubwayStationResponseDto.builder()
+                        .id(subwayStation.getId())
+                        .lineNumber(subwayStation.getLineNumber())
+                        .stationName(subwayStation.getStationName())
+                        .build()
+                );
+            }
 
             return PlaceDto.builder()
                 .createdAt(restaurant.getCreatedAt())
@@ -55,18 +68,23 @@ public class AdminPlaceListResponseDto {
                         .openingHourSat(restaurant.getOpeningHourSat())
                         .build()
                 )
-                .subwayStation(
-                    SubwayStationResponseDto.builder()
-                        .id(subwayStation.getId())
-                        .stationName(subwayStation.getStationName())
-                        .lineNumber(subwayStation.getLineNumber())
-                        .build()
-                )
+                .subwayStationList(subwayStationDtoList)
                 .build();
         }
 
         public static PlaceDto detailedFrom(Restaurant restaurant) {
-            SubwayStation subwayStation = restaurant.getSubwayStation();
+            List<SubwayStationPlace> subwayStationPlaceList = restaurant.getSubwayStationPlaceList();
+            List<SubwayStationResponseDto> subwayStationDtoList = new ArrayList<>();
+            for (SubwayStationPlace subwayStationPlace : subwayStationPlaceList) {
+                SubwayStation subwayStation = subwayStationPlace.getSubwayStation();
+                subwayStationDtoList.add(
+                    SubwayStationResponseDto.builder()
+                        .id(subwayStation.getId())
+                        .lineNumber(subwayStation.getLineNumber())
+                        .stationName(subwayStation.getStationName())
+                        .build()
+                );
+            }
             List<MenuDto> menuList = restaurant.getMenuList().stream().map(MenuDto::from).toList();
 
             return PlaceDto.builder()
@@ -98,13 +116,7 @@ public class AdminPlaceListResponseDto {
                         .openingHourSat(restaurant.getOpeningHourSat())
                         .build()
                 )
-                .subwayStation(
-                    SubwayStationResponseDto.builder()
-                        .id(subwayStation.getId())
-                        .stationName(subwayStation.getStationName())
-                        .lineNumber(subwayStation.getLineNumber())
-                        .build()
-                )
+                .subwayStationList(subwayStationDtoList)
                 .menuList(menuList)
                 .build();
         }

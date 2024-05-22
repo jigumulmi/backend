@@ -1,5 +1,6 @@
 package com.jigumulmi.place.dto.response;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 
 @Getter
 @SuperBuilder
+@NoArgsConstructor
 public class RestaurantResponseDto {
 
     @Getter
@@ -30,5 +32,5 @@ public class RestaurantResponseDto {
 
     private PositionDto position;
 
-    private SubwayStationResponseDto subwayStation;
+    private List<SubwayStationResponseDto> subwayStationList;
 }

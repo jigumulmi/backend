@@ -65,7 +65,7 @@ public class PlaceController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Register success");
     }
 
-    @Operation(summary = "장소 리스트 조회")
+    @Operation(summary = "장소 리스트 조회", description = "subwayStationId: 지하철역 검색, placeId: 마커 검색, 둘다 없는 경우 전체 검색")
     @ApiResponses(
         value = {@ApiResponse(responseCode = "200", content = {
             @Content(array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))})}
