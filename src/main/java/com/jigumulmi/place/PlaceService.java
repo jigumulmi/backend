@@ -8,6 +8,7 @@ import com.jigumulmi.place.domain.Restaurant;
 import com.jigumulmi.place.domain.Review;
 import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.domain.SubwayStation;
+import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
@@ -28,6 +29,7 @@ import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.RestaurantRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
+import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlaceService {
 
     private final SubwayStationRepository subwayStationRepository;
+    private final SubwayStationPlaceRepository subwayStationPlaceRepository;
     private final RestaurantRepository restaurantRepository;
     private final MenuRepository menuRepository;
     private final ReviewRepository reviewRepository;
@@ -59,7 +62,8 @@ public class PlaceService {
             SubwayStationResponseDto responseDto = SubwayStationResponseDto.builder()
                 .id(subwayStation.getId())
                 .stationName(subwayStation.getStationName())
-                .lineNumber(subwayStation.getLineNumber()).build();
+                .lineNumber(subwayStation.getLineNumber())
+                .build();
 
             responseDtoList.add(responseDto);
         }
@@ -69,12 +73,22 @@ public class PlaceService {
 
     @Transactional
     public void registerPlace(CreatePlaceRequestDto requestDto) {
+
+        Restaurant newRestaurant = Restaurant.builder()
+            .name(requestDto.getName())
+            .registrantComment(requestDto.getRegistrantComment())
+            .isApproved(false)
+            .build();
+
         SubwayStation subwayStation = subwayStationRepository.findById(
                 requestDto.getSubwayStationId())
             .orElseThrow(IllegalArgumentException::new);
-        Restaurant newRestaurant = Restaurant.builder().name(requestDto.getName())
-            .subwayStation(subwayStation).registrantComment(requestDto.getRegistrantComment())
-            .isApproved(false).build();
+
+        SubwayStationPlace subwayStationPlace = SubwayStationPlace.builder()
+            .isMain(true)
+            .subwayStation(subwayStation)
+            .restaurant(newRestaurant)
+            .build();
 
         ArrayList<Menu> menuList = new ArrayList<>();
         for (String menuName : requestDto.getMenuList()) {
@@ -84,54 +98,19 @@ public class PlaceService {
 
         restaurantRepository.save(newRestaurant);
         menuRepository.saveAll(menuList);
+        subwayStationPlaceRepository.save(subwayStationPlace);
     }
 
     public List<RestaurantResponseDto> getPlaceList(GetPlaceListRequestDto requestDto) {
         Long subwayStationId = requestDto.getSubwayStationId();
         Long placeId = requestDto.getPlaceId();
 
-        List<Restaurant> restaurantList;
-        if (subwayStationId != null & placeId == null) {
-            restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(
-                subwayStationId);
-        } else if (subwayStationId == null & placeId == null) {
-            restaurantList = restaurantRepository.findAllByIsApprovedTrue();
-        } else if (subwayStationId == null & placeId != null) {
-            SubwayStation subwayStation = restaurantRepository.findSubwayStationById(placeId);
-            restaurantList = restaurantRepository.findAllBySubwayStationIdAndIsApprovedTrue(
-                subwayStation.getId());
-        } else {
-            throw new CustomException(CommonErrorCode.UNPROCESSABLE_ENTITY);
-        }
-
-        ArrayList<RestaurantResponseDto> responseDtoList = new ArrayList<>();
-        for (Restaurant restaurant : restaurantList) {
-            SubwayStation subwayStation = restaurant.getSubwayStation();
-
-            RestaurantResponseDto responseDto = RestaurantResponseDto.builder()
-                .id(restaurant.getId())
-                .name(restaurant.getName())
-                .mainImageUrl(restaurant.getMainImageUrl())
-                .position(
-                    PositionDto.builder().longitude(restaurant.getLongitude())
-                        .latitude(restaurant.getLatitude()).build()
-                )
-                .subwayStation(
-                    SubwayStationResponseDto.builder().id(subwayStation.getId())
-                        .stationName(subwayStation.getStationName())
-                        .lineNumber(subwayStation.getLineNumber()).build()
-                )
-                .build();
-
-            responseDtoList.add(responseDto);
-        }
-
-        return responseDtoList;
+        return customPlaceRepository.getRestaurantList(placeId, subwayStationId);
     }
 
+    @Transactional(readOnly = true)
     public RestaurantDetailResponseDto getPlaceDetail(Long placeId) {
-        Restaurant restaurant = restaurantRepository.findByIdAndIsApprovedTrue(placeId);
-        SubwayStation subwayStation = restaurant.getSubwayStation();
+        Restaurant restaurant = customPlaceRepository.getRestaurantDetail(placeId);
 
         List<MenuDto> menuList = restaurant.getMenuList().stream().map(MenuDto::from).toList();
 
@@ -149,6 +128,19 @@ public class PlaceService {
             .statistics(reviewRatingStatMap)
             .build();
 
+        List<SubwayStationPlace> subwayStationPlaceList = restaurant.getSubwayStationPlaceList();
+        List<SubwayStationResponseDto> subwayStationDtoList = new ArrayList<>();
+        for (SubwayStationPlace subwayStationPlace : subwayStationPlaceList) {
+            SubwayStation subwayStation = subwayStationPlace.getSubwayStation();
+            subwayStationDtoList.add(
+                SubwayStationResponseDto.builder()
+                    .id(subwayStation.getId())
+                    .lineNumber(subwayStation.getLineNumber())
+                    .stationName(subwayStation.getStationName())
+                    .build()
+            );
+        }
+
         return RestaurantDetailResponseDto.builder()
             .id(restaurant.getId())
             .name(restaurant.getName())
@@ -159,13 +151,7 @@ public class PlaceService {
                     .longitude(restaurant.getLongitude())
                     .build()
             )
-            .subwayStation(
-                SubwayStationResponseDto.builder()
-                    .id(subwayStation.getId())
-                    .lineNumber(subwayStation.getLineNumber())
-                    .stationName(subwayStation.getStationName())
-                    .build()
-            )
+            .subwayStationList(subwayStationDtoList)
             .category(restaurant.getCategory())
             .address(restaurant.getAddress())
             .contact(restaurant.getContact())

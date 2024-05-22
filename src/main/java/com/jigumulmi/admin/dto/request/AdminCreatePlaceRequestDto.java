@@ -25,5 +25,5 @@ public class AdminCreatePlaceRequestDto {
     private String additionalInfo;
     private String registrantComment;
     private Boolean isApproved = false;
-    private Long subwayStationId;
+    private List<Long> subwayStationIdList;
 }

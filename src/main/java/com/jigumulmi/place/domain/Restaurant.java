@@ -7,6 +7,7 @@ import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto.OpeningHourD
 import com.jigumulmi.place.dto.response.RestaurantResponseDto.PositionDto;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
@@ -15,7 +16,6 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"subwayStation"})
 public class Restaurant extends Timestamped {
 
     @Id
@@ -30,6 +30,7 @@ public class Restaurant extends Timestamped {
 
     private String contact;
 
+    @BatchSize(size = 10)
     @OneToMany(mappedBy = "restaurant")
     @JsonManagedReference
     private List<Menu> menuList = new ArrayList<>();
@@ -63,20 +64,23 @@ public class Restaurant extends Timestamped {
     @ColumnDefault("false")
     private Boolean isApproved;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "subway_station_id")
-    private SubwayStation subwayStation;
 
     @OneToMany(mappedBy = "restaurant")
     @JsonManagedReference
     private List<Review> reviewList = new ArrayList<>();
+
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "restaurant")
+    @JsonManagedReference
+    private List<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
 
     @Builder
     public Restaurant(String name, String category, String address, String contact,
         List<Menu> menuList, String openingHourSun, String openingHourMon, String openingHourTue,
         String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat,
         String additionalInfo, String mainImageUrl, String placeUrl, Double longitude,
-        Double latitude, String registrantComment, Boolean isApproved, SubwayStation subwayStation,
+        Double latitude, String registrantComment, Boolean isApproved,
+        List<SubwayStationPlace> subwayStationPlaceList,
         List<Review> reviewList) {
         this.name = name;
         this.category = category;
@@ -97,11 +101,12 @@ public class Restaurant extends Timestamped {
         this.latitude = latitude;
         this.registrantComment = registrantComment;
         this.isApproved = isApproved;
-        this.subwayStation = subwayStation;
+        this.subwayStationPlaceList = subwayStationPlaceList;
         this.reviewList = reviewList;
     }
 
-    public void adminUpdate(AdminUpdatePlaceRequestDto requestDto, SubwayStation subwayStation,
+    public void adminUpdate(AdminUpdatePlaceRequestDto requestDto,
+        List<SubwayStationPlace> subwayStationPlaceList,
         List<Menu> menuList) {
         OpeningHourDto openingHour = requestDto.getOpeningHour();
         PositionDto position = requestDto.getPosition();
@@ -125,6 +130,6 @@ public class Restaurant extends Timestamped {
         this.latitude = position.getLatitude();
         this.registrantComment = requestDto.getRegistrantComment();
         this.isApproved = requestDto.getIsApproved();
-        this.subwayStation = subwayStation;
+        this.subwayStationPlaceList = subwayStationPlaceList;
     }
 }
