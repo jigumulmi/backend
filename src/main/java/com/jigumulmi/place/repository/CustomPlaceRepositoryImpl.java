@@ -161,7 +161,11 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             .from(review)
             .join(review.member)
             .leftJoin(review.reviewReplyList)
-            .where(review.restaurant.id.eq(placeId))
+            .where(review.restaurant.id.eq(placeId)
+                .and(review.content.ne("")
+                    .or(review.member.id.eq(requestMemberId))
+                )
+            )
             .orderBy(review.modifiedAt.desc())
             .fetch();
     }
