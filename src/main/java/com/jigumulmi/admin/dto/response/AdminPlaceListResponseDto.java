@@ -29,14 +29,17 @@ public class AdminPlaceListResponseDto {
             List<SubwayStationPlace> subwayStationPlaceList = restaurant.getSubwayStationPlaceList();
             List<SubwayStationResponseDto> subwayStationDtoList = new ArrayList<>();
             for (SubwayStationPlace subwayStationPlace : subwayStationPlaceList) {
-                SubwayStation subwayStation = subwayStationPlace.getSubwayStation();
-                subwayStationDtoList.add(
-                    SubwayStationResponseDto.builder()
-                        .id(subwayStation.getId())
-                        .lineNumber(subwayStation.getLineNumber())
-                        .stationName(subwayStation.getStationName())
-                        .build()
-                );
+                if (subwayStationPlace.getIsMain()) {
+                    SubwayStation subwayStation = subwayStationPlace.getSubwayStation();
+                    subwayStationDtoList.add(
+                        SubwayStationResponseDto.builder()
+                            .id(subwayStation.getId())
+                            .lineNumber(subwayStation.getLineNumber())
+                            .stationName(subwayStation.getStationName())
+                            .isMain(subwayStationPlace.getIsMain())
+                            .build()
+                    );
+                }
             }
 
             return PlaceDto.builder()
@@ -82,6 +85,7 @@ public class AdminPlaceListResponseDto {
                         .id(subwayStation.getId())
                         .lineNumber(subwayStation.getLineNumber())
                         .stationName(subwayStation.getStationName())
+                        .isMain(subwayStationPlace.getIsMain())
                         .build()
                 );
             }

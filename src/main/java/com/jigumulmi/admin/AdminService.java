@@ -144,15 +144,14 @@ public class AdminService {
         Restaurant restaurant = restaurantRepository.findById(requestDto.getPlaceId())
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
+        List<Long> subwayStationIdList = requestDto.getSubwayStationIdList();
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(
-            requestDto.getSubwayStationIdList());
+                subwayStationIdList);
 
         ArrayList<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
-        for (int i = 0; i < subwayStationList.size(); i++) {
-            SubwayStation subwayStation = subwayStationList.get(i);
-
+        for (SubwayStation subwayStation : subwayStationList) {
             SubwayStationPlace subwayStationPlace = SubwayStationPlace.builder()
-                .isMain(i == 0) // 첫 요소가 메인 지하철역
+                .isMain(subwayStation.getId().equals(subwayStationIdList.getFirst())) // 첫 요소가 메인 지하철역
                 .subwayStation(subwayStation)
                 .restaurant(restaurant)
                 .build();
