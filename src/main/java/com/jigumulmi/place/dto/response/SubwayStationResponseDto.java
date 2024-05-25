@@ -14,4 +14,5 @@ public class SubwayStationResponseDto {
     private Long id;
     private String stationName;
     private String lineNumber;
+    private Boolean isMain = false;
 }

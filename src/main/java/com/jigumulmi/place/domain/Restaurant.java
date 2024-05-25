@@ -71,6 +71,7 @@ public class Restaurant extends Timestamped {
 
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "restaurant")
+    @OrderBy("isMain DESC")
     @JsonManagedReference
     private List<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
 
