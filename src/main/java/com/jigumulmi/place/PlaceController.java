@@ -9,8 +9,8 @@ import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
-import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
-import com.jigumulmi.place.dto.response.RestaurantResponseDto;
+import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -65,26 +65,26 @@ public class PlaceController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Register success");
     }
 
-    @Operation(summary = "장소 리스트 조회", description = "subwayStationId: 지하철역 검색, placeId: 마커 검색, 둘다 없는 경우 전체 검색")
+    @Operation(summary = "장소 리스트 조회")
     @ApiResponses(
         value = {@ApiResponse(responseCode = "200", content = {
-            @Content(array = @ArraySchema(schema = @Schema(implementation = RestaurantResponseDto.class)))})}
+            @Content(array = @ArraySchema(schema = @Schema(implementation = PlaceResponseDto.class)))})}
     )
     @GetMapping("")
     public ResponseEntity<?> getPlaceList(
         @ParameterObject @ModelAttribute GetPlaceListRequestDto requestDto) {
-        List<RestaurantResponseDto> placeList = placeService.getPlaceList(requestDto);
+        List<PlaceResponseDto> placeList = placeService.getPlaceList(requestDto);
         return ResponseEntity.ok().body(placeList);
     }
 
     @Operation(summary = "장소 상세 조회")
     @ApiResponses(
         value = {@ApiResponse(responseCode = "200", content = {
-            @Content(schema = @Schema(implementation = RestaurantDetailResponseDto.class))})}
+            @Content(schema = @Schema(implementation = PlaceDetailResponseDto.class))})}
     )
     @GetMapping("/detail/{placeId}")
     public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
-        RestaurantDetailResponseDto placeDetail = placeService.getPlaceDetail(placeId);
+        PlaceDetailResponseDto placeDetail = placeService.getPlaceDetail(placeId);
         return ResponseEntity.ok().body(placeDetail);
     }
 

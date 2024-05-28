@@ -14,13 +14,13 @@ import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.place.domain.Menu;
-import com.jigumulmi.place.domain.Restaurant;
+import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
-import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto.OpeningHourDto;
-import com.jigumulmi.place.dto.response.RestaurantResponseDto.PositionDto;
+import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.MenuRepository;
-import com.jigumulmi.place.repository.RestaurantRepository;
+import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import java.util.ArrayList;
@@ -40,7 +40,7 @@ public class AdminService {
     private final int DEFAULT_PAGE_SIZE = 15;
 
     private final MemberRepository memberRepository;
-    private final RestaurantRepository restaurantRepository;
+    private final PlaceRepository placeRepository;
     private final SubwayStationPlaceRepository subwayStationPlaceRepository;
     private final MenuRepository menuRepository;
     private final SubwayStationRepository subwayStationRepository;
@@ -66,7 +66,7 @@ public class AdminService {
         Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
-        Page<PlaceDto> placePage = restaurantRepository.findAll(pageable).map(PlaceDto::from);
+        Page<PlaceDto> placePage = placeRepository.findAll(pageable).map(PlaceDto::from);
 
         return AdminPlaceListResponseDto.builder()
             .data(placePage.getContent())
@@ -80,7 +80,7 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public PlaceDto getPlaceDetail(Long placeId) {
-        return restaurantRepository.findById(placeId).map(PlaceDto::detailedFrom)
+        return placeRepository.findById(placeId).map(PlaceDto::detailedFrom)
             .orElseThrow(() -> new CustomException(
                 CommonErrorCode.RESOURCE_NOT_FOUND));
 
@@ -91,7 +91,7 @@ public class AdminService {
         OpeningHourDto openingHour = requestDto.getOpeningHour();
         PositionDto position = requestDto.getPosition();
 
-        Restaurant restaurant = Restaurant.builder()
+        Place place = Place.builder()
             .name(requestDto.getName())
             .category(requestDto.getCategory())
             .address(requestDto.getAddress())
@@ -121,7 +121,7 @@ public class AdminService {
             SubwayStationPlace subwayStationPlace = SubwayStationPlace.builder()
                 .isMain(i == 0)
                 .subwayStation(subwayStation)
-                .restaurant(restaurant)
+                .place(place)
                 .build();
 
             subwayStationPlaceList.add(subwayStationPlace);
@@ -129,11 +129,11 @@ public class AdminService {
 
         ArrayList<Menu> menuList = new ArrayList<>();
         for (String menuName : requestDto.getMenuList()) {
-            Menu menu = Menu.builder().name(menuName).restaurant(restaurant).build();
+            Menu menu = Menu.builder().name(menuName).place(place).build();
             menuList.add(menu);
         }
 
-        restaurantRepository.save(restaurant);
+        placeRepository.save(place);
         menuRepository.saveAll(menuList);
         subwayStationPlaceRepository.saveAll(subwayStationPlaceList);
     }
@@ -141,19 +141,20 @@ public class AdminService {
     @Transactional
     public void updatePlaceDetail(AdminUpdatePlaceRequestDto requestDto) {
 
-        Restaurant restaurant = restaurantRepository.findById(requestDto.getPlaceId())
+        Place place = placeRepository.findById(requestDto.getPlaceId())
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
         List<Long> subwayStationIdList = requestDto.getSubwayStationIdList();
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(
-                subwayStationIdList);
+            subwayStationIdList);
 
         ArrayList<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
         for (SubwayStation subwayStation : subwayStationList) {
             SubwayStationPlace subwayStationPlace = SubwayStationPlace.builder()
-                .isMain(subwayStation.getId().equals(subwayStationIdList.getFirst())) // 첫 요소가 메인 지하철역
+                .isMain(
+                    subwayStation.getId().equals(subwayStationIdList.getFirst())) // 첫 요소가 메인 지하철역
                 .subwayStation(subwayStation)
-                .restaurant(restaurant)
+                .place(place)
                 .build();
 
             subwayStationPlaceList.add(subwayStationPlace);
@@ -161,17 +162,17 @@ public class AdminService {
 
         ArrayList<Menu> menuList = new ArrayList<>();
         for (String menuName : requestDto.getMenuList()) {
-            Menu menu = Menu.builder().name(menuName).restaurant(restaurant).build();
+            Menu menu = Menu.builder().name(menuName).place(place).build();
             menuList.add(menu);
         }
 
-        restaurant.adminUpdate(requestDto, subwayStationPlaceList, menuList);
+        place.adminUpdate(requestDto, subwayStationPlaceList, menuList);
 
-        menuRepository.deleteAllByRestaurantId(requestDto.getPlaceId());
+        menuRepository.deleteAllByPlaceId(requestDto.getPlaceId());
         menuRepository.saveAll(menuList);
-        subwayStationPlaceRepository.deleteAllByRestaurantId(requestDto.getPlaceId());
+        subwayStationPlaceRepository.deleteAllByPlaceId(requestDto.getPlaceId());
         subwayStationPlaceRepository.saveAll(subwayStationPlaceList);
-        restaurantRepository.save(restaurant);
+        placeRepository.save(place);
     }
 
 }

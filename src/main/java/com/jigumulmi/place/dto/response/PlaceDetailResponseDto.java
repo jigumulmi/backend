@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @SuperBuilder
-public class RestaurantDetailResponseDto extends RestaurantResponseDto {
+public class PlaceDetailResponseDto extends PlaceResponseDto {
 
     @Getter
     @Builder
@@ -56,9 +56,9 @@ public class RestaurantDetailResponseDto extends RestaurantResponseDto {
 
     private String contact;
 
-    private List<RestaurantDetailResponseDto.MenuDto> menuList;
+    private List<PlaceDetailResponseDto.MenuDto> menuList;
 
-    private RestaurantDetailResponseDto.OpeningHourDto openingHour;
+    private PlaceDetailResponseDto.OpeningHourDto openingHour;
 
     private String additionalInfo;
 
