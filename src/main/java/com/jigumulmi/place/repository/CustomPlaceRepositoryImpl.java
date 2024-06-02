@@ -1,21 +1,21 @@
 package com.jigumulmi.place.repository;
 
 
-import static com.jigumulmi.place.domain.QRestaurant.restaurant;
+import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QReview.review;
 import static com.jigumulmi.place.domain.QReviewReply.reviewReply;
 import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
+import static com.jigumulmi.place.domain.QSubwayStationLine.subwayStationLine;
+import static com.jigumulmi.place.domain.QSubwayStationLineMapping.subwayStationLineMapping;
 import static com.jigumulmi.place.domain.QSubwayStationPlace.subwayStationPlace;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
-import com.jigumulmi.config.exception.CustomException;
-import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
-import com.jigumulmi.place.domain.Restaurant;
-import com.jigumulmi.place.dto.response.RestaurantResponseDto;
-import com.jigumulmi.place.dto.response.RestaurantResponseDto.PositionDto;
+import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.dto.response.PlaceResponseDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -24,8 +24,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.MathExpressions;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Map;
@@ -41,30 +39,38 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<RestaurantResponseDto> getRestaurantList(Long placeId, Long subwayStationId) {
-
+    public List<PlaceResponseDto> getPlaceList(Long subwayStationId) {
         return queryFactory
-            .from(restaurant)
-            .join(restaurant.subwayStationPlaceList, subwayStationPlace)
-            .join(subwayStationPlace.subwayStation)
-            .where(restaurant.isApproved.eq(true),
-                subwayStationCondition(placeId, subwayStationId)
+            .from(place)
+            .join(place.subwayStationPlaceList, subwayStationPlace)
+            .join(subwayStationPlace.subwayStation, subwayStation)
+            .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
+            .join(subwayStationLineMapping.subwayStationLine, subwayStationLine)
+            .where(place.isApproved.eq(true),
+                subwayStationCondition(subwayStationId)
             )
             .transform(
-                groupBy(restaurant.id).list(
-                    Projections.fields(RestaurantResponseDto.class,
-                        restaurant.id,
-                        restaurant.name,
-                        restaurant.mainImageUrl,
+                groupBy(place.id).list(
+                    Projections.fields(PlaceResponseDto.class,
+                        place.id,
+                        place.name,
+                        place.mainImageUrl,
                         Projections.fields(PositionDto.class,
-                            restaurant.latitude,
-                            restaurant.longitude
+                            place.latitude,
+                            place.longitude
                         ).as("position"),
                         list(
                             Projections.fields(SubwayStationResponseDto.class,
                                 subwayStation.id,
                                 subwayStation.stationName,
-                                subwayStation.lineNumber
+                                subwayStationPlace.isMain
+                                //list(
+                                //    Projections.fields(
+                                //        SubwayStationLineDto.class,
+                                //        subwayStationLine.id,
+                                //        subwayStationLine.lineNumber
+                                //    )
+                                //).as("subwayStationLineList")
                             )
                         ).as("subwayStationList")
                     )
@@ -72,43 +78,36 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             );
     }
 
-    public BooleanExpression subwayStationCondition(Long placeId, Long subwayStationId) {
-        if (placeId != null && subwayStationId == null) {
-            JPQLQuery<Long> subwayStationIdListSubquery = JPAExpressions
-                .select(subwayStationPlace.subwayStation.id)
-                .from(subwayStationPlace)
-                .where(subwayStationPlace.restaurant.id.eq(placeId));
-
-            return subwayStation.id.in(subwayStationIdListSubquery);
-
-        } else if (subwayStationId != null && placeId == null) {
-            return subwayStation.id.eq(subwayStationId);
-        } else if (subwayStationId == null && placeId == null) {
+    public BooleanExpression subwayStationCondition(Long subwayStationId) {
+        if (subwayStationId == null) {
             return null;
         } else {
-            throw new CustomException(CommonErrorCode.INVALID_PARAMETER);
+            return subwayStation.id.eq(subwayStationId).and(subwayStationPlace.isMain.eq(true));
         }
 
     }
 
     @Override
-    public Restaurant getRestaurantDetail(Long placeId) {
+    public Place getPlaceDetail(Long placeId) {
         // 둘 이상의 컬렉션에 fetchjoin() 불가
-        Restaurant restaurantDetail = queryFactory
-            .selectFrom(restaurant)
-            .join(restaurant.menuList)
-            .join(restaurant.subwayStationPlaceList, subwayStationPlace)
-            .join(subwayStationPlace.subwayStation)
-            .where(restaurant.isApproved.eq(true),
-                restaurant.id.eq(placeId))
+        Place placeDetail = queryFactory
+            .selectFrom(place)
+            .join(place.menuList)
+            .join(place.subwayStationPlaceList, subwayStationPlace)
+            .join(subwayStationPlace.subwayStation, subwayStation)
+            .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
+            .join(subwayStationLineMapping.subwayStationLine)
+            .where(place.isApproved.eq(true),
+                place.id.eq(placeId).and(subwayStationPlace.isMain.eq(true)))
             .fetchOne();
 
-        Hibernate.initialize(Objects.requireNonNull(restaurantDetail).getMenuList());
-        Hibernate.initialize(Objects.requireNonNull(restaurantDetail).getSubwayStationPlaceList());
-        //Objects.requireNonNull(restaurant).getSubwayStationPlaceList().stream()
+        Hibernate.initialize(Objects.requireNonNull(placeDetail).getMenuList());
+        Hibernate.initialize(
+            Objects.requireNonNull(placeDetail).getSubwayStationPlaceList().getFirst());
+        //Objects.requireNonNull(placeDetail).getSubwayStationPlaceList().stream()
         //    .map(SubwayStationPlace::getSubwayStation).forEach(Hibernate::initialize);
 
-        return restaurantDetail;
+        return placeDetail;
 
     }
 
@@ -117,7 +116,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
 
         return queryFactory
             .from(review)
-            .where(review.restaurant.id.eq(placeId))
+            .where(review.place.id.eq(placeId))
             .groupBy(review.rating)
             .transform(groupBy(review.rating).as(review.rating.count()));
     }
@@ -127,7 +126,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
         return queryFactory
             .select(MathExpressions.round(review.rating.avg(), 2))
             .from(review)
-            .where(review.restaurant.id.eq(placeId))
+            .where(review.place.id.eq(placeId))
             .fetchOne();
     }
 
@@ -144,6 +143,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         ConstantImpl.create("%Y.%m.%d")
                     ).as("reviewedAt"),
                     review.deletedAt,
+                    review.modifiedAt,
                     review.id,
                     review.rating,
                     review.content,
@@ -161,11 +161,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             .from(review)
             .join(review.member)
             .leftJoin(review.reviewReplyList)
-            .where(review.restaurant.id.eq(placeId)
-                .and(review.content.ne("")
-                    .or(review.member.id.eq(requestMemberId))
-                )
-            )
+            .where(review.place.id.eq(placeId))
             .orderBy(review.modifiedAt.desc())
             .fetch();
     }

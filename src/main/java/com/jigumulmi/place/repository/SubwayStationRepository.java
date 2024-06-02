@@ -1,12 +1,10 @@
 package com.jigumulmi.place.repository;
 
 import com.jigumulmi.place.domain.SubwayStation;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SubwayStationRepository extends JpaRepository<SubwayStation, Long> {
 
-    List<SubwayStation> findAllByStationNameStartsWith(String name, Sort sort);
+    List<SubwayStation> findAllByStationNameStartsWith(String stationName);
 }

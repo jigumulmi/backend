@@ -7,7 +7,7 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@ToString(exclude = {"restaurant"})
+@ToString(exclude = {"place"})
 public class Menu {
 
     @Id
@@ -17,13 +17,13 @@ public class Menu {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "place_id")
     @JsonBackReference
-    private Restaurant restaurant;
+    private Place place;
 
     @Builder
-    public Menu(String name, Restaurant restaurant) {
+    public Menu(String name, Place place) {
         this.name = name;
-        this.restaurant = restaurant;
+        this.place = place;
     }
 }

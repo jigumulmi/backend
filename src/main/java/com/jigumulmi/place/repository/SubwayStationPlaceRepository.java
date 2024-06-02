@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SubwayStationPlaceRepository extends JpaRepository<SubwayStationPlace, Long> {
 
-    void deleteAllByRestaurantId(Long placeId);
+    void deleteAllByPlaceId(Long placeId);
 }

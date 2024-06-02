@@ -3,8 +3,8 @@ package com.jigumulmi.place.domain;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.config.common.Timestamped;
-import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto.OpeningHourDto;
-import com.jigumulmi.place.dto.response.RestaurantResponseDto.PositionDto;
+import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Restaurant extends Timestamped {
+public class Place extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class Restaurant extends Timestamped {
     private String contact;
 
     @BatchSize(size = 10)
-    @OneToMany(mappedBy = "restaurant")
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Menu> menuList = new ArrayList<>();
 
@@ -65,18 +65,18 @@ public class Restaurant extends Timestamped {
     private Boolean isApproved;
 
 
-    @OneToMany(mappedBy = "restaurant")
+    @OneToMany(mappedBy = "place")
     @JsonManagedReference
     private List<Review> reviewList = new ArrayList<>();
 
     @BatchSize(size = 10)
-    @OneToMany(mappedBy = "restaurant")
+    @OneToMany(mappedBy = "place")
     @OrderBy("isMain DESC")
     @JsonManagedReference
     private List<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
 
     @Builder
-    public Restaurant(String name, String category, String address, String contact,
+    public Place(String name, String category, String address, String contact,
         List<Menu> menuList, String openingHourSun, String openingHourMon, String openingHourTue,
         String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat,
         String additionalInfo, String mainImageUrl, String placeUrl, Double longitude,

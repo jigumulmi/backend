@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
-    void deleteAllByRestaurantId(Long placeId);
+    void deleteAllByPlaceId(Long placeId);
 }

@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor
-public class RestaurantResponseDto {
+public class PlaceResponseDto {
 
     @Getter
     @Builder

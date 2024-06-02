@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-    Long countByRestaurantId(Long placeId);
+    Long countByPlaceId(Long placeId);
 
     Review findByIdAndMember(Long reviewId, Member member);
 }

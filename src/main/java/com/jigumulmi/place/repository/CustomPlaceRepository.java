@@ -1,7 +1,7 @@
 package com.jigumulmi.place.repository;
 
-import com.jigumulmi.place.domain.Restaurant;
-import com.jigumulmi.place.dto.response.RestaurantResponseDto;
+import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import java.util.List;
@@ -9,9 +9,9 @@ import java.util.Map;
 
 public interface CustomPlaceRepository {
 
-    List<RestaurantResponseDto> getRestaurantList(Long placeId, Long subwayStationId);
+    List<PlaceResponseDto> getPlaceList(Long subwayStationId);
 
-    Restaurant getRestaurantDetail(Long placeId);
+    Place getPlaceDetail(Long placeId);
 
     Map<Integer, Long> getReviewRatingStatsByPlaceId(Long placeId);
 

@@ -12,5 +12,4 @@ import lombok.ToString;
 public class GetPlaceListRequestDto {
 
     private Long subwayStationId;
-    private Long placeId;
 }

@@ -12,12 +12,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SubwayStationPlace {
+public class SubwayStationLineMapping {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,17 +29,15 @@ public class SubwayStationPlace {
     private SubwayStation subwayStation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "place_id")
+    @JoinColumn(name = "subway_station_line_id")
     @JsonBackReference
-    private Place place;
+    private SubwayStationLine subwayStationLine;
 
-    @ColumnDefault("false")
-    private Boolean isMain;
 
     @Builder
-    public SubwayStationPlace(SubwayStation subwayStation, Place place, Boolean isMain) {
+    public SubwayStationLineMapping(SubwayStation subwayStation,
+        SubwayStationLine subwayStationLine) {
         this.subwayStation = subwayStation;
-        this.place = place;
-        this.isMain = isMain;
+        this.subwayStationLine = subwayStationLine;
     }
 }

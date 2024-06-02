@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "restaurant_id"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "place_id"})})
 public class Review extends Timestamped {
 
     @Id
@@ -33,9 +33,9 @@ public class Review extends Timestamped {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "restaurant_id")
+    @JoinColumn(name = "place_id")
     @JsonBackReference
-    private Restaurant restaurant;
+    private Place place;
 
     @OneToMany(mappedBy = "review")
     @JsonManagedReference
@@ -45,12 +45,12 @@ public class Review extends Timestamped {
     private LocalDateTime deletedAt;
 
     @Builder
-    public Review(Integer rating, String content, Member member, Restaurant restaurant,
+    public Review(Integer rating, String content, Member member, Place place,
         List<ReviewReply> reviewReplyList, LocalDateTime deletedAt) {
         this.rating = rating;
         this.content = content;
         this.member = member;
-        this.restaurant = restaurant;
+        this.place = place;
         this.reviewReplyList = reviewReplyList;
         this.deletedAt = deletedAt;
     }

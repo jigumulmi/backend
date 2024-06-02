@@ -1,9 +1,9 @@
 package com.jigumulmi.admin.dto.response;
 
-import com.jigumulmi.place.domain.Restaurant;
+import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
-import com.jigumulmi.place.dto.response.RestaurantDetailResponseDto;
+import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,15 +18,15 @@ public class AdminPlaceListResponseDto {
 
     @Getter
     @SuperBuilder
-    public static class PlaceDto extends RestaurantDetailResponseDto {
+    public static class PlaceDto extends PlaceDetailResponseDto {
 
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
         private String registrantComment;
         private Boolean isApproved;
 
-        public static PlaceDto from(Restaurant restaurant) {
-            List<SubwayStationPlace> subwayStationPlaceList = restaurant.getSubwayStationPlaceList();
+        public static PlaceDto from(Place place) {
+            List<SubwayStationPlace> subwayStationPlaceList = place.getSubwayStationPlaceList();
             List<SubwayStationResponseDto> subwayStationDtoList = new ArrayList<>();
             for (SubwayStationPlace subwayStationPlace : subwayStationPlaceList) {
                 if (subwayStationPlace.getIsMain()) {
@@ -34,7 +34,6 @@ public class AdminPlaceListResponseDto {
                     subwayStationDtoList.add(
                         SubwayStationResponseDto.builder()
                             .id(subwayStation.getId())
-                            .lineNumber(subwayStation.getLineNumber())
                             .stationName(subwayStation.getStationName())
                             .isMain(subwayStationPlace.getIsMain())
                             .build()
@@ -43,81 +42,80 @@ public class AdminPlaceListResponseDto {
             }
 
             return PlaceDto.builder()
-                .createdAt(restaurant.getCreatedAt())
-                .modifiedAt(restaurant.getModifiedAt())
-                .id(restaurant.getId())
-                .name(restaurant.getName())
-                .category(restaurant.getCategory())
-                .address(restaurant.getAddress())
-                .contact(restaurant.getContact())
-                .mainImageUrl(restaurant.getMainImageUrl())
-                .registrantComment(restaurant.getRegistrantComment())
-                .isApproved(restaurant.getIsApproved())
-                .additionalInfo(restaurant.getAdditionalInfo())
+                .createdAt(place.getCreatedAt())
+                .modifiedAt(place.getModifiedAt())
+                .id(place.getId())
+                .name(place.getName())
+                .category(place.getCategory())
+                .address(place.getAddress())
+                .contact(place.getContact())
+                .mainImageUrl(place.getMainImageUrl())
+                .registrantComment(place.getRegistrantComment())
+                .isApproved(place.getIsApproved())
+                .additionalInfo(place.getAdditionalInfo())
                 .position(
                     PositionDto.builder()
-                        .longitude(restaurant.getLongitude())
-                        .latitude(restaurant.getLatitude())
+                        .longitude(place.getLongitude())
+                        .latitude(place.getLatitude())
                         .build()
                 )
                 .openingHour(
                     OpeningHourDto.builder()
-                        .openingHourSun(restaurant.getOpeningHourSun())
-                        .openingHourMon(restaurant.getOpeningHourMon())
-                        .openingHourTue(restaurant.getOpeningHourTue())
-                        .openingHourWed(restaurant.getOpeningHourWed())
-                        .openingHourThu(restaurant.getOpeningHourThu())
-                        .openingHourFri(restaurant.getOpeningHourFri())
-                        .openingHourSat(restaurant.getOpeningHourSat())
+                        .openingHourSun(place.getOpeningHourSun())
+                        .openingHourMon(place.getOpeningHourMon())
+                        .openingHourTue(place.getOpeningHourTue())
+                        .openingHourWed(place.getOpeningHourWed())
+                        .openingHourThu(place.getOpeningHourThu())
+                        .openingHourFri(place.getOpeningHourFri())
+                        .openingHourSat(place.getOpeningHourSat())
                         .build()
                 )
                 .subwayStationList(subwayStationDtoList)
                 .build();
         }
 
-        public static PlaceDto detailedFrom(Restaurant restaurant) {
-            List<SubwayStationPlace> subwayStationPlaceList = restaurant.getSubwayStationPlaceList();
+        public static PlaceDto detailedFrom(Place place) {
+            List<SubwayStationPlace> subwayStationPlaceList = place.getSubwayStationPlaceList();
             List<SubwayStationResponseDto> subwayStationDtoList = new ArrayList<>();
             for (SubwayStationPlace subwayStationPlace : subwayStationPlaceList) {
                 SubwayStation subwayStation = subwayStationPlace.getSubwayStation();
                 subwayStationDtoList.add(
                     SubwayStationResponseDto.builder()
                         .id(subwayStation.getId())
-                        .lineNumber(subwayStation.getLineNumber())
                         .stationName(subwayStation.getStationName())
                         .isMain(subwayStationPlace.getIsMain())
                         .build()
                 );
             }
-            List<MenuDto> menuList = restaurant.getMenuList().stream().map(MenuDto::from).toList();
+            List<MenuDto> menuList = place.getMenuList().stream().map(MenuDto::from).toList();
 
             return PlaceDto.builder()
-                .createdAt(restaurant.getCreatedAt())
-                .modifiedAt(restaurant.getModifiedAt())
-                .id(restaurant.getId())
-                .name(restaurant.getName())
-                .category(restaurant.getCategory())
-                .address(restaurant.getAddress())
-                .contact(restaurant.getContact())
-                .mainImageUrl(restaurant.getMainImageUrl())
-                .registrantComment(restaurant.getRegistrantComment())
-                .isApproved(restaurant.getIsApproved())
-                .additionalInfo(restaurant.getAdditionalInfo())
+                .createdAt(place.getCreatedAt())
+                .modifiedAt(place.getModifiedAt())
+                .id(place.getId())
+                .name(place.getName())
+                .category(place.getCategory())
+                .address(place.getAddress())
+                .contact(place.getContact())
+                .mainImageUrl(place.getMainImageUrl())
+                .registrantComment(place.getRegistrantComment())
+                .isApproved(place.getIsApproved())
+                .additionalInfo(place.getAdditionalInfo())
                 .position(
                     PositionDto.builder()
-                        .longitude(restaurant.getLongitude())
-                        .latitude(restaurant.getLatitude())
+                        .longitude(place.getLongitude())
+                        .latitude(place.getLatitude())
                         .build()
                 )
                 .openingHour(
                     OpeningHourDto.builder()
-                        .openingHourSun(restaurant.getOpeningHourSun())
-                        .openingHourMon(restaurant.getOpeningHourMon())
-                        .openingHourTue(restaurant.getOpeningHourTue())
-                        .openingHourWed(restaurant.getOpeningHourWed())
-                        .openingHourThu(restaurant.getOpeningHourThu())
-                        .openingHourFri(restaurant.getOpeningHourFri())
-                        .openingHourSat(restaurant.getOpeningHourSat())
+                        .openingHourSun(place.getOpeningHourSun())
+                        .openingHourMon(place.getOpeningHourMon())
+                        .openingHourTue(place.getOpeningHourTue())
+                        .openingHourWed(place.getOpeningHourWed())
+                        .openingHourThu(place.getOpeningHourThu())
+                        .openingHourFri(place.getOpeningHourFri())
+                        .openingHourSat(place.getOpeningHourSat())
                         .build()
                 )
                 .subwayStationList(subwayStationDtoList)
