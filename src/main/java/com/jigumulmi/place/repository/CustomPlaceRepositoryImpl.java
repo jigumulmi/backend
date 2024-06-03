@@ -19,6 +19,7 @@ import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -59,20 +60,18 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                             place.latitude,
                             place.longitude
                         ).as("position"),
-                        list(
-                            Projections.fields(SubwayStationResponseDto.class,
-                                subwayStation.id,
-                                subwayStation.stationName,
-                                subwayStationPlace.isMain
-                                //list(
-                                //    Projections.fields(
-                                //        SubwayStationLineDto.class,
-                                //        subwayStationLine.id,
-                                //        subwayStationLine.lineNumber
-                                //    )
-                                //).as("subwayStationLineList")
-                            )
-                        ).as("subwayStationList")
+                        Projections.fields(SubwayStationResponseDto.class,
+                            subwayStation.id,
+                            subwayStation.stationName,
+                            subwayStationPlace.isMain,
+                            list(
+                                Projections.fields(
+                                    SubwayStationLineDto.class,
+                                    subwayStationLine.id,
+                                    subwayStationLine.lineNumber
+                                )
+                            ).as("subwayStationLineList")
+                        ).as("subwayStation")
                     )
                 )
             );

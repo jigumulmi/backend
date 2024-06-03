@@ -7,6 +7,7 @@ import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto.MemberDto;
+import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.dto.response.PageDto;
@@ -63,6 +64,7 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public AdminPlaceListResponseDto getPlaceList(AdminGetPlaceListRequestDto requestDto) {
+        // TODO 쿼리 개선
         Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
@@ -79,8 +81,8 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public PlaceDto getPlaceDetail(Long placeId) {
-        return placeRepository.findById(placeId).map(PlaceDto::detailedFrom)
+    public AdminPlaceDetailResponseDto getPlaceDetail(Long placeId) {
+        return placeRepository.findById(placeId).map(AdminPlaceDetailResponseDto::from)
             .orElseThrow(() -> new CustomException(
                 CommonErrorCode.RESOURCE_NOT_FOUND));
 

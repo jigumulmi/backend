@@ -1,6 +1,5 @@
 package com.jigumulmi.place.dto.response;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,5 +31,5 @@ public class PlaceResponseDto {
 
     private PositionDto position;
 
-    private List<SubwayStationResponseDto> subwayStationList;
+    private SubwayStationResponseDto subwayStation;
 }
