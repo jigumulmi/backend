@@ -11,8 +11,8 @@ import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
-import com.jigumulmi.place.dto.response.ReviewListResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
+import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -110,12 +110,12 @@ public class PlaceController {
     @Operation(summary = "리뷰 리스트 조회")
     @ApiResponses(
         value = {@ApiResponse(responseCode = "200", content = {
-            @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewListResponseDto.class)))})}
+            @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewResponseDto.class)))})}
     )
     @GetMapping("/review")
     public ResponseEntity<?> getReviewList(@OptionalAuthUser Member member,
         @RequestParam(name = "placeId") Long placeId) {
-        List<ReviewListResponseDto> reviewList = placeService.getReviewList(member, placeId);
+        List<ReviewResponseDto> reviewList = placeService.getReviewList(member, placeId);
         return ResponseEntity.ok().body(reviewList);
     }
 
@@ -173,7 +173,7 @@ public class PlaceController {
 
     @Operation(summary = "리뷰 좋아요 등록")
     @ApiResponse(responseCode = "204")
-    @PostMapping("/review/{reviewId}/like")
+    @PostMapping("/review/{reviewId}/reaction")
     public ResponseEntity<?> createReviewLike(@PathVariable(name = "reviewId") Long reviewId,
         @RequiredAuthUser Member member) {
         placeService.createReviewLike(reviewId, member);
@@ -182,7 +182,7 @@ public class PlaceController {
 
     @Operation(summary = "답글 좋아요 등록")
     @ApiResponse(responseCode = "204")
-    @PostMapping("/review/reply/{reviewReplyId}/like")
+    @PostMapping("/review/reply/{reviewReplyId}/reaction")
     public ResponseEntity<?> createReviewReplyLike(
         @PathVariable(name = "reviewReplyId") Long reviewReplyId,
         @RequiredAuthUser Member member) {
@@ -192,21 +192,21 @@ public class PlaceController {
 
     @Operation(summary = "리뷰 좋아요 삭제")
     @ApiResponse(responseCode = "204")
-    @DeleteMapping("/review/like")
+    @DeleteMapping("/review/reaction/{reviewReactionId}")
     public ResponseEntity<?> deleteReviewLike(
-        @RequestParam(name = "reviewReactionId") Long reviewReactionId,
+        @PathVariable(name = "reviewReactionId") Long reviewReactionId,
         @RequiredAuthUser Member member) {
         placeService.deleteReviewLike(reviewReactionId, member);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review like");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review reaction");
     }
 
     @Operation(summary = "답글 좋아요 삭제")
     @ApiResponse(responseCode = "204")
-    @DeleteMapping("/review/reply/like")
+    @DeleteMapping("/review/reply/reaction/{reviewReplyReactionId}")
     public ResponseEntity<?> deleteReviewReplyLike(
-        @RequestParam(name = "reviewReplyReactionId") Long reviewReplyReactionId,
+        @PathVariable(name = "reviewReplyReactionId") Long reviewReplyReactionId,
         @RequiredAuthUser Member member) {
         placeService.deleteReviewReplyLike(reviewReplyReactionId, member);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review reply like");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review reply reaction");
     }
 }
