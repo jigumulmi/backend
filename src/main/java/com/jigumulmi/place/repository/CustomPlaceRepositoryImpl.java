@@ -3,7 +3,9 @@ package com.jigumulmi.place.repository;
 
 import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QReview.review;
+import static com.jigumulmi.place.domain.QReviewReaction.reviewReaction;
 import static com.jigumulmi.place.domain.QReviewReply.reviewReply;
+import static com.jigumulmi.place.domain.QReviewReplyReaction.reviewReplyReaction;
 import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
 import static com.jigumulmi.place.domain.QSubwayStationLine.subwayStationLine;
 import static com.jigumulmi.place.domain.QSubwayStationLineMapping.subwayStationLineMapping;
@@ -16,6 +18,7 @@ import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.dto.response.ReactionDto;
 import com.jigumulmi.place.dto.response.ReviewListResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -25,6 +28,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.MathExpressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Map;
@@ -155,11 +159,23 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         review.member.deregisteredAt,
                         review.member.id,
                         review.member.nickname,
-                        review.member.email).as("member"))
+                        review.member.email).as("member"),
+                    Projections.fields(ReactionDto.class,
+                        review.reviewReactionList.size().as("likeCount"),
+                        new CaseBuilder()
+                            .when(JPAExpressions.select(reviewReaction.countDistinct())
+                                .from(reviewReaction)
+                                .where(reviewReaction.member.id.eq(requestMemberId))
+                                .eq(1L))
+                            .then(true)
+                            .otherwise(false).as("canDelete")
+                    ).as("reaction")
+                )
             ).distinct()
             .from(review)
             .join(review.member)
             .leftJoin(review.reviewReplyList)
+            .leftJoin(review.reviewReactionList)
             .where(review.place.id.eq(placeId))
             .orderBy(review.modifiedAt.desc())
             .fetch();
@@ -178,6 +194,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         reviewReply.modifiedAt,
                         ConstantImpl.create("%Y.%m.%d")
                     ).as("repliedAt"),
+                    reviewReply.modifiedAt,
                     reviewReply.id,
                     reviewReply.content,
                     new CaseBuilder()
@@ -187,11 +204,23 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         reviewReply.member.createdAt,
                         reviewReply.member.id,
                         reviewReply.member.nickname,
-                        reviewReply.member.email).as("member"))
+                        reviewReply.member.email).as("member"),
+                    Projections.fields(ReactionDto.class,
+                        reviewReply.reviewReplyReactionList.size().as("likeCount"),
+                        new CaseBuilder()
+                            .when(JPAExpressions.select(reviewReplyReaction.countDistinct())
+                                .from(reviewReplyReaction)
+                                .where(reviewReplyReaction.member.id.eq(requestMemberId))
+                                .eq(1L))
+                            .then(true)
+                            .otherwise(false).as("canDelete")
+                    ).as("reaction")
+                )
             ).distinct()
             .from(reviewReply)
             .where(reviewReply.review.id.eq(reviewId))
             .join(reviewReply.member)
+            .leftJoin(reviewReply.reviewReplyReactionList)
             .orderBy(reviewReply.modifiedAt.desc())
             .fetch();
     }

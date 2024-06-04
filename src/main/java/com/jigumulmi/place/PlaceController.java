@@ -170,4 +170,43 @@ public class PlaceController {
         placeService.deleteReviewReply(reviewReplyId, member);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review reply success");
     }
+
+    @Operation(summary = "리뷰 좋아요 등록")
+    @ApiResponse(responseCode = "204")
+    @PostMapping("/review/{reviewId}/like")
+    public ResponseEntity<?> createReviewLike(@PathVariable(name = "reviewId") Long reviewId,
+        @RequiredAuthUser Member member) {
+        placeService.createReviewLike(reviewId, member);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Like review success");
+    }
+
+    @Operation(summary = "답글 좋아요 등록")
+    @ApiResponse(responseCode = "204")
+    @PostMapping("/review/reply/{reviewReplyId}/like")
+    public ResponseEntity<?> createReviewReplyLike(
+        @PathVariable(name = "reviewReplyId") Long reviewReplyId,
+        @RequiredAuthUser Member member) {
+        placeService.createReviewReplyLike(reviewReplyId, member);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Like review reply success");
+    }
+
+    @Operation(summary = "리뷰 좋아요 삭제")
+    @ApiResponse(responseCode = "204")
+    @DeleteMapping("/review/like")
+    public ResponseEntity<?> deleteReviewLike(
+        @RequestParam(name = "reviewReactionId") Long reviewReactionId,
+        @RequiredAuthUser Member member) {
+        placeService.deleteReviewLike(reviewReactionId, member);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review like");
+    }
+
+    @Operation(summary = "답글 좋아요 삭제")
+    @ApiResponse(responseCode = "204")
+    @DeleteMapping("/review/reply/like")
+    public ResponseEntity<?> deleteReviewReplyLike(
+        @RequestParam(name = "reviewReplyReactionId") Long reviewReplyReactionId,
+        @RequiredAuthUser Member member) {
+        placeService.deleteReviewReplyLike(reviewReplyReactionId, member);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review reply like");
+    }
 }
