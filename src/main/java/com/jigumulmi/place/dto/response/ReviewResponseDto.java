@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 
 @Getter
-public class ReviewListResponseDto {
+public class ReviewResponseDto {
 
     private String reviewedAt;
     private LocalDateTime deletedAt;

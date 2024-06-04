@@ -19,11 +19,12 @@ import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.ReactionDto;
-import com.jigumulmi.place.dto.response.ReviewListResponseDto;
+import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.querydsl.core.types.ConstantImpl;
+import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -134,12 +135,12 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
     }
 
     @Override
-    public List<ReviewListResponseDto> getReviewListByPlaceId(Long placeId, Long requestMemberId) {
+    public List<ReviewResponseDto> getReviewListByPlaceId(Long placeId, Long requestMemberId) {
         // fetchJoin() 과 Projections 동시 사용 불가
         // 엔티티인 상태로 탐색하는 것이 fetchJoin이기 때문
         return queryFactory
             .select(
-                Projections.fields(ReviewListResponseDto.class,
+                Projections.fields(ReviewResponseDto.class,
                     stringTemplate(
                         "DATE_FORMAT({0}, {1})",
                         review.modifiedAt,
@@ -161,14 +162,10 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         review.member.nickname,
                         review.member.email).as("member"),
                     Projections.fields(ReactionDto.class,
-                        review.reviewReactionList.size().as("likeCount"),
-                        new CaseBuilder()
-                            .when(JPAExpressions.select(reviewReaction.countDistinct())
-                                .from(reviewReaction)
-                                .where(reviewReaction.member.id.eq(requestMemberId))
-                                .eq(1L))
-                            .then(true)
-                            .otherwise(false).as("canDelete")
+                        review.reviewReactionList.size().as("likeReactionCount"),
+                        ExpressionUtils.as(JPAExpressions.select(reviewReaction.id)
+                            .from(reviewReaction)
+                            .where(reviewReaction.member.id.eq(requestMemberId)), "likeReactionId")
                     ).as("reaction")
                 )
             ).distinct()
@@ -206,14 +203,11 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         reviewReply.member.nickname,
                         reviewReply.member.email).as("member"),
                     Projections.fields(ReactionDto.class,
-                        reviewReply.reviewReplyReactionList.size().as("likeCount"),
-                        new CaseBuilder()
-                            .when(JPAExpressions.select(reviewReplyReaction.countDistinct())
+                        reviewReply.reviewReplyReactionList.size().as("likeReactionCount"),
+                        ExpressionUtils.as(JPAExpressions.select(reviewReplyReaction.id)
                                 .from(reviewReplyReaction)
-                                .where(reviewReplyReaction.member.id.eq(requestMemberId))
-                                .eq(1L))
-                            .then(true)
-                            .otherwise(false).as("canDelete")
+                                .where(reviewReplyReaction.member.id.eq(requestMemberId)),
+                            "likeReactionId")
                     ).as("reaction")
                 )
             ).distinct()

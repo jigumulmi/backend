@@ -24,8 +24,8 @@ import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
-import com.jigumulmi.place.dto.response.ReviewListResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
+import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
@@ -195,7 +195,7 @@ public class PlaceService {
         reviewReplyRepository.save(reviewReply);
     }
 
-    public List<ReviewListResponseDto> getReviewList(Member member, Long placeId) {
+    public List<ReviewResponseDto> getReviewList(Member member, Long placeId) {
         return customPlaceRepository.getReviewListByPlaceId(placeId, member.getId());
     }
 
