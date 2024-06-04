@@ -11,4 +11,5 @@ public class ReviewReplyResponseDto {
     private String content;
     private Boolean isEditable;
     private MemberDetailResponseDto member;
+    private ReactionDto reaction;
 }

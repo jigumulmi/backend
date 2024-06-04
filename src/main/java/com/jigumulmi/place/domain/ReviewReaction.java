@@ -1,5 +1,6 @@
 package com.jigumulmi.place.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
 import jakarta.persistence.Entity;
@@ -31,10 +32,12 @@ public class ReviewReaction extends Timestamped {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+    @JsonBackReference
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
+    @JsonBackReference
     private Review review;
 
     @Builder

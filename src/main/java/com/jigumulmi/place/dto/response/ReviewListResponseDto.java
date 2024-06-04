@@ -15,4 +15,5 @@ public class ReviewListResponseDto {
     private Integer replyCount;
     private Boolean isEditable;
     private MemberDetailResponseDto member;
+    private ReactionDto reaction;
 }
