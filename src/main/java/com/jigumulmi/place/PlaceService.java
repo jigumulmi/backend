@@ -6,7 +6,9 @@ import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.Review;
+import com.jigumulmi.place.domain.ReviewReaction;
 import com.jigumulmi.place.domain.ReviewReply;
+import com.jigumulmi.place.domain.ReviewReplyReaction;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationLineMapping;
 import com.jigumulmi.place.domain.SubwayStationPlace;
@@ -29,10 +31,13 @@ import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLi
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
+import com.jigumulmi.place.repository.ReviewReactionRepository;
+import com.jigumulmi.place.repository.ReviewReplyReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
+import com.jigumulmi.place.vo.Reaction;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -51,6 +56,8 @@ public class PlaceService {
     private final MenuRepository menuRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewReplyRepository reviewReplyRepository;
+    private final ReviewReactionRepository reviewReactionRepository;
+    private final ReviewReplyReactionRepository reviewReplyReactionRepository;
     private final CustomPlaceRepository customPlaceRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
@@ -226,5 +233,41 @@ public class PlaceService {
     public void deleteReviewReply(Long reviewReplyId, Member member) {
         ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(reviewReplyId, member);
         reviewReplyRepository.delete(reviewReply);
+    }
+
+    public void createReviewLike(Long reviewId, Member member) {
+        Review review = reviewRepository.findById(reviewId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        ReviewReaction reviewReaction = ReviewReaction.builder()
+            .member(member)
+            .review(review)
+            .category(Reaction.LIKE.name())
+            .build();
+
+        reviewReactionRepository.save(reviewReaction);
+    }
+
+    public void createReviewReplyLike(Long reviewReplyId, Member member) {
+        ReviewReply reviewReply = reviewReplyRepository.findById(reviewReplyId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        ReviewReplyReaction reviewReplyReaction = ReviewReplyReaction.builder()
+            .member(member)
+            .reviewReply(reviewReply)
+            .category(Reaction.LIKE.name())
+            .build();
+
+        reviewReplyReactionRepository.save(reviewReplyReaction);
+    }
+
+    public void deleteReviewLike(Long reviewReactionId, Member member) {
+
+        reviewReactionRepository.deleteByIdAndMemberId(reviewReactionId, member.getId());
+    }
+
+    public void deleteReviewReplyLike(Long reviewReplyReactionId, Member member) {
+
+        reviewReplyReactionRepository.deleteByIdAndMemberId(reviewReplyReactionId, member.getId());
     }
 }
