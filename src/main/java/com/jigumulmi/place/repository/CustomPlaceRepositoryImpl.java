@@ -19,8 +19,8 @@ import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.ReactionDto;
-import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
+import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.querydsl.core.types.ConstantImpl;
@@ -138,6 +138,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
     public List<ReviewResponseDto> getReviewListByPlaceId(Long placeId, Long requestMemberId) {
         // fetchJoin() 과 Projections 동시 사용 불가
         // 엔티티인 상태로 탐색하는 것이 fetchJoin이기 때문
+
         return queryFactory
             .select(
                 Projections.fields(ReviewResponseDto.class,
@@ -162,17 +163,20 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         review.member.nickname,
                         review.member.email).as("member"),
                     Projections.fields(ReactionDto.class,
-                        review.reviewReactionList.size().as("likeReactionCount"),
-                        ExpressionUtils.as(JPAExpressions.select(reviewReaction.id)
-                            .from(reviewReaction)
-                            .where(reviewReaction.member.id.eq(requestMemberId)), "likeReactionId")
+                        ExpressionUtils.as(JPAExpressions.select(reviewReaction.count())
+                                .from(reviewReaction)
+                                .where(reviewReaction.review.id.eq(review.id)),
+                            "likeReactionCount"),
+                        reviewReaction.id.as("likeReactionId")
                     ).as("reaction")
                 )
             ).distinct()
             .from(review)
             .join(review.member)
             .leftJoin(review.reviewReplyList)
-            .leftJoin(review.reviewReactionList)
+            .leftJoin(review.reviewReactionList, reviewReaction)
+            .on(reviewReaction.review.id.eq(review.id)
+                .and(reviewReaction.member.id.eq(requestMemberId)))
             .where(review.place.id.eq(placeId))
             .orderBy(review.modifiedAt.desc())
             .fetch();
@@ -203,18 +207,20 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         reviewReply.member.nickname,
                         reviewReply.member.email).as("member"),
                     Projections.fields(ReactionDto.class,
-                        reviewReply.reviewReplyReactionList.size().as("likeReactionCount"),
-                        ExpressionUtils.as(JPAExpressions.select(reviewReplyReaction.id)
+                        ExpressionUtils.as(JPAExpressions.select(reviewReplyReaction.count())
                                 .from(reviewReplyReaction)
-                                .where(reviewReplyReaction.member.id.eq(requestMemberId)),
-                            "likeReactionId")
+                                .where(reviewReplyReaction.reviewReply.id.eq(reviewReply.id)),
+                            "likeReactionCount"),
+                        reviewReplyReaction.id.as("likeReactionId")
                     ).as("reaction")
                 )
             ).distinct()
             .from(reviewReply)
             .where(reviewReply.review.id.eq(reviewId))
             .join(reviewReply.member)
-            .leftJoin(reviewReply.reviewReplyReactionList)
+            .leftJoin(reviewReply.reviewReplyReactionList, reviewReplyReaction)
+            .on(reviewReplyReaction.reviewReply.id.eq(reviewReply.id)
+                .and(reviewReplyReaction.member.id.eq(requestMemberId)))
             .orderBy(reviewReply.modifiedAt.desc())
             .fetch();
     }

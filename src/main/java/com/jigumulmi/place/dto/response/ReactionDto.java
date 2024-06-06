@@ -5,6 +5,6 @@ import lombok.Getter;
 @Getter
 public class ReactionDto {
 
-    private Integer likeReactionCount;
+    private Long likeReactionCount;
     private Long likeReactionId;
 }
