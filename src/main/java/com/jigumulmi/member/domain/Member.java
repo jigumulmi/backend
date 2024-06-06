@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,6 +18,7 @@ import lombok.ToString;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @ToString
 public class Member extends Timestamped {
 
@@ -46,6 +48,14 @@ public class Member extends Timestamped {
      */
     public Member(Long fakeId) {
         this.id = fakeId;
+    }
+
+    /**
+     * 스웨거로 인증된 사용자
+     */
+    public Member(Long id, String nickname) {
+        this.id = id;
+        this.nickname = nickname;
     }
 
     public void updateNickname(String nickname) {
