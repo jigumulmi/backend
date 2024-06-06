@@ -2,6 +2,7 @@ package com.jigumulmi.place;
 
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
+import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
@@ -38,6 +39,7 @@ import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.Reaction;
+import jakarta.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -169,17 +171,25 @@ public class PlaceService {
     }
 
     public void postReview(CreateReviewRequestDto requestDto, Member member) {
-        Place place = placeRepository.findById(requestDto.getPlaceId())
-            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
-        Review review = Review.builder()
-            .place(place)
-            .content(requestDto.getContent())
-            .rating(requestDto.getRating())
-            .member(member)
-            .reviewReplyList(Collections.emptyList())
-            .build();
+        try {
+            Place place = placeRepository.findById(requestDto.getPlaceId())
+                .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+            Review review = Review.builder()
+                .place(place)
+                .content(requestDto.getContent())
+                .rating(requestDto.getRating())
+                .member(member)
+                .reviewReplyList(Collections.emptyList())
+                .build();
 
-        reviewRepository.save(review);
+            reviewRepository.save(review);
+        } catch (ConstraintViolationException e) {
+            throw new CustomException(PlaceErrorCode.DUPLICATE_REVIEW);
+        } catch (CustomException e) {
+            throw new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND);
+        } catch (Exception e) {
+            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        }
     }
 
     public void postReviewReply(CreateReviewReplyRequestDto requestDto, Member member) {
