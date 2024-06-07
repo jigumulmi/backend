@@ -148,7 +148,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         ConstantImpl.create("%Y.%m.%d")
                     ).as("reviewedAt"),
                     review.deletedAt,
-                    review.modifiedAt,
+                    review.createdAt,
                     review.id,
                     review.rating,
                     review.content,
@@ -178,7 +178,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             .on(reviewReaction.review.id.eq(review.id)
                 .and(reviewReaction.member.id.eq(requestMemberId)))
             .where(review.place.id.eq(placeId))
-            .orderBy(review.modifiedAt.desc())
+            .orderBy(review.createdAt.desc())
             .fetch();
     }
 
@@ -195,7 +195,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         reviewReply.modifiedAt,
                         ConstantImpl.create("%Y.%m.%d")
                     ).as("repliedAt"),
-                    reviewReply.modifiedAt,
+                    reviewReply.createdAt,
                     reviewReply.id,
                     reviewReply.content,
                     new CaseBuilder()
@@ -221,7 +221,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             .leftJoin(reviewReply.reviewReplyReactionList, reviewReplyReaction)
             .on(reviewReplyReaction.reviewReply.id.eq(reviewReply.id)
                 .and(reviewReplyReaction.member.id.eq(requestMemberId)))
-            .orderBy(reviewReply.modifiedAt.desc())
+            .orderBy(reviewReply.createdAt.desc())
             .fetch();
     }
 
