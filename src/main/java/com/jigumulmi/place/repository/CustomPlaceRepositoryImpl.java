@@ -28,7 +28,6 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.MathExpressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -107,7 +106,8 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
 
         Hibernate.initialize(Objects.requireNonNull(placeDetail).getMenuList());
         Hibernate.initialize(
-            Objects.requireNonNull(placeDetail).getSubwayStationPlaceList().getFirst());
+            Objects.requireNonNull(placeDetail).getSubwayStationPlaceList().stream()
+                .findFirst());
         //Objects.requireNonNull(placeDetail).getSubwayStationPlaceList().stream()
         //    .map(SubwayStationPlace::getSubwayStation).forEach(Hibernate::initialize);
 
@@ -123,15 +123,6 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             .where(review.place.id.eq(placeId))
             .groupBy(review.rating)
             .transform(groupBy(review.rating).as(review.rating.count()));
-    }
-
-    @Override
-    public Double getAverageRatingByPlaceId(Long placeId) {
-        return queryFactory
-            .select(MathExpressions.round(review.rating.avg(), 2))
-            .from(review)
-            .where(review.place.id.eq(placeId))
-            .fetchOne();
     }
 
     @Override

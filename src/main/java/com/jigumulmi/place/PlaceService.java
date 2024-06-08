@@ -1,5 +1,7 @@
 package com.jigumulmi.place;
 
+import static java.lang.Math.round;
+
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;
@@ -108,13 +110,19 @@ public class PlaceService {
 
         List<MenuDto> menuList = place.getMenuList().stream().map(MenuDto::from).toList();
 
-        Double averageRating = customPlaceRepository.getAverageRatingByPlaceId(placeId);
-        Long totalCount = reviewRepository.countByPlaceId(placeId);
         Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
             placeId);
+
+        long totalCount = 0L;
+        long totalRating = 0L;
         for (int i = 1; i <= 5; i++) {
             reviewRatingStatMap.putIfAbsent(i, 0L);
+
+            Long count = reviewRatingStatMap.get(i);
+            totalCount += count;
+            totalRating += (count * i);
         }
+        Double averageRating = round((float) totalRating / totalCount * 100) / 100.0; // 소수점 둘째자리까지
 
         OverallReviewResponseDto overallReviewResponseDto = OverallReviewResponseDto.builder()
             .averageRating(averageRating)
