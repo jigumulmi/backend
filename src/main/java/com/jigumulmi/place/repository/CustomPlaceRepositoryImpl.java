@@ -52,8 +52,8 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             .join(subwayStationPlace.subwayStation, subwayStation)
             .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
             .join(subwayStationLineMapping.subwayStationLine, subwayStationLine)
-            .where(place.isApproved.eq(true),
-                subwayStationCondition(subwayStationId)
+            .where(place.isApproved.eq(true).and(subwayStationPlace.isMain.eq(true)),
+                placeCondition(subwayStationId)
             )
             .transform(
                 groupBy(place.id).list(
@@ -82,11 +82,17 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             );
     }
 
-    public BooleanExpression subwayStationCondition(Long subwayStationId) {
+    public BooleanExpression placeCondition(Long subwayStationId) {
         if (subwayStationId == null) {
             return null;
         } else {
-            return subwayStation.id.eq(subwayStationId).and(subwayStationPlace.isMain.eq(true));
+            return place.id.in(
+                JPAExpressions
+                    .select(place.id)
+                    .from(place)
+                    .join(place.subwayStationPlaceList, subwayStationPlace)
+                    .where(subwayStationPlace.subwayStation.id.eq(subwayStationId))
+            );
         }
 
     }
