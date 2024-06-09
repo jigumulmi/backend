@@ -170,8 +170,6 @@ public class AdminService {
 
         place.adminUpdate(requestDto, subwayStationPlaceList, menuList);
 
-        menuRepository.deleteAllByPlaceId(requestDto.getPlaceId());
-        menuRepository.saveAll(menuList);
         subwayStationPlaceRepository.deleteAllByPlaceId(requestDto.getPlaceId());
         subwayStationPlaceRepository.saveAll(subwayStationPlaceList);
         placeRepository.save(place);

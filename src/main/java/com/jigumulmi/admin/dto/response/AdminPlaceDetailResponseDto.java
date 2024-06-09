@@ -26,7 +26,6 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
         List<SubwayStationResponseDto> subwayStationDtoList = new ArrayList<>();
         for (SubwayStationPlace subwayStationPlace : subwayStationPlaceList) {
             SubwayStation subwayStation = subwayStationPlace.getSubwayStation();
-            System.out.println("subwayStation = " + subwayStation);
             subwayStationDtoList.add(
                 SubwayStationResponseDto.builder()
                     .id(subwayStation.getId())
@@ -35,7 +34,6 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
                     .build()
             );
         }
-        System.out.println("subwayStationDtoList = " + subwayStationDtoList);
 
         List<MenuDto> menuList = place.getMenuList().stream().map(MenuDto::from).toList();
 
