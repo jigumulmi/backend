@@ -221,7 +221,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             .leftJoin(reviewReply.reviewReplyReactionList, reviewReplyReaction)
             .on(reviewReplyReaction.reviewReply.id.eq(reviewReply.id)
                 .and(reviewReplyReaction.member.id.eq(requestMemberId)))
-            .orderBy(reviewReply.createdAt.desc())
+            .orderBy(reviewReply.createdAt.asc())
             .fetch();
     }
 
