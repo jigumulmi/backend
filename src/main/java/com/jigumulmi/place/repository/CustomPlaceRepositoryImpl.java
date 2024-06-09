@@ -168,7 +168,10 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                                 .where(reviewReaction.review.id.eq(review.id)),
                             "likeReactionCount"),
                         reviewReaction.id.as("likeReactionId")
-                    ).as("reaction")
+                    ).as("reaction"),
+                    new CaseBuilder()
+                        .when(review.createdAt.eq(review.modifiedAt)).then(false)
+                        .otherwise(true).as("isEdited")
                 )
             ).distinct()
             .from(review)
@@ -212,7 +215,10 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                                 .where(reviewReplyReaction.reviewReply.id.eq(reviewReply.id)),
                             "likeReactionCount"),
                         reviewReplyReaction.id.as("likeReactionId")
-                    ).as("reaction")
+                    ).as("reaction"),
+                    new CaseBuilder()
+                        .when(reviewReply.createdAt.eq(reviewReply.modifiedAt)).then(false)
+                        .otherwise(true).as("isEdited")
                 )
             ).distinct()
             .from(reviewReply)
@@ -221,7 +227,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
             .leftJoin(reviewReply.reviewReplyReactionList, reviewReplyReaction)
             .on(reviewReplyReaction.reviewReply.id.eq(reviewReply.id)
                 .and(reviewReplyReaction.member.id.eq(requestMemberId)))
-            .orderBy(reviewReply.createdAt.desc())
+            .orderBy(reviewReply.createdAt.asc())
             .fetch();
     }
 
