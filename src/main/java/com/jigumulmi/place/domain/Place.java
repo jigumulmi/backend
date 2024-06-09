@@ -116,7 +116,8 @@ public class Place extends Timestamped {
         this.category = requestDto.getCategory();
         this.address = requestDto.getAddress();
         this.contact = requestDto.getContact();
-        this.menuList = menuList;
+        this.menuList.clear();
+        this.menuList.addAll(menuList);
         this.openingHourSun = openingHour.getOpeningHourSun();
         this.openingHourMon = openingHour.getOpeningHourMon();
         this.openingHourTue = openingHour.getOpeningHourTue();
@@ -131,6 +132,7 @@ public class Place extends Timestamped {
         this.latitude = position.getLatitude();
         this.registrantComment = requestDto.getRegistrantComment();
         this.isApproved = requestDto.getIsApproved();
-        this.subwayStationPlaceList = subwayStationPlaceList;
+        this.subwayStationPlaceList.clear();
+        this.subwayStationPlaceList.addAll(subwayStationPlaceList);
     }
 }
