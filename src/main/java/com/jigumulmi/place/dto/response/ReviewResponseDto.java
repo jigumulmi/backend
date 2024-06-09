@@ -16,4 +16,5 @@ public class ReviewResponseDto {
     private Boolean isEditable;
     private MemberDetailResponseDto member;
     private ReactionDto reaction;
+    private Boolean isEdited;
 }
