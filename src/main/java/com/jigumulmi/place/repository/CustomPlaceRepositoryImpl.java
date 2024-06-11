@@ -1,6 +1,7 @@
 package com.jigumulmi.place.repository;
 
 
+import static com.jigumulmi.place.domain.QMenu.menu;
 import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QReview.review;
 import static com.jigumulmi.place.domain.QReviewReaction.reviewReaction;
@@ -14,8 +15,10 @@ import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
+import com.jigumulmi.config.exception.CustomException;
+import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
-import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.ReactionDto;
@@ -32,9 +35,7 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -91,28 +92,63 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
     }
 
     @Override
-    public Place getPlaceDetail(Long placeId) {
+    public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
         // 둘 이상의 컬렉션에 fetchjoin() 불가
-        Place placeDetail = queryFactory
-            .selectFrom(place)
-            .join(place.menuList)
+
+        return queryFactory
+            .from(place)
+            .join(place.menuList, menu)
             .join(place.subwayStationPlaceList, subwayStationPlace)
+            .on(subwayStationPlace.place.id.eq(place.id).and(subwayStationPlace.isMain.eq(true)))
             .join(subwayStationPlace.subwayStation, subwayStation)
             .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
             .join(subwayStationLineMapping.subwayStationLine)
-            .where(place.isApproved.eq(true),
-                place.id.eq(placeId).and(subwayStationPlace.isMain.eq(true)))
-            .fetchOne();
-
-        Hibernate.initialize(Objects.requireNonNull(placeDetail).getMenuList());
-        Hibernate.initialize(
-            Objects.requireNonNull(placeDetail).getSubwayStationPlaceList().stream()
-                .findFirst());
-        //Objects.requireNonNull(placeDetail).getSubwayStationPlaceList().stream()
-        //    .map(SubwayStationPlace::getSubwayStation).forEach(Hibernate::initialize);
-
-        return placeDetail;
-
+            .where(place.id.eq(placeId).and(place.isApproved.eq(true)))
+            .transform(
+                groupBy(place.id).list(
+                    Projections.fields(PlaceDetailResponseDto.class,
+                        place.id,
+                        place.name,
+                        place.mainImageUrl,
+                        Projections.fields(PositionDto.class,
+                            place.latitude,
+                            place.longitude
+                        ).as("position"),
+                        Projections.fields(SubwayStationResponseDto.class,
+                            subwayStation.id,
+                            subwayStation.stationName,
+                            subwayStationPlace.isMain,
+                            list(
+                                Projections.fields(
+                                    SubwayStationLineDto.class,
+                                    subwayStationLine.id,
+                                    subwayStationLine.lineNumber
+                                )
+                            ).as("subwayStationLineList")
+                        ).as("subwayStation"),
+                        place.category,
+                        place.address,
+                        place.contact,
+                        list(
+                            Projections.fields(PlaceDetailResponseDto.MenuDto.class,
+                                menu.id,
+                                menu.name
+                            )
+                        ).as("menuList"),
+                        Projections.fields(PlaceDetailResponseDto.OpeningHourDto.class,
+                            place.openingHourSun,
+                            place.openingHourMon,
+                            place.openingHourTue,
+                            place.openingHourWed,
+                            place.openingHourThu,
+                            place.openingHourFri,
+                            place.openingHourSat
+                        ).as("openingHour"),
+                        place.additionalInfo
+                    )
+                )
+            ).stream().findFirst()
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
     }
 
     @Override

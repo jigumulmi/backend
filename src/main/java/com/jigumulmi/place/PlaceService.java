@@ -13,7 +13,6 @@ import com.jigumulmi.place.domain.ReviewReaction;
 import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.domain.ReviewReplyReaction;
 import com.jigumulmi.place.domain.SubwayStation;
-import com.jigumulmi.place.domain.SubwayStationLineMapping;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
@@ -23,14 +22,10 @@ import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
-import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
@@ -106,9 +101,7 @@ public class PlaceService {
 
     @Transactional(readOnly = true)
     public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
-        Place place = customPlaceRepository.getPlaceDetail(placeId);
-
-        List<MenuDto> menuList = place.getMenuList().stream().map(MenuDto::from).toList();
+        PlaceDetailResponseDto place = customPlaceRepository.getPlaceDetail(placeId);
 
         Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
             placeId);
@@ -130,48 +123,22 @@ public class PlaceService {
             .statistics(reviewRatingStatMap)
             .build();
 
-        SubwayStationPlace subwayStationPlace = place.getSubwayStationPlaceList().stream()
-            .findFirst()
-            .orElseThrow(() -> new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR));
-        SubwayStation subwayStation = subwayStationPlace.getSubwayStation();
-        // TODO 쿼리 개선
-        List<SubwayStationLineDto> subwayStationLineDtoList = subwayStation.getSubwayStationLineMappingList()
-            .stream()
-            .map(SubwayStationLineMapping::getSubwayStationLine).map(SubwayStationLineDto::from)
-            .toList();
-
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
             .name(place.getName())
             .mainImageUrl(place.getMainImageUrl())
             .position(
-                PositionDto.builder()
-                    .latitude(place.getLatitude())
-                    .longitude(place.getLongitude())
-                    .build()
+                place.getPosition()
             )
             .subwayStation(
-                SubwayStationResponseDto.builder()
-                    .id(subwayStation.getId())
-                    .stationName(subwayStation.getStationName())
-                    .isMain(subwayStationPlace.getIsMain())
-                    .subwayStationLineList(subwayStationLineDtoList)
-                    .build()
+                place.getSubwayStation()
             )
             .category(place.getCategory())
             .address(place.getAddress())
             .contact(place.getContact())
-            .menuList(menuList)
+            .menuList(place.getMenuList())
             .openingHour(
-                OpeningHourDto.builder()
-                    .openingHourSun(place.getOpeningHourSun())
-                    .openingHourMon(place.getOpeningHourMon())
-                    .openingHourTue(place.getOpeningHourTue())
-                    .openingHourWed(place.getOpeningHourWed())
-                    .openingHourThu(place.getOpeningHourThu())
-                    .openingHourFri(place.getOpeningHourFri())
-                    .openingHourSat(place.getOpeningHourSat())
-                    .build()
+                place.getOpeningHour()
             )
             .additionalInfo(place.getAdditionalInfo())
             .overallReview(overallReviewResponseDto)
