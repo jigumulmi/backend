@@ -104,16 +104,8 @@ public class PlaceService {
     public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
         PlaceDetailResponseDto place = customPlaceRepository.getPlaceDetail(placeId);
 
-        List<Menu> menuList = menuRepository.findAllByPlaceId(placeId);
-        List<PlaceDetailResponseDto.MenuDto> menuDtoList = new ArrayList<>();
-        for (Menu menu : menuList) {
-            menuDtoList.add(
-                MenuDto.builder()
-                    .id(menu.getId())
-                    .name(menu.getName())
-                    .build()
-            );
-        }
+        List<MenuDto> menuList = menuRepository.findAllByPlaceId(placeId).stream()
+            .map(MenuDto::from).toList();
 
         Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
             placeId);
@@ -148,7 +140,7 @@ public class PlaceService {
             .category(place.getCategory())
             .address(place.getAddress())
             .contact(place.getContact())
-            .menuList(menuDtoList)
+            .menuList(menuList)
             .openingHour(
                 place.getOpeningHour()
             )
