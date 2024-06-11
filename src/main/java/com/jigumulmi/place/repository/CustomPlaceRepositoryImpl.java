@@ -155,7 +155,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
 
         return queryFactory
             .from(review)
-            .where(review.place.id.eq(placeId))
+            .where(review.place.id.eq(placeId).and(review.deletedAt.isNull()))
             .groupBy(review.rating)
             .transform(groupBy(review.rating).as(review.rating.count()));
     }
