@@ -22,6 +22,7 @@ import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
+import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
@@ -103,6 +104,17 @@ public class PlaceService {
     public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
         PlaceDetailResponseDto place = customPlaceRepository.getPlaceDetail(placeId);
 
+        List<Menu> menuList = menuRepository.findAllByPlaceId(placeId);
+        List<PlaceDetailResponseDto.MenuDto> menuDtoList = new ArrayList<>();
+        for (Menu menu : menuList) {
+            menuDtoList.add(
+                MenuDto.builder()
+                    .id(menu.getId())
+                    .name(menu.getName())
+                    .build()
+            );
+        }
+
         Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
             placeId);
 
@@ -136,7 +148,7 @@ public class PlaceService {
             .category(place.getCategory())
             .address(place.getAddress())
             .contact(place.getContact())
-            .menuList(place.getMenuList())
+            .menuList(menuDtoList)
             .openingHour(
                 place.getOpeningHour()
             )

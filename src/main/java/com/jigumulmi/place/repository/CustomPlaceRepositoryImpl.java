@@ -1,7 +1,6 @@
 package com.jigumulmi.place.repository;
 
 
-import static com.jigumulmi.place.domain.QMenu.menu;
 import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QReview.review;
 import static com.jigumulmi.place.domain.QReviewReaction.reviewReaction;
@@ -100,10 +99,10 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
     @Override
     public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
         // 둘 이상의 컬렉션에 fetchjoin() 불가
+        // 중첩 리스트 프로젝션 안되는 듯...
 
         return queryFactory
             .from(place)
-            .join(place.menuList, menu)
             .join(place.subwayStationPlaceList, subwayStationPlace)
             .on(subwayStationPlace.place.id.eq(place.id).and(subwayStationPlace.isMain.eq(true)))
             .join(subwayStationPlace.subwayStation, subwayStation)
@@ -135,12 +134,6 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
                         place.category,
                         place.address,
                         place.contact,
-                        list(
-                            Projections.fields(PlaceDetailResponseDto.MenuDto.class,
-                                menu.id,
-                                menu.name
-                            )
-                        ).as("menuList"),
                         Projections.fields(PlaceDetailResponseDto.OpeningHourDto.class,
                             place.openingHourSun,
                             place.openingHourMon,
@@ -162,7 +155,7 @@ public class CustomPlaceRepositoryImpl implements CustomPlaceRepository {
 
         return queryFactory
             .from(review)
-            .where(review.place.id.eq(placeId))
+            .where(review.place.id.eq(placeId).and(review.deletedAt.isNull()))
             .groupBy(review.rating)
             .transform(groupBy(review.rating).as(review.rating.count()));
     }
