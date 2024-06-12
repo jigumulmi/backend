@@ -37,7 +37,6 @@ import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.Reaction;
-import jakarta.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -150,7 +149,12 @@ public class PlaceService {
     }
 
     public void postReview(CreateReviewRequestDto requestDto, Member member) {
-        try {
+        boolean canPostReview = reviewRepository.findTopByPlaceIdAndMemberIdAndDeletedAtIsNull(
+            requestDto.getPlaceId(),
+            member.getId()
+        ).isEmpty();
+
+        if (canPostReview) {
             Place place = placeRepository.findById(requestDto.getPlaceId())
                 .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
             Review review = Review.builder()
@@ -162,12 +166,8 @@ public class PlaceService {
                 .build();
 
             reviewRepository.save(review);
-        } catch (ConstraintViolationException e) {
+        } else {
             throw new CustomException(PlaceErrorCode.DUPLICATE_REVIEW);
-        } catch (CustomException e) {
-            throw new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND);
-        } catch (Exception e) {
-            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
