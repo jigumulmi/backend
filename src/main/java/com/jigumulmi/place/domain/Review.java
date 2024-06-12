@@ -14,8 +14,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -30,7 +28,6 @@ import lombok.ToString;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "place_id"})})
 public class Review extends Timestamped {
 
     @Id
