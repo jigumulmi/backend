@@ -219,9 +219,21 @@ public class PlaceService {
         }
     }
 
+    @Transactional
     public void deleteReviewReply(Long reviewReplyId, Member member) {
         ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(reviewReplyId, member);
+
+        Review review = reviewReply.getReview();
+
+        List<ReviewReply> reviewReplyList = review.getReviewReplyList();
+        int reviewReplyCount = reviewReplyList.size();
+
         reviewReplyRepository.delete(reviewReply);
+
+        // 속한 리뷰가 삭제된 상태고, 해당 답글이 마지막이었던 경우
+        if (review.getDeletedAt() != null && reviewReplyCount == 1) {
+            reviewRepository.delete(review);
+        }
     }
 
     public void createReviewLike(Long reviewId, Member member) {
