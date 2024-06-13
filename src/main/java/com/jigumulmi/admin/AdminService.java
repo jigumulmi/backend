@@ -11,6 +11,7 @@ import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.dto.response.PageDto;
+import com.jigumulmi.admin.repository.CustomAdminRepository;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
@@ -40,6 +41,7 @@ public class AdminService {
 
     private final int DEFAULT_PAGE_SIZE = 15;
 
+    private final CustomAdminRepository customAdminRepository;
     private final MemberRepository memberRepository;
     private final PlaceRepository placeRepository;
     private final SubwayStationPlaceRepository subwayStationPlaceRepository;
@@ -64,11 +66,10 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public AdminPlaceListResponseDto getPlaceList(AdminGetPlaceListRequestDto requestDto) {
-        // TODO 쿼리 개선
         Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
-        Page<PlaceDto> placePage = placeRepository.findAll(pageable).map(PlaceDto::from);
+        Page<PlaceDto> placePage = customAdminRepository.getPlaceList(pageable);
 
         return AdminPlaceListResponseDto.builder()
             .data(placePage.getContent())
