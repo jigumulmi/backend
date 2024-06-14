@@ -23,7 +23,6 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 public class SecurityConfig {
 
     private final SwaggerBasicAuthFilter swaggerBasicAuthFilter;
-    private final SessionAuthenticationFilter sessionAuthenticationFilter;
 
     private final String[] origins = new String[]{"http://localhost:3000", "https://jigumulmi.com",
         "https://www.jigumulmi.com"};
@@ -60,9 +59,7 @@ public class SecurityConfig {
             .httpBasic(HttpBasicConfigurer::disable)
             .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-            //.addFilterAfter(swaggerBasicAuthFilter,
-            //    UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(sessionAuthenticationFilter,
+            .addFilterBefore(swaggerBasicAuthFilter,
                 UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .anyRequest().permitAll());
