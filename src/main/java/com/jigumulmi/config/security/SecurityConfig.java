@@ -1,5 +1,9 @@
 package com.jigumulmi.config.security;
 
+import com.jigumulmi.config.swagger.SwaggerBasicAuthFilter;
+import java.util.Collections;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -8,16 +12,18 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.filter.ForwardedHeaderFilter;
 
-import java.util.Collections;
-import java.util.List;
-
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final SwaggerBasicAuthFilter swaggerBasicAuthFilter;
+    private final SessionAuthenticationFilter sessionAuthenticationFilter;
 
     private final String[] origins = new String[]{"http://localhost:3000", "https://jigumulmi.com",
         "https://www.jigumulmi.com"};
@@ -43,12 +49,23 @@ public class SecurityConfig {
         };
     }
 
+    public static final String[] SwaggerPatterns = {
+        "/swagger-resources/**", "/swagger-ui/**", "/docs/**", "/docs",
+    };
+
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.httpBasic(HttpBasicConfigurer::disable)
+        httpSecurity
+            .httpBasic(HttpBasicConfigurer::disable)
             .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
+            //.addFilterAfter(swaggerBasicAuthFilter,
+            //    UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(sessionAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class)
+            .authorizeHttpRequests(auth -> auth
+                .anyRequest().permitAll());
 
         return httpSecurity.build();
     }
