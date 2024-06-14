@@ -1,4 +1,4 @@
-package com.jigumulmi.config;
+package com.jigumulmi.config.Querydsl;
 
 import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
