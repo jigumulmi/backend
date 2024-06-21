@@ -48,8 +48,8 @@ public class GooglePlaceApiResponseDto {
                 OpenClose open = period.getOpen();
                 OpenClose close = period.getClose();
 
-                String openString = open.getHour() + ":" + open.getMinute();
-                String closeString = close.getHour() + ":" + close.getMinute();
+                String openString = String.format("%02d:%02d", open.getHour(), open.getMinute());
+                String closeString = String.format("%02d:%02d", close.getHour(), close.getMinute());
 
                 return openString + " - " + closeString;
             }
