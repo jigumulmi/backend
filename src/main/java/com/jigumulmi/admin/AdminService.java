@@ -21,11 +21,14 @@ import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.MenuRepository;
+import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
@@ -65,6 +68,7 @@ public class AdminService {
     private final SubwayStationPlaceRepository subwayStationPlaceRepository;
     private final MenuRepository menuRepository;
     private final SubwayStationRepository subwayStationRepository;
+    private final PlaceImageRepository placeImageRepository;
 
     public AdminMemberListResponseDto getMemberList(AdminGetMemberListRequestDto requestDto) {
         Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
@@ -125,7 +129,6 @@ public class AdminService {
             .openingHourFri(openingHour.getOpeningHourFri())
             .openingHourSat(openingHour.getOpeningHourSat())
             .additionalInfo(requestDto.getAdditionalInfo())
-            .mainImageUrl(requestDto.getMainImageUrl())
             .placeUrl(requestDto.getPlaceUrl())
             .longitude(position.getLongitude())
             .latitude(position.getLatitude())
@@ -154,8 +157,20 @@ public class AdminService {
             menuList.add(menu);
         }
 
+        ArrayList<PlaceImage> imageList = new ArrayList<>();
+        for (ImageDto image : requestDto.getImageList()) {
+            imageList.add(
+                PlaceImage.builder()
+                    .url(image.getUrl())
+                    .isMain(image.getIsMain())
+                    .place(place)
+                    .build()
+            );
+        }
+
         placeRepository.save(place);
         menuRepository.saveAll(menuList);
+        placeImageRepository.saveAll(imageList);
         subwayStationPlaceRepository.saveAll(subwayStationPlaceList);
     }
 
@@ -187,7 +202,18 @@ public class AdminService {
             menuList.add(menu);
         }
 
-        place.adminUpdate(requestDto, subwayStationPlaceList, menuList);
+        ArrayList<PlaceImage> imageList = new ArrayList<>();
+        for (ImageDto image : requestDto.getImageList()) {
+            imageList.add(
+                PlaceImage.builder()
+                    .url(image.getUrl())
+                    .isMain(image.getIsMain())
+                    .place(place)
+                    .build()
+            );
+        }
+
+        place.adminUpdate(requestDto, subwayStationPlaceList, menuList, imageList);
 
         subwayStationPlaceRepository.deleteAllByPlaceId(requestDto.getPlaceId());
         subwayStationPlaceRepository.saveAll(subwayStationPlaceList);

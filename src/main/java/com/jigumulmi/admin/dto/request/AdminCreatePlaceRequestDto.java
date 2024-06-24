@@ -1,6 +1,7 @@
 package com.jigumulmi.admin.dto.request;
 
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class AdminCreatePlaceRequestDto {
     private String contact;
     private List<String> menuList = new ArrayList<>();
     private PlaceDetailResponseDto.OpeningHourDto openingHour;
-    private String mainImageUrl;
+    private List<ImageDto> imageList = new ArrayList<>();
     private String placeUrl;
     private PositionDto position;
     private String additionalInfo;

@@ -59,7 +59,6 @@ public class CustomPlaceRepository {
                     Projections.fields(PlaceResponseDto.class,
                         place.id,
                         place.name,
-                        place.mainImageUrl,
                         Projections.fields(PositionDto.class,
                             place.latitude,
                             place.longitude
@@ -114,7 +113,6 @@ public class CustomPlaceRepository {
                     Projections.fields(PlaceDetailResponseDto.class,
                         place.id,
                         place.name,
-                        place.mainImageUrl,
                         Projections.fields(PositionDto.class,
                             place.latitude,
                             place.longitude

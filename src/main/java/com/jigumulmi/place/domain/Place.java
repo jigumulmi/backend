@@ -91,6 +91,7 @@ public class Place extends Timestamped {
 
     @BatchSize(size = 10)
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("isMain DESC")
     @JsonManagedReference
     private List<PlaceImage> placeImageList = new ArrayList<>();
 
