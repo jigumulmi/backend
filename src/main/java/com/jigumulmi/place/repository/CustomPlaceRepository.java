@@ -13,6 +13,7 @@ import static com.jigumulmi.place.domain.QSubwayStationLineMapping.subwayStation
 import static com.jigumulmi.place.domain.QSubwayStationPlace.subwayStationPlace;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
+import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
 import com.jigumulmi.config.exception.CustomException;
@@ -32,7 +33,6 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
@@ -66,7 +66,7 @@ public class CustomPlaceRepository {
                         list(Projections.fields(ImageDto.class,
                             placeImage.id,
                             placeImage.url,
-                            Expressions.constantAs(true, Expressions.booleanPath("isMain"))
+                            TRUE.as("isMain")
                         )).as("imageList"),
                         Projections.fields(PositionDto.class,
                             place.latitude,
@@ -75,7 +75,7 @@ public class CustomPlaceRepository {
                         Projections.fields(SubwayStationResponseDto.class,
                             subwayStation.id,
                             subwayStation.stationName,
-                            Expressions.constantAs(true, Expressions.booleanPath("isMain")),
+                            TRUE.as("isMain"),
                             list(
                                 Projections.fields(
                                     SubwayStationLineDto.class,
@@ -129,7 +129,7 @@ public class CustomPlaceRepository {
                         Projections.fields(SubwayStationResponseDto.class,
                             subwayStation.id,
                             subwayStation.stationName,
-                            subwayStationPlace.isMain,
+                            TRUE.as("isMain"),
                             list(
                                 Projections.fields(
                                     SubwayStationLineDto.class,
