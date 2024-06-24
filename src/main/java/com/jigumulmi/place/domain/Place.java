@@ -67,8 +67,6 @@ public class Place extends Timestamped {
 
     private String additionalInfo;
 
-    private String mainImageUrl;
-
     private String placeUrl;
 
     private Double longitude;
@@ -91,14 +89,19 @@ public class Place extends Timestamped {
     @JsonManagedReference
     private List<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
 
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<PlaceImage> placeImageList = new ArrayList<>();
+
     @Builder
-    public Place(String name, String category, String address, String contact,
-        List<Menu> menuList, String openingHourSun, String openingHourMon, String openingHourTue,
-        String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat,
-        String additionalInfo, String mainImageUrl, String placeUrl, Double longitude,
-        Double latitude, String registrantComment, Boolean isApproved,
+    public Place(String name, String category, String address, String contact, List<Menu> menuList,
+        String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed,
+        String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo,
+        String placeUrl, Double longitude, Double latitude, String registrantComment,
+        Boolean isApproved, List<Review> reviewList,
         List<SubwayStationPlace> subwayStationPlaceList,
-        List<Review> reviewList) {
+        List<PlaceImage> placeImageList) {
         this.name = name;
         this.category = category;
         this.address = address;
@@ -112,19 +115,19 @@ public class Place extends Timestamped {
         this.openingHourFri = openingHourFri;
         this.openingHourSat = openingHourSat;
         this.additionalInfo = additionalInfo;
-        this.mainImageUrl = mainImageUrl;
         this.placeUrl = placeUrl;
         this.longitude = longitude;
         this.latitude = latitude;
         this.registrantComment = registrantComment;
         this.isApproved = isApproved;
-        this.subwayStationPlaceList = subwayStationPlaceList;
         this.reviewList = reviewList;
+        this.subwayStationPlaceList = subwayStationPlaceList;
+        this.placeImageList = placeImageList;
     }
 
     public void adminUpdate(AdminUpdatePlaceRequestDto requestDto,
         List<SubwayStationPlace> subwayStationPlaceList,
-        List<Menu> menuList) {
+        List<Menu> menuList, List<PlaceImage> placeImageList) {
         OpeningHourDto openingHour = requestDto.getOpeningHour();
         PositionDto position = requestDto.getPosition();
 
@@ -142,7 +145,6 @@ public class Place extends Timestamped {
         this.openingHourFri = openingHour.getOpeningHourFri();
         this.openingHourSat = openingHour.getOpeningHourSat();
         this.additionalInfo = requestDto.getAdditionalInfo();
-        this.mainImageUrl = requestDto.getMainImageUrl();
         this.placeUrl = requestDto.getPlaceUrl();
         this.longitude = position.getLongitude();
         this.latitude = position.getLatitude();
@@ -150,6 +152,8 @@ public class Place extends Timestamped {
         this.isApproved = requestDto.getIsApproved();
         this.subwayStationPlaceList.clear();
         this.subwayStationPlaceList.addAll(subwayStationPlaceList);
+        this.placeImageList.clear();
+        this.placeImageList.addAll(placeImageList);
     }
 
     public void saveBasic(GooglePlaceApiResponseDto googlePlaceApiResponseDto,
