@@ -11,7 +11,6 @@ import lombok.experimental.SuperBuilder;
 
 
 @Getter
-@Setter
 @SuperBuilder
 @NoArgsConstructor
 public class PlaceResponseDto {
@@ -50,6 +49,7 @@ public class PlaceResponseDto {
 
     private String name;
 
+    @Setter
     private List<ImageDto> imageList;
 
     private PositionDto position;
