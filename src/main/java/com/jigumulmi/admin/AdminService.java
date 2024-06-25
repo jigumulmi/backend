@@ -27,8 +27,6 @@ import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
-import com.jigumulmi.place.repository.MenuRepository;
-import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
@@ -66,9 +64,7 @@ public class AdminService {
     private final MemberRepository memberRepository;
     private final PlaceRepository placeRepository;
     private final SubwayStationPlaceRepository subwayStationPlaceRepository;
-    private final MenuRepository menuRepository;
     private final SubwayStationRepository subwayStationRepository;
-    private final PlaceImageRepository placeImageRepository;
 
     public AdminMemberListResponseDto getMemberList(AdminGetMemberListRequestDto requestDto) {
         Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
@@ -168,10 +164,9 @@ public class AdminService {
             );
         }
 
+        place.addChildren(subwayStationPlaceList, menuList, imageList);
+
         placeRepository.save(place);
-        menuRepository.saveAll(menuList);
-        placeImageRepository.saveAll(imageList);
-        subwayStationPlaceRepository.saveAll(subwayStationPlaceList);
     }
 
     @Transactional

@@ -36,7 +36,6 @@ import com.jigumulmi.place.repository.ReviewReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
-import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.Reaction;
 import java.util.ArrayList;
@@ -52,7 +51,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlaceService {
 
     private final SubwayStationRepository subwayStationRepository;
-    private final SubwayStationPlaceRepository subwayStationPlaceRepository;
     private final PlaceRepository placeRepository;
     private final MenuRepository menuRepository;
     private final ReviewRepository reviewRepository;
@@ -91,9 +89,10 @@ public class PlaceService {
             .isMain(true)
             .build();
 
+        newPlace.addChildren(Collections.singletonList(subwayStationPlace), menuList,
+            null);
+
         placeRepository.save(newPlace);
-        menuRepository.saveAll(menuList);
-        subwayStationPlaceRepository.save(subwayStationPlace);
     }
 
     public List<PlaceResponseDto> getPlaceList(GetPlaceListRequestDto requestDto) {

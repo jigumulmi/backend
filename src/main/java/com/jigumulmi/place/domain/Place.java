@@ -84,7 +84,7 @@ public class Place extends Timestamped {
     private List<Review> reviewList = new ArrayList<>();
 
     @BatchSize(size = 10)
-    @OneToMany(mappedBy = "place")
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("isMain DESC")
     @JsonManagedReference
     private List<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
@@ -122,6 +122,13 @@ public class Place extends Timestamped {
         this.registrantComment = registrantComment;
         this.isApproved = isApproved;
         this.reviewList = reviewList;
+        this.subwayStationPlaceList = subwayStationPlaceList;
+        this.placeImageList = placeImageList;
+    }
+
+    public void addChildren(List<SubwayStationPlace> subwayStationPlaceList,
+        List<Menu> menuList, List<PlaceImage> placeImageList) {
+        this.menuList = menuList;
         this.subwayStationPlaceList = subwayStationPlaceList;
         this.placeImageList = placeImageList;
     }
