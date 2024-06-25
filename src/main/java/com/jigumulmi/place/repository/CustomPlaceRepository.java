@@ -2,6 +2,7 @@ package com.jigumulmi.place.repository;
 
 
 import static com.jigumulmi.place.domain.QPlace.place;
+import static com.jigumulmi.place.domain.QPlaceImage.placeImage;
 import static com.jigumulmi.place.domain.QReview.review;
 import static com.jigumulmi.place.domain.QReviewReaction.reviewReaction;
 import static com.jigumulmi.place.domain.QReviewReply.reviewReply;
@@ -12,6 +13,7 @@ import static com.jigumulmi.place.domain.QSubwayStationLineMapping.subwayStation
 import static com.jigumulmi.place.domain.QSubwayStationPlace.subwayStationPlace;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
+import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
 import com.jigumulmi.config.exception.CustomException;
@@ -19,6 +21,7 @@ import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.ReactionDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
@@ -47,19 +50,24 @@ public class CustomPlaceRepository {
     public List<PlaceResponseDto> getPlaceList(Long subwayStationId) {
         return queryFactory
             .from(place)
+            .join(place.placeImageList, placeImage)
+            .on(place.id.eq(placeImage.place.id).and(placeImage.isMain.eq(true)))
             .join(place.subwayStationPlaceList, subwayStationPlace)
+            .on(place.id.eq(subwayStationPlace.place.id).and(subwayStationPlace.isMain.eq(true)))
             .join(subwayStationPlace.subwayStation, subwayStation)
             .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
             .join(subwayStationLineMapping.subwayStationLine, subwayStationLine)
-            .where(place.isApproved.eq(true).and(subwayStationPlace.isMain.eq(true)),
-                placeCondition(subwayStationId)
-            )
+            .where(place.isApproved.eq(true), placeCondition(subwayStationId))
             .transform(
                 groupBy(place.id).list(
                     Projections.fields(PlaceResponseDto.class,
                         place.id,
                         place.name,
-                        place.mainImageUrl,
+                        list(Projections.fields(ImageDto.class,
+                            placeImage.id,
+                            placeImage.url,
+                            TRUE.as("isMain")
+                        )).as("imageList"),
                         Projections.fields(PositionDto.class,
                             place.latitude,
                             place.longitude
@@ -67,7 +75,7 @@ public class CustomPlaceRepository {
                         Projections.fields(SubwayStationResponseDto.class,
                             subwayStation.id,
                             subwayStation.stationName,
-                            subwayStationPlace.isMain,
+                            TRUE.as("isMain"),
                             list(
                                 Projections.fields(
                                     SubwayStationLineDto.class,
@@ -114,7 +122,6 @@ public class CustomPlaceRepository {
                     Projections.fields(PlaceDetailResponseDto.class,
                         place.id,
                         place.name,
-                        place.mainImageUrl,
                         Projections.fields(PositionDto.class,
                             place.latitude,
                             place.longitude
@@ -122,7 +129,7 @@ public class CustomPlaceRepository {
                         Projections.fields(SubwayStationResponseDto.class,
                             subwayStation.id,
                             subwayStation.stationName,
-                            subwayStationPlace.isMain,
+                            TRUE.as("isMain"),
                             list(
                                 Projections.fields(
                                     SubwayStationLineDto.class,

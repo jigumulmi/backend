@@ -13,13 +13,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AdminCreatePlaceRequestDto {
 
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ImageRequestDto {
+
+        private String url;
+        private Boolean isMain = false;
+    }
+
     private String name;
     private String category;
     private String address;
     private String contact;
     private List<String> menuList = new ArrayList<>();
     private PlaceDetailResponseDto.OpeningHourDto openingHour;
-    private String mainImageUrl;
+    private List<ImageRequestDto> imageList = new ArrayList<>();
     private String placeUrl;
     private PositionDto position;
     private String additionalInfo;
