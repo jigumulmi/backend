@@ -1,7 +1,6 @@
 package com.jigumulmi.admin.dto.request;
 
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,13 +13,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class AdminCreatePlaceRequestDto {
 
+    @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ImageRequestDto {
+
+        private String url;
+        private Boolean isMain = false;
+    }
+
     private String name;
     private String category;
     private String address;
     private String contact;
     private List<String> menuList = new ArrayList<>();
     private PlaceDetailResponseDto.OpeningHourDto openingHour;
-    private List<ImageDto> imageList = new ArrayList<>();
+    private List<ImageRequestDto> imageList = new ArrayList<>();
     private String placeUrl;
     private PositionDto position;
     private String additionalInfo;
