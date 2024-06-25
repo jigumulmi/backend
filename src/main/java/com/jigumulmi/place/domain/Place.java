@@ -2,16 +2,33 @@ package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
+import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto;
+import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.Location;
+import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.RegularOpeningHours;
+import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.RegularOpeningHours.Period;
+import com.jigumulmi.admin.dto.response.KakaoPlaceApiResponseDto;
+import com.jigumulmi.admin.dto.response.KakaoPlaceApiResponseDto.Document;
 import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -51,8 +68,7 @@ public class Place extends Timestamped {
 
     private String additionalInfo;
 
-    private String mainImageUrl;
-
+    @Column(length = 2083)
     private String placeUrl;
 
     private Double longitude;
@@ -70,19 +86,25 @@ public class Place extends Timestamped {
     private List<Review> reviewList = new ArrayList<>();
 
     @BatchSize(size = 10)
-    @OneToMany(mappedBy = "place")
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("isMain DESC")
     @JsonManagedReference
     private List<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
 
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("isMain DESC")
+    @JsonManagedReference
+    private List<PlaceImage> placeImageList = new ArrayList<>();
+
     @Builder
-    public Place(String name, String category, String address, String contact,
-        List<Menu> menuList, String openingHourSun, String openingHourMon, String openingHourTue,
-        String openingHourWed, String openingHourThu, String openingHourFri, String openingHourSat,
-        String additionalInfo, String mainImageUrl, String placeUrl, Double longitude,
-        Double latitude, String registrantComment, Boolean isApproved,
+    public Place(String name, String category, String address, String contact, List<Menu> menuList,
+        String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed,
+        String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo,
+        String placeUrl, Double longitude, Double latitude, String registrantComment,
+        Boolean isApproved, List<Review> reviewList,
         List<SubwayStationPlace> subwayStationPlaceList,
-        List<Review> reviewList) {
+        List<PlaceImage> placeImageList) {
         this.name = name;
         this.category = category;
         this.address = address;
@@ -96,19 +118,26 @@ public class Place extends Timestamped {
         this.openingHourFri = openingHourFri;
         this.openingHourSat = openingHourSat;
         this.additionalInfo = additionalInfo;
-        this.mainImageUrl = mainImageUrl;
         this.placeUrl = placeUrl;
         this.longitude = longitude;
         this.latitude = latitude;
         this.registrantComment = registrantComment;
         this.isApproved = isApproved;
-        this.subwayStationPlaceList = subwayStationPlaceList;
         this.reviewList = reviewList;
+        this.subwayStationPlaceList = subwayStationPlaceList;
+        this.placeImageList = placeImageList;
+    }
+
+    public void addChildren(List<SubwayStationPlace> subwayStationPlaceList,
+        List<Menu> menuList, List<PlaceImage> placeImageList) {
+        this.menuList = menuList;
+        this.subwayStationPlaceList = subwayStationPlaceList;
+        this.placeImageList = placeImageList;
     }
 
     public void adminUpdate(AdminUpdatePlaceRequestDto requestDto,
         List<SubwayStationPlace> subwayStationPlaceList,
-        List<Menu> menuList) {
+        List<Menu> menuList, List<PlaceImage> placeImageList) {
         OpeningHourDto openingHour = requestDto.getOpeningHour();
         PositionDto position = requestDto.getPosition();
 
@@ -126,7 +155,6 @@ public class Place extends Timestamped {
         this.openingHourFri = openingHour.getOpeningHourFri();
         this.openingHourSat = openingHour.getOpeningHourSat();
         this.additionalInfo = requestDto.getAdditionalInfo();
-        this.mainImageUrl = requestDto.getMainImageUrl();
         this.placeUrl = requestDto.getPlaceUrl();
         this.longitude = position.getLongitude();
         this.latitude = position.getLatitude();
@@ -134,5 +162,45 @@ public class Place extends Timestamped {
         this.isApproved = requestDto.getIsApproved();
         this.subwayStationPlaceList.clear();
         this.subwayStationPlaceList.addAll(subwayStationPlaceList);
+        this.placeImageList.clear();
+        this.placeImageList.addAll(placeImageList);
+    }
+
+    public void saveBasic(GooglePlaceApiResponseDto googlePlaceApiResponseDto,
+        KakaoPlaceApiResponseDto kakaoPlaceApiResponseDto) {
+
+        try {
+            Document document = kakaoPlaceApiResponseDto.getDocuments().getFirst();
+            String categoryName = document.getCategoryName();
+            String[] categoryList = categoryName.split(" > ");
+            String finalCategory = categoryList[categoryList.length - 1];
+
+            this.name = document.getPlaceName();
+            this.category = finalCategory;
+            this.address = document.getRoadAddressName();
+            this.contact = document.getPhone();
+            this.placeUrl = document.getPlaceUrl();
+        } finally {
+            Location location = googlePlaceApiResponseDto.getLocation();
+
+            RegularOpeningHours regularOpeningHours = googlePlaceApiResponseDto.getRegularOpeningHours();
+            Map<Integer, String> periodMap = new HashMap<>();
+            for (Period period : regularOpeningHours.getPeriods()) {
+                Integer day = period.getOpen().getDay();
+                periodMap.put(day, Period.makeString(period));
+            }
+
+            final String CLOSING_DAY = "정기휴무";
+            this.openingHourSun = periodMap.getOrDefault(0, CLOSING_DAY);
+            this.openingHourMon = periodMap.getOrDefault(1, CLOSING_DAY);
+            this.openingHourTue = periodMap.getOrDefault(2, CLOSING_DAY);
+            this.openingHourWed = periodMap.getOrDefault(3, CLOSING_DAY);
+            this.openingHourThu = periodMap.getOrDefault(4, CLOSING_DAY);
+            this.openingHourFri = periodMap.getOrDefault(5, CLOSING_DAY);
+            this.openingHourSat = periodMap.getOrDefault(6, CLOSING_DAY);
+            this.longitude = location.getLongitude();
+            this.latitude = location.getLatitude();
+        }
+
     }
 }

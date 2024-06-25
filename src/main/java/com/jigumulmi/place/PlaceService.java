@@ -24,17 +24,18 @@ import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
+import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.ReviewReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
-import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.Reaction;
 import java.util.ArrayList;
@@ -50,7 +51,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlaceService {
 
     private final SubwayStationRepository subwayStationRepository;
-    private final SubwayStationPlaceRepository subwayStationPlaceRepository;
     private final PlaceRepository placeRepository;
     private final MenuRepository menuRepository;
     private final ReviewRepository reviewRepository;
@@ -58,6 +58,7 @@ public class PlaceService {
     private final ReviewReactionRepository reviewReactionRepository;
     private final ReviewReplyReactionRepository reviewReplyReactionRepository;
     private final CustomPlaceRepository customPlaceRepository;
+    private final PlaceImageRepository placeImageRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         return subwayStationRepository.findAllByStationNameStartsWith(stationName)
@@ -88,15 +89,22 @@ public class PlaceService {
             .isMain(true)
             .build();
 
+        newPlace.addChildren(Collections.singletonList(subwayStationPlace), menuList,
+            null);
+
         placeRepository.save(newPlace);
-        menuRepository.saveAll(menuList);
-        subwayStationPlaceRepository.save(subwayStationPlace);
     }
 
     public List<PlaceResponseDto> getPlaceList(GetPlaceListRequestDto requestDto) {
         Long subwayStationId = requestDto.getSubwayStationId();
 
-        return customPlaceRepository.getPlaceList(subwayStationId);
+        List<PlaceResponseDto> placeList = customPlaceRepository.getPlaceList(subwayStationId);
+        for (PlaceResponseDto responseDto : placeList) {
+            List<ImageDto> imageList = responseDto.getImageList();
+            responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
+        }
+
+        return placeList;
     }
 
     @Transactional(readOnly = true)
@@ -105,6 +113,9 @@ public class PlaceService {
 
         List<MenuDto> menuList = menuRepository.findAllByPlaceId(placeId).stream()
             .map(MenuDto::from).toList();
+
+        List<ImageDto> imageList = placeImageRepository.findAllByPlaceId(placeId).stream()
+            .map(ImageDto::from).toList();
 
         Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
             placeId);
@@ -129,7 +140,7 @@ public class PlaceService {
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
             .name(place.getName())
-            .mainImageUrl(place.getMainImageUrl())
+            .imageList(imageList)
             .position(
                 place.getPosition()
             )

@@ -3,6 +3,7 @@ package com.jigumulmi.admin;
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.dto.request.AdminSavePlaceBasicRequestDto;
 import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -69,7 +71,7 @@ public class AdminController {
     @Operation(summary = "장소 등록")
     @ApiResponse(responseCode = "204")
     @PostMapping("/place")
-    public ResponseEntity<?> updatePlaceDetail(@RequestBody AdminCreatePlaceRequestDto requestDto) {
+    public ResponseEntity<?> createPlace(@RequestBody AdminCreatePlaceRequestDto requestDto) {
         adminService.createPlace(requestDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Create Success");
     }
@@ -81,5 +83,14 @@ public class AdminController {
         @RequestBody AdminUpdatePlaceRequestDto requestDto) {
         adminService.updatePlaceDetail(requestDto);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update Success");
+    }
+
+    @Operation(summary = "장소 기본 정보 등록")
+    @ApiResponse(responseCode = "204")
+    @PatchMapping("/place")
+    public ResponseEntity<?> savePlaceBasic(
+        @RequestBody AdminSavePlaceBasicRequestDto requestDto) {
+        adminService.savePlaceBasic(requestDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Saved basic info");
     }
 }

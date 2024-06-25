@@ -2,14 +2,19 @@ package com.jigumulmi.admin;
 
 
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.ImageRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.dto.request.AdminSavePlaceBasicRequestDto;
 import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto.MemberDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
+import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto;
+import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.Location;
+import com.jigumulmi.admin.dto.response.KakaoPlaceApiResponseDto;
 import com.jigumulmi.admin.dto.response.PageDto;
 import com.jigumulmi.admin.repository.CustomAdminRepository;
 import com.jigumulmi.config.exception.CustomException;
@@ -17,23 +22,30 @@ import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
-import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
-import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @Service
 @RequiredArgsConstructor
@@ -41,11 +53,15 @@ public class AdminService {
 
     private final int DEFAULT_PAGE_SIZE = 15;
 
+    @Value("${google.api.key}")
+    private String GOOGLE_API_KEY;
+
+    @Value("${kakao.admin.key}")
+    private String KAKAO_ADMIN_KEY;
+
     private final CustomAdminRepository customAdminRepository;
     private final MemberRepository memberRepository;
     private final PlaceRepository placeRepository;
-    private final SubwayStationPlaceRepository subwayStationPlaceRepository;
-    private final MenuRepository menuRepository;
     private final SubwayStationRepository subwayStationRepository;
 
     public AdminMemberListResponseDto getMemberList(AdminGetMemberListRequestDto requestDto) {
@@ -107,7 +123,6 @@ public class AdminService {
             .openingHourFri(openingHour.getOpeningHourFri())
             .openingHourSat(openingHour.getOpeningHourSat())
             .additionalInfo(requestDto.getAdditionalInfo())
-            .mainImageUrl(requestDto.getMainImageUrl())
             .placeUrl(requestDto.getPlaceUrl())
             .longitude(position.getLongitude())
             .latitude(position.getLatitude())
@@ -136,9 +151,20 @@ public class AdminService {
             menuList.add(menu);
         }
 
+        ArrayList<PlaceImage> imageList = new ArrayList<>();
+        for (ImageRequestDto image : requestDto.getImageList()) {
+            imageList.add(
+                PlaceImage.builder()
+                    .url(image.getUrl())
+                    .isMain(image.getIsMain())
+                    .place(place)
+                    .build()
+            );
+        }
+
+        place.addChildren(subwayStationPlaceList, menuList, imageList);
+
         placeRepository.save(place);
-        menuRepository.saveAll(menuList);
-        subwayStationPlaceRepository.saveAll(subwayStationPlaceList);
     }
 
     @Transactional
@@ -169,11 +195,78 @@ public class AdminService {
             menuList.add(menu);
         }
 
-        place.adminUpdate(requestDto, subwayStationPlaceList, menuList);
+        ArrayList<PlaceImage> imageList = new ArrayList<>();
+        for (ImageRequestDto imageRequestDto : requestDto.getImageList()) {
+            imageList.add(
+                PlaceImage.builder()
+                    .url(imageRequestDto.getUrl())
+                    .isMain(imageRequestDto.getIsMain())
+                    .place(place)
+                    .build()
+            );
+        }
 
-        subwayStationPlaceRepository.deleteAllByPlaceId(requestDto.getPlaceId());
-        subwayStationPlaceRepository.saveAll(subwayStationPlaceList);
+        place.adminUpdate(requestDto, subwayStationPlaceList, menuList, imageList);
+
         placeRepository.save(place);
     }
 
+    public void savePlaceBasic(AdminSavePlaceBasicRequestDto requestDto) {
+        GooglePlaceApiResponseDto googlePlaceApiResponseDto = getDataFromGoogle(requestDto);
+        String placeName = googlePlaceApiResponseDto.getDisplayName().getText();
+        Location location = googlePlaceApiResponseDto.getLocation();
+
+        KakaoPlaceApiResponseDto kakaoPlaceApiResponseDto = getDataFromKakao(placeName, location);
+
+        Place place = placeRepository.findById(requestDto.getPlaceId())
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+        place.saveBasic(googlePlaceApiResponseDto, kakaoPlaceApiResponseDto);
+        placeRepository.save(place);
+    }
+
+    private KakaoPlaceApiResponseDto getDataFromKakao(String placeName, Location location) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "KakaoAK " + KAKAO_ADMIN_KEY);
+        HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(headers);
+
+        String uri = UriComponentsBuilder
+            .fromUriString("https://dapi.kakao.com/v2/local/search/keyword.json")
+            .queryParam("query", placeName)
+            .queryParam("x", location.getLongitude())
+            .queryParam("y", location.getLatitude())
+            .queryParam("radius", 20) // 단위: 미터
+            .queryParam("size", 1)
+            .build()
+            .toUriString();
+
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<KakaoPlaceApiResponseDto> response = rt.exchange(uri, HttpMethod.GET,
+            requestHeader,
+            KakaoPlaceApiResponseDto.class);
+
+        return response.getBody();
+    }
+
+    private GooglePlaceApiResponseDto getDataFromGoogle(AdminSavePlaceBasicRequestDto requestDto) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Goog-Api-Key", GOOGLE_API_KEY);
+        HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(headers);
+
+        String uri = UriComponentsBuilder
+            .fromUriString("https://places.googleapis.com")
+            .path("/v1/places/" + requestDto.getGooglePlaceId())
+            .queryParam("fields",
+                "location,regularOpeningHours,displayName")
+            .queryParam("languageCode", "ko")
+            .queryParam("regionCode", "KR")
+            .build()
+            .toUriString();
+
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<GooglePlaceApiResponseDto> response = rt.exchange(uri, HttpMethod.GET,
+            requestHeader,
+            GooglePlaceApiResponseDto.class);
+
+        return response.getBody();
+    }
 }

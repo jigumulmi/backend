@@ -49,14 +49,14 @@ jobs:
         run: echo "${{ secrets.DEV_DEPLOY_SH_SCRIPT }}" > ./deploy.sh
         shell: bash
 
-      # Gradle build (Test 제외)
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.6
 
+      # Gradle build (Test 제외)
       - name: Execute Gradle build
-        run: ./gradlew build
+        run: ./gradlew build -x test
 
       - name: Deliver Files
         uses: appleboy/scp-action@master

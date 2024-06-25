@@ -1,4 +1,4 @@
-package com.jigumulmi.config.Querydsl;
+package com.jigumulmi.config.querydsl;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;

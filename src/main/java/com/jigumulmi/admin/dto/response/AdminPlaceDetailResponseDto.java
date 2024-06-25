@@ -37,6 +37,8 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
 
         List<MenuDto> menuList = place.getMenuList().stream().map(MenuDto::from).toList();
 
+        List<ImageDto> imageList = place.getPlaceImageList().stream().map(ImageDto::from).toList();
+
         return AdminPlaceDetailResponseDto.builder()
             .createdAt(place.getCreatedAt())
             .modifiedAt(place.getModifiedAt())
@@ -45,7 +47,7 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
             .category(place.getCategory())
             .address(place.getAddress())
             .contact(place.getContact())
-            .mainImageUrl(place.getMainImageUrl())
+            .imageList(imageList)
             .registrantComment(place.getRegistrantComment())
             .isApproved(place.getIsApproved())
             .additionalInfo(place.getAdditionalInfo())
