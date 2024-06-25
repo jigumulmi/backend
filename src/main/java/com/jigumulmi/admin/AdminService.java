@@ -2,6 +2,7 @@ package com.jigumulmi.admin;
 
 
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.ImageRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminSavePlaceBasicRequestDto;
@@ -25,7 +26,6 @@ import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
@@ -158,7 +158,7 @@ public class AdminService {
         }
 
         ArrayList<PlaceImage> imageList = new ArrayList<>();
-        for (ImageDto image : requestDto.getImageList()) {
+        for (ImageRequestDto image : requestDto.getImageList()) {
             imageList.add(
                 PlaceImage.builder()
                     .url(image.getUrl())
@@ -203,11 +203,11 @@ public class AdminService {
         }
 
         ArrayList<PlaceImage> imageList = new ArrayList<>();
-        for (ImageDto image : requestDto.getImageList()) {
+        for (ImageRequestDto imageRequestDto : requestDto.getImageList()) {
             imageList.add(
                 PlaceImage.builder()
-                    .url(image.getUrl())
-                    .isMain(image.getIsMain())
+                    .url(imageRequestDto.getUrl())
+                    .isMain(imageRequestDto.getIsMain())
                     .place(place)
                     .build()
             );
