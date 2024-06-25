@@ -28,7 +28,6 @@ import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.PlaceRepository;
-import com.jigumulmi.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +62,6 @@ public class AdminService {
     private final CustomAdminRepository customAdminRepository;
     private final MemberRepository memberRepository;
     private final PlaceRepository placeRepository;
-    private final SubwayStationPlaceRepository subwayStationPlaceRepository;
     private final SubwayStationRepository subwayStationRepository;
 
     public AdminMemberListResponseDto getMemberList(AdminGetMemberListRequestDto requestDto) {
@@ -210,8 +208,6 @@ public class AdminService {
 
         place.adminUpdate(requestDto, subwayStationPlaceList, menuList, imageList);
 
-        subwayStationPlaceRepository.deleteAllByPlaceId(requestDto.getPlaceId());
-        subwayStationPlaceRepository.saveAll(subwayStationPlaceList);
         placeRepository.save(place);
     }
 

@@ -18,6 +18,7 @@ public class KakaoPlaceApiResponseDto {
     @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
     public static class Document {
 
+        // TODO 장소 중복 방지 로직
         //private String id;
         private String placeName;
         private String categoryName;

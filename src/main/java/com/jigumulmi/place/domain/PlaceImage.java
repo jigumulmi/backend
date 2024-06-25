@@ -1,6 +1,7 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ public class PlaceImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(length = 2083)
     private String url;
 
     @ColumnDefault("false")

@@ -12,6 +12,7 @@ import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -67,6 +68,7 @@ public class Place extends Timestamped {
 
     private String additionalInfo;
 
+    @Column(length = 2083)
     private String placeUrl;
 
     private Double longitude;
