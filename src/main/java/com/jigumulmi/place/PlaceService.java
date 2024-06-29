@@ -1,50 +1,27 @@
 package com.jigumulmi.place;
 
-import static java.lang.Math.round;
-
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;
 import com.jigumulmi.member.domain.Member;
-import com.jigumulmi.place.domain.Menu;
-import com.jigumulmi.place.domain.Place;
-import com.jigumulmi.place.domain.Review;
-import com.jigumulmi.place.domain.ReviewReaction;
-import com.jigumulmi.place.domain.ReviewReply;
-import com.jigumulmi.place.domain.ReviewReplyReaction;
-import com.jigumulmi.place.domain.SubwayStation;
-import com.jigumulmi.place.domain.SubwayStationPlace;
-import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
-import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
-import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
-import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
-import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
-import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
-import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
+import com.jigumulmi.place.domain.*;
+import com.jigumulmi.place.dto.request.*;
+import com.jigumulmi.place.dto.response.*;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
-import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
-import com.jigumulmi.place.dto.response.ReviewResponseDto;
-import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
-import com.jigumulmi.place.repository.CustomPlaceRepository;
-import com.jigumulmi.place.repository.MenuRepository;
-import com.jigumulmi.place.repository.PlaceImageRepository;
-import com.jigumulmi.place.repository.PlaceRepository;
-import com.jigumulmi.place.repository.ReviewReactionRepository;
-import com.jigumulmi.place.repository.ReviewReplyReactionRepository;
-import com.jigumulmi.place.repository.ReviewReplyRepository;
-import com.jigumulmi.place.repository.ReviewRepository;
-import com.jigumulmi.place.repository.SubwayStationRepository;
+import com.jigumulmi.place.repository.*;
+import com.jigumulmi.place.vo.CurrentOpeningInfo;
 import com.jigumulmi.place.vo.Reaction;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
+import static java.lang.Math.round;
 
 @Service
 @RequiredArgsConstructor
@@ -102,6 +79,10 @@ public class PlaceService {
         for (PlaceResponseDto responseDto : placeList) {
             List<ImageDto> imageList = responseDto.getImageList();
             responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
+
+            String todayOpeningHour = responseDto.getCurrentOpeningInfo();
+            String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(todayOpeningHour);
+            responseDto.setCurrentOpeningInfo(currentOpeningInfo);
         }
 
         return placeList;
