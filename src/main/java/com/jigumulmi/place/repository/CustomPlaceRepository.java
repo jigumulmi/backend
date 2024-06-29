@@ -18,6 +18,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.DayOfWeek;
 import java.util.List;
 import java.util.Map;
 
@@ -45,7 +46,7 @@ public class CustomPlaceRepository {
 
 
     public List<PlaceResponseDto> getPlaceList(Long subwayStationId) {
-        int dayNumber = getDayNumber();
+        DayOfWeek todayOfWeek = getTodayOfWeek();
 
         return queryFactory
             .from(place)
@@ -85,13 +86,13 @@ public class CustomPlaceRepository {
                         ).as("subwayStation"),
                         place.category,
                         new CaseBuilder()
-                            .when(isMonday(dayNumber)).then(place.openingHourMon)
-                            .when(isTuesday(dayNumber)).then(place.openingHourTue)
-                            .when(isWednesday(dayNumber)).then(place.openingHourWed)
-                            .when(isThursday(dayNumber)).then(place.openingHourThu)
-                            .when(isFriday(dayNumber)).then(place.openingHourFri)
-                            .when(isSaturday(dayNumber)).then(place.openingHourSat)
-                            .when(isSunday(dayNumber)).then(place.openingHourSun)
+                            .when(isMonday(todayOfWeek)).then(place.openingHourMon)
+                            .when(isTuesday(todayOfWeek)).then(place.openingHourTue)
+                            .when(isWednesday(todayOfWeek)).then(place.openingHourWed)
+                            .when(isThursday(todayOfWeek)).then(place.openingHourThu)
+                            .when(isFriday(todayOfWeek)).then(place.openingHourFri)
+                            .when(isSaturday(todayOfWeek)).then(place.openingHourSat)
+                            .when(isSunday(todayOfWeek)).then(place.openingHourSun)
                             .otherwise("")
                             .as("currentOpeningInfo")
                     )

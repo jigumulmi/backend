@@ -59,6 +59,7 @@ public enum CurrentOpeningInfo {
         boolean isOpen = isOpen(now, openTime, closeTime);
         boolean isOpeningSoon = isOpeningSoon(now, openTime);
         boolean isClosingSoon = isClosingSoon(now, closeTime);
+
         CurrentOpeningInfo info;
         if (isOpeningSoon) {
             info = CurrentOpeningInfo.OPENING_SOON;
@@ -73,40 +74,36 @@ public enum CurrentOpeningInfo {
         return info.response;
     }
 
-    /**
-     * @return 월: 1 ~ 일: 7
-     */
-    public static int getDayNumber() {
+    public static DayOfWeek getTodayOfWeek() {
         LocalDate now = LocalDate.now(ZoneId.of("Asia/Seoul"));
-        DayOfWeek dayOfWeek = now.getDayOfWeek();
-        return dayOfWeek.getValue();
+        return now.getDayOfWeek();
     }
 
-    public static BooleanTemplate isMonday(int dayNumber) {
-        return Expressions.booleanTemplate(String.valueOf(dayNumber == 1));
+    public static BooleanTemplate isMonday(DayOfWeek dayOfWeek) {
+        return Expressions.booleanTemplate(String.valueOf(dayOfWeek == DayOfWeek.MONDAY));
     }
 
-    public static BooleanTemplate isTuesday(int dayNumber) {
-        return Expressions.booleanTemplate(String.valueOf(dayNumber == 2));
+    public static BooleanTemplate isTuesday(DayOfWeek dayOfWeek) {
+        return Expressions.booleanTemplate(String.valueOf(dayOfWeek == DayOfWeek.TUESDAY));
     }
 
-    public static BooleanTemplate isWednesday(int dayNumber) {
-        return Expressions.booleanTemplate(String.valueOf(dayNumber == 3));
+    public static BooleanTemplate isWednesday(DayOfWeek dayOfWeek) {
+        return Expressions.booleanTemplate(String.valueOf(dayOfWeek == DayOfWeek.WEDNESDAY));
     }
 
-    public static BooleanTemplate isThursday(int dayNumber) {
-        return Expressions.booleanTemplate(String.valueOf(dayNumber == 4));
+    public static BooleanTemplate isThursday(DayOfWeek dayOfWeek) {
+        return Expressions.booleanTemplate(String.valueOf(dayOfWeek == DayOfWeek.THURSDAY));
     }
 
-    public static BooleanTemplate isFriday(int dayNumber) {
-        return Expressions.booleanTemplate(String.valueOf(dayNumber == 5));
+    public static BooleanTemplate isFriday(DayOfWeek dayOfWeek) {
+        return Expressions.booleanTemplate(String.valueOf(dayOfWeek == DayOfWeek.FRIDAY));
     }
 
-    public static BooleanTemplate isSaturday(int dayNumber) {
-        return Expressions.booleanTemplate(String.valueOf(dayNumber == 6));
+    public static BooleanTemplate isSaturday(DayOfWeek dayOfWeek) {
+        return Expressions.booleanTemplate(String.valueOf(dayOfWeek == DayOfWeek.SATURDAY));
     }
 
-    public static BooleanTemplate isSunday(int dayNumber) {
-        return Expressions.booleanTemplate(String.valueOf(dayNumber == 7));
+    public static BooleanTemplate isSunday(DayOfWeek dayOfWeek) {
+        return Expressions.booleanTemplate(String.valueOf(dayOfWeek == DayOfWeek.SUNDAY));
     }
 }
