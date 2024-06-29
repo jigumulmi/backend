@@ -1,13 +1,10 @@
 package com.jigumulmi.place.dto.response;
 
 import com.jigumulmi.place.domain.PlaceImage;
-import java.util.List;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 
 @Getter
@@ -57,4 +54,7 @@ public class PlaceResponseDto {
     private SubwayStationResponseDto subwayStation;
 
     private String category;
+
+    @Setter
+    private String currentOpeningInfo;
 }
