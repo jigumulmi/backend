@@ -83,7 +83,8 @@ public class CustomPlaceRepository {
                                     subwayStationLine.lineNumber
                                 )
                             ).as("subwayStationLineList")
-                        ).as("subwayStation")
+                        ).as("subwayStation"),
+                        place.category
                     )
                 )
             );

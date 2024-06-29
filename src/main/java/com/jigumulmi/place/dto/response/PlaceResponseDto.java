@@ -55,4 +55,6 @@ public class PlaceResponseDto {
     private PositionDto position;
 
     private SubwayStationResponseDto subwayStation;
+
+    private String category;
 }
