@@ -22,7 +22,7 @@ public enum CurrentOpeningInfo {
 
     private final String response;
 
-    private static final Long SOON_STANDARD = 1L;
+    private static final Long SOON_STANDARD = 30L;
 
     private static boolean isOpen(LocalTime currentTime, LocalTime openTime, LocalTime closeTime) {
         if (openTime.isBefore(closeTime)) {
@@ -33,12 +33,12 @@ public enum CurrentOpeningInfo {
     }
 
     private static boolean isOpeningSoon(LocalTime currentTime, LocalTime openTime) {
-        LocalTime soonBeforeOpening = openTime.minusHours(SOON_STANDARD);
+        LocalTime soonBeforeOpening = openTime.minusMinutes(SOON_STANDARD);
         return currentTime.isAfter(soonBeforeOpening) && currentTime.isBefore(openTime);
     }
 
     private static boolean isClosingSoon(LocalTime currentTime, LocalTime closeTime) {
-        LocalTime soonBeforeClosing = closeTime.minusHours(SOON_STANDARD);
+        LocalTime soonBeforeClosing = closeTime.minusMinutes(SOON_STANDARD);
         return currentTime.isAfter(soonBeforeClosing) && currentTime.isBefore(closeTime);
     }
 
