@@ -27,8 +27,8 @@ public class KakaoPlaceApiResponseDto {
         private String phone;
         //private String addressName;
         private String roadAddressName;
-        //private String x;
-        //private String y;
+        private String x;
+        private String y;
         private String placeUrl;
         //private String distance;
     }
