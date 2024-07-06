@@ -3,7 +3,6 @@ package com.jigumulmi.place.domain;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto;
-import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.Location;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.RegularOpeningHours;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.RegularOpeningHours.Period;
 import com.jigumulmi.admin.dto.response.KakaoPlaceApiResponseDto;
@@ -180,9 +179,9 @@ public class Place extends Timestamped {
             this.address = document.getRoadAddressName();
             this.contact = document.getPhone();
             this.placeUrl = document.getPlaceUrl();
+            this.longitude = Double.valueOf(document.getX());
+            this.latitude = Double.valueOf(document.getY());
         } finally {
-            Location location = googlePlaceApiResponseDto.getLocation();
-
             RegularOpeningHours regularOpeningHours = googlePlaceApiResponseDto.getRegularOpeningHours();
             Map<Integer, String> periodMap = new HashMap<>();
             for (Period period : regularOpeningHours.getPeriods()) {
@@ -198,8 +197,6 @@ public class Place extends Timestamped {
             this.openingHourThu = periodMap.getOrDefault(4, CLOSING_DAY);
             this.openingHourFri = periodMap.getOrDefault(5, CLOSING_DAY);
             this.openingHourSat = periodMap.getOrDefault(6, CLOSING_DAY);
-            this.longitude = location.getLongitude();
-            this.latitude = location.getLatitude();
         }
 
     }

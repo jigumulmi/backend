@@ -45,6 +45,18 @@ public class PlaceResponseDto {
         }
     }
 
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SurroundingDateOpeningHour {
+
+        private String yesterday;
+        private String today;
+        private String tomorrow;
+    }
+
+
     private Long id;
 
     private String name;
@@ -55,4 +67,11 @@ public class PlaceResponseDto {
     private PositionDto position;
 
     private SubwayStationResponseDto subwayStation;
+
+    private String category;
+
+    private SurroundingDateOpeningHour surroundingDateOpeningHour;
+
+    @Setter
+    private String currentOpeningInfo;
 }

@@ -11,6 +11,7 @@ import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
 import static com.jigumulmi.place.domain.QSubwayStationLine.subwayStationLine;
 import static com.jigumulmi.place.domain.QSubwayStationLineMapping.subwayStationLineMapping;
 import static com.jigumulmi.place.domain.QSubwayStationPlace.subwayStationPlace;
+import static com.jigumulmi.place.vo.CurrentOpeningInfo.getSurroundingDateOpeningHourExpressions;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
@@ -23,6 +24,7 @@ import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
 import com.jigumulmi.place.dto.response.ReactionDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
@@ -46,8 +48,8 @@ public class CustomPlaceRepository {
 
     private final JPAQueryFactory queryFactory;
 
-
     public List<PlaceResponseDto> getPlaceList(Long subwayStationId) {
+
         return queryFactory
             .from(place)
             .join(place.placeImageList, placeImage)
@@ -83,7 +85,11 @@ public class CustomPlaceRepository {
                                     subwayStationLine.lineNumber
                                 )
                             ).as("subwayStationLineList")
-                        ).as("subwayStation")
+                        ).as("subwayStation"),
+                        place.category,
+                        Projections.fields(SurroundingDateOpeningHour.class,
+                            getSurroundingDateOpeningHourExpressions()
+                        ).as("surroundingDateOpeningHour")
                     )
                 )
             );

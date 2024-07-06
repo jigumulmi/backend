@@ -25,7 +25,7 @@ public class SecurityConfig {
     private final SwaggerBasicAuthFilter swaggerBasicAuthFilter;
 
     private final String[] origins = new String[]{"http://localhost:3000", "https://jigumulmi.com",
-        "https://www.jigumulmi.com"};
+        "https://www.jigumulmi.com", "https://dev.jigumulmi.com"};
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {

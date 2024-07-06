@@ -25,6 +25,7 @@ import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -37,6 +38,7 @@ import com.jigumulmi.place.repository.ReviewReplyReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
+import com.jigumulmi.place.vo.CurrentOpeningInfo;
 import com.jigumulmi.place.vo.Reaction;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -102,6 +104,11 @@ public class PlaceService {
         for (PlaceResponseDto responseDto : placeList) {
             List<ImageDto> imageList = responseDto.getImageList();
             responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
+
+            SurroundingDateOpeningHour surroundingDateOpeningHour = responseDto.getSurroundingDateOpeningHour();
+            String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
+                surroundingDateOpeningHour);
+            responseDto.setCurrentOpeningInfo(currentOpeningInfo);
         }
 
         return placeList;
