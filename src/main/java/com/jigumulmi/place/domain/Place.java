@@ -165,6 +165,8 @@ public class Place extends Timestamped {
         this.placeImageList.addAll(placeImageList);
     }
 
+    public static final String CLOSING_DAY = "정기휴무";
+
     public void saveBasic(GooglePlaceApiResponseDto googlePlaceApiResponseDto,
         KakaoPlaceApiResponseDto kakaoPlaceApiResponseDto) {
 
@@ -189,7 +191,6 @@ public class Place extends Timestamped {
                 periodMap.put(day, Period.makeString(period));
             }
 
-            final String CLOSING_DAY = "정기휴무";
             this.openingHourSun = periodMap.getOrDefault(0, CLOSING_DAY);
             this.openingHourMon = periodMap.getOrDefault(1, CLOSING_DAY);
             this.openingHourTue = periodMap.getOrDefault(2, CLOSING_DAY);
