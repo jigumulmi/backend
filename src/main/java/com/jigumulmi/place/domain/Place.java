@@ -16,8 +16,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +34,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(indexes = @Index(columnList = "kakaoPlaceId", unique = true))
 public class Place extends Timestamped {
 
     @Id
@@ -96,6 +99,8 @@ public class Place extends Timestamped {
     @JsonManagedReference
     private List<PlaceImage> placeImageList = new ArrayList<>();
 
+    private String kakaoPlaceId;
+
     @Builder
     public Place(String name, String category, String address, String contact, List<Menu> menuList,
         String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed,
@@ -103,7 +108,7 @@ public class Place extends Timestamped {
         String placeUrl, Double longitude, Double latitude, String registrantComment,
         Boolean isApproved, List<Review> reviewList,
         List<SubwayStationPlace> subwayStationPlaceList,
-        List<PlaceImage> placeImageList) {
+        List<PlaceImage> placeImageList, String kakaoPlaceId) {
         this.name = name;
         this.category = category;
         this.address = address;
@@ -125,6 +130,7 @@ public class Place extends Timestamped {
         this.reviewList = reviewList;
         this.subwayStationPlaceList = subwayStationPlaceList;
         this.placeImageList = placeImageList;
+        this.kakaoPlaceId = kakaoPlaceId;
     }
 
     public void addChildren(List<SubwayStationPlace> subwayStationPlaceList,
@@ -163,6 +169,7 @@ public class Place extends Timestamped {
         this.subwayStationPlaceList.addAll(subwayStationPlaceList);
         this.placeImageList.clear();
         this.placeImageList.addAll(placeImageList);
+        this.kakaoPlaceId = requestDto.getKakaoPlaceId();
     }
 
     public static final String CLOSING_DAY = "정기휴무";
@@ -183,6 +190,7 @@ public class Place extends Timestamped {
             this.placeUrl = document.getPlaceUrl();
             this.longitude = Double.valueOf(document.getX());
             this.latitude = Double.valueOf(document.getY());
+            this.kakaoPlaceId = document.getId();
         } finally {
             RegularOpeningHours regularOpeningHours = googlePlaceApiResponseDto.getRegularOpeningHours();
             Map<Integer, String> periodMap = new HashMap<>();
@@ -199,6 +207,5 @@ public class Place extends Timestamped {
             this.openingHourFri = periodMap.getOrDefault(5, CLOSING_DAY);
             this.openingHourSat = periodMap.getOrDefault(6, CLOSING_DAY);
         }
-
     }
 }
