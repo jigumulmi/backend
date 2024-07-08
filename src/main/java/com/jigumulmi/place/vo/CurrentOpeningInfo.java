@@ -1,5 +1,6 @@
 package com.jigumulmi.place.vo;
 
+import static com.jigumulmi.place.domain.Place.CLOSING_DAY;
 import static com.jigumulmi.place.domain.QPlace.place;
 
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
@@ -71,7 +72,6 @@ public enum CurrentOpeningInfo {
 
     public static String getCurrentOpeningInfo(
         SurroundingDateOpeningHour surroundingDateOpeningHour) {
-        String HOLIDAY_IN_DB = "정기휴무";
 
         String yesterdayOpeningHour = surroundingDateOpeningHour.getYesterday();
         String todayOpeningHour = surroundingDateOpeningHour.getToday();
@@ -82,7 +82,7 @@ public enum CurrentOpeningInfo {
 
         LocalTime yesterdayOpenTime = null;
         LocalTime yesterdayCloseTime = null;
-        if (!Objects.equals(yesterdayOpeningHour, HOLIDAY_IN_DB)) {
+        if (!Objects.equals(yesterdayOpeningHour, CLOSING_DAY)) {
             String[] splitYesterdayOpeningHour = yesterdayOpeningHour.split(" - ");
             yesterdayOpenTime = LocalTime.parse(splitYesterdayOpeningHour[0], formatter);
             yesterdayCloseTime = LocalTime.parse(splitYesterdayOpeningHour[1], formatter);
@@ -90,7 +90,7 @@ public enum CurrentOpeningInfo {
 
         LocalTime todayOpenTime = null;
         LocalTime todayCloseTime = null;
-        if (!Objects.equals(todayOpeningHour, HOLIDAY_IN_DB)) {
+        if (!Objects.equals(todayOpeningHour, CLOSING_DAY)) {
             String[] splitTodayOpeningHour = todayOpeningHour.split(" - ");
             todayOpenTime = LocalTime.parse(splitTodayOpeningHour[0], formatter);
             todayCloseTime = LocalTime.parse(splitTodayOpeningHour[1], formatter);
@@ -98,7 +98,7 @@ public enum CurrentOpeningInfo {
 
         LocalTime tomorrowOpenTime = null;
         LocalTime tomorrowCloseTime = null;
-        if (!Objects.equals(tomorrowOpeningHour, HOLIDAY_IN_DB)) {
+        if (!Objects.equals(tomorrowOpeningHour, CLOSING_DAY)) {
             String[] splitTomorrowOpeningHour = tomorrowOpeningHour.split(" - ");
             tomorrowOpenTime = LocalTime.parse(splitTomorrowOpeningHour[0], formatter);
             tomorrowCloseTime = LocalTime.parse(splitTomorrowOpeningHour[1], formatter);
@@ -122,7 +122,7 @@ public enum CurrentOpeningInfo {
             } else {
                 info = CurrentOpeningInfo.OPEN_NOW;
             }
-        } else if (todayOpeningHour.equals(HOLIDAY_IN_DB)) {
+        } else if (todayOpeningHour.equals(CLOSING_DAY)) {
             if (isOpenToday || isOpenTomorrow) {
                 info = CurrentOpeningInfo.OPEN_NOW;
             } else {
