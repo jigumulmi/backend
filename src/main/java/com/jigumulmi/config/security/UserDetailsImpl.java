@@ -1,12 +1,13 @@
 package com.jigumulmi.config.security;
 
 import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.member.dto.vo.MemberRole;
+import java.util.ArrayList;
+import java.util.Collection;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.Collections;
 
 @Getter
 public class UserDetailsImpl implements UserDetails {
@@ -23,7 +24,14 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        Boolean isAdmin = member.getIsAdmin();
+        MemberRole memberRole = MemberRole.getRole(isAdmin);
+
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        for (String role : memberRole.getValue().split(",")) {
+            authorities.add(new SimpleGrantedAuthority(role));
+        }
+        return authorities;
     }
 
     @Override

@@ -55,7 +55,7 @@ public class KakaoService {
             Long id = member.getId();
             String email = member.getEmail();
             String[] splitEmail = email.split("@");
-            String tempNickname = splitEmail[0] + 739 + id;
+            String tempNickname = splitEmail[0] + 739 + id; // 739: memberId 노출하지 않기 위한 임의의 숫자
 
             member.updateNickname(tempNickname);
             memberRepository.save(member);
@@ -170,7 +170,11 @@ public class KakaoService {
         if (kakaoMember == null) {
             Long kakaoUserId = getKakaoUserId(accessToken);
             //String nickname = kakaoMemberInfo.getNickname();
-            kakaoMember = Member.builder().email(kakaoEmail).kakaoUserId(kakaoUserId).build();
+            kakaoMember = Member.builder()
+                .email(kakaoEmail)
+                .kakaoUserId(kakaoUserId)
+                .isAdmin(false)
+                .build();
             memberRepository.save(kakaoMember);
         }
 

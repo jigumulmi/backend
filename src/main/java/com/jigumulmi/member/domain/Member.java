@@ -14,6 +14,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
@@ -33,12 +34,17 @@ public class Member extends Timestamped {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime deregisteredAt;
 
+    @ColumnDefault("false")
+    private Boolean isAdmin;
+
     @Builder
-    public Member(String nickname, String email, Long kakaoUserId, LocalDateTime deregisteredAt) {
+    public Member(String nickname, String email, Long kakaoUserId, LocalDateTime deregisteredAt,
+        Boolean isAdmin) {
         this.nickname = nickname;
         this.email = email;
         this.kakaoUserId = kakaoUserId;
         this.deregisteredAt = deregisteredAt;
+        this.isAdmin = isAdmin;
     }
 
     /**
@@ -56,6 +62,7 @@ public class Member extends Timestamped {
     public Member(Long id, String nickname) {
         this.id = id;
         this.nickname = nickname;
+        this.isAdmin = true;
     }
 
     public void updateNickname(String nickname) {
