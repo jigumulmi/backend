@@ -32,7 +32,7 @@ public class MemberService {
     public MemberDetailResponseDto getUserDetail(Member member) {
         return new MemberDetailResponseDto(
             member.getCreatedAt(), member.getDeregisteredAt(), member.getId(), member.getNickname(),
-            member.getEmail()
+            member.getEmail(), member.getIsAdmin()
         );
     }
 }

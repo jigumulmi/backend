@@ -128,6 +128,7 @@ public class AdminService {
             .latitude(position.getLatitude())
             .registrantComment(requestDto.getRegistrantComment())
             .isApproved(requestDto.getIsApproved())
+            .kakaoPlaceId(requestDto.getKakaoPlaceId())
             .build();
 
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(
