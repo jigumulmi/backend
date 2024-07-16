@@ -156,7 +156,10 @@ public class CustomPlaceRepository {
                             place.openingHourFri,
                             place.openingHourSat
                         ).as("openingHour"),
-                        place.additionalInfo
+                        place.additionalInfo,
+                        Projections.fields(SurroundingDateOpeningHour.class,
+                            getSurroundingDateOpeningHourExpressions()
+                        ).as("surroundingDateOpeningHour")
                     )
                 )
             ).stream().findFirst()
