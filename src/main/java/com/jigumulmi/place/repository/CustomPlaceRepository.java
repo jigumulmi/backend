@@ -1,6 +1,27 @@
 package com.jigumulmi.place.repository;
 
 
+import com.jigumulmi.config.exception.CustomException;
+import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
+import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
+import com.jigumulmi.place.dto.response.*;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
+import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
+import com.querydsl.core.types.ConstantImpl;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Map;
+
 import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QPlaceImage.placeImage;
 import static com.jigumulmi.place.domain.QReview.review;
@@ -16,31 +37,6 @@ import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
-
-import com.jigumulmi.config.exception.CustomException;
-import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
-import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
-import com.jigumulmi.place.dto.response.ReactionDto;
-import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
-import com.jigumulmi.place.dto.response.ReviewResponseDto;
-import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
-import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
-import com.querydsl.core.types.ConstantImpl;
-import com.querydsl.core.types.ExpressionUtils;
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import java.util.List;
-import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -107,7 +103,6 @@ public class CustomPlaceRepository {
                     .where(subwayStationPlace.subwayStation.id.eq(subwayStationId))
             );
         }
-
     }
 
 

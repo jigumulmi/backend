@@ -1,36 +1,21 @@
 package com.jigumulmi.admin;
 
 
-import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.dto.request.*;
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.ImageRequestDto;
-import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
-import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.dto.request.AdminSavePlaceBasicRequestDto;
-import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
-import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
+import com.jigumulmi.admin.dto.response.*;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto.MemberDto;
-import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
-import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
-import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.Location;
-import com.jigumulmi.admin.dto.response.KakaoPlaceApiResponseDto;
-import com.jigumulmi.admin.dto.response.PageDto;
 import com.jigumulmi.admin.repository.CustomAdminRepository;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
-import com.jigumulmi.place.domain.Menu;
-import com.jigumulmi.place.domain.Place;
-import com.jigumulmi.place.domain.PlaceImage;
-import com.jigumulmi.place.domain.SubwayStation;
-import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.domain.*;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -46,6 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -85,7 +73,7 @@ public class AdminService {
         Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
-        Page<PlaceDto> placePage = customAdminRepository.getPlaceList(pageable);
+        Page<PlaceDto> placePage = customAdminRepository.getPlaceList(pageable, requestDto.getPlaceName());
 
         return AdminPlaceListResponseDto.builder()
             .data(placePage.getContent())
