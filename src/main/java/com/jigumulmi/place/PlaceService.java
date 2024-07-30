@@ -118,6 +118,10 @@ public class PlaceService {
     public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
         PlaceDetailResponseDto place = customPlaceRepository.getPlaceDetail(placeId);
 
+        SurroundingDateOpeningHour surroundingDateOpeningHour = place.getSurroundingDateOpeningHour();
+        String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
+            surroundingDateOpeningHour);
+
         List<MenuDto> menuList = menuRepository.findAllByPlaceId(placeId).stream()
             .map(MenuDto::from).toList();
 
@@ -163,6 +167,8 @@ public class PlaceService {
             )
             .additionalInfo(place.getAdditionalInfo())
             .overallReview(overallReviewResponseDto)
+            .surroundingDateOpeningHour(surroundingDateOpeningHour)
+            .currentOpeningInfo(currentOpeningInfo)
             .build();
     }
 

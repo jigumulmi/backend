@@ -8,10 +8,9 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.dsl.StringExpression;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -30,123 +29,67 @@ public enum CurrentOpeningInfo {
 
     private static final Long SOON_STANDARD = 30L;
 
-    private static boolean isBeforeOpening(LocalTime currentTime, LocalTime openTime) {
-        if (openTime == null) {
-            return false;
-        }
-
-        LocalTime soonBeforeOpening = openTime.minusMinutes(SOON_STANDARD);
-        return currentTime.isBefore(soonBeforeOpening);
-    }
-
-    private static boolean isOpeningSoon(LocalTime currentTime, LocalTime openTime) {
-        if (openTime == null) {
-            return false;
-        }
-
-        LocalTime soonBeforeOpening = openTime.minusMinutes(SOON_STANDARD);
-        return currentTime.isAfter(soonBeforeOpening) && currentTime.isBefore(openTime);
-    }
-
-    private static boolean isClosingSoon(LocalTime currentTime, LocalTime closeTime) {
-        if (closeTime == null) {
-            return false;
-        }
-
-        LocalTime soonBeforeClosing = closeTime.minusMinutes(SOON_STANDARD);
-        return currentTime.isAfter(soonBeforeClosing) && currentTime.isBefore(closeTime);
-    }
-
-    private static boolean isOpen(LocalTime currentTime, LocalTime openTime, LocalTime closeTime) {
-        if (openTime == null || closeTime == null) {
-            return false;
-        }
-
-        if (openTime.isBefore(closeTime)) {
-            return !currentTime.isBefore(openTime) && currentTime.isBefore(closeTime);
-        } else { // 종료 시간이 다음날 또는 24시간 영업
-            return currentTime.isAfter(openTime) || !currentTime.isAfter(closeTime);
-        }
-    }
-
-
     public static String getCurrentOpeningInfo(
-        SurroundingDateOpeningHour surroundingDateOpeningHour) {
+        SurroundingDateOpeningHour surroundingDateOpeningHour
+    ) {
+        LocalDateTime now = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
-        String yesterdayOpeningHour = surroundingDateOpeningHour.getYesterday();
-        String todayOpeningHour = surroundingDateOpeningHour.getToday();
-        String tomorrowOpeningHour = surroundingDateOpeningHour.getTomorrow();
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        LocalTime now = LocalTime.now(ZoneId.of("Asia/Seoul"));
-
-        LocalTime yesterdayOpenTime = null;
-        LocalTime yesterdayCloseTime = null;
-        if (!Objects.equals(yesterdayOpeningHour, CLOSING_DAY)) {
-            String[] splitYesterdayOpeningHour = yesterdayOpeningHour.split(" - ");
-            yesterdayOpenTime = LocalTime.parse(splitYesterdayOpeningHour[0], formatter);
-            yesterdayCloseTime = LocalTime.parse(splitYesterdayOpeningHour[1], formatter);
+        // "오늘 휴뮤" 판단
+        if (CLOSING_DAY.equals(surroundingDateOpeningHour.getToday())) {
+            if (isOpenNow(surroundingDateOpeningHour.getYesterday(), now)) {
+                return CurrentOpeningInfo.OPEN_NOW.getResponse();
+            }
+            return CurrentOpeningInfo.HOLIDAY.getResponse();
         }
 
-        LocalTime todayOpenTime = null;
-        LocalTime todayCloseTime = null;
-        if (!Objects.equals(todayOpeningHour, CLOSING_DAY)) {
-            String[] splitTodayOpeningHour = todayOpeningHour.split(" - ");
-            todayOpenTime = LocalTime.parse(splitTodayOpeningHour[0], formatter);
-            todayCloseTime = LocalTime.parse(splitTodayOpeningHour[1], formatter);
+        return getOpeningStatus(surroundingDateOpeningHour.getToday(), now);
+    }
+
+    private static boolean isOpenNow(String openingHours, LocalDateTime now) {
+        if (CLOSING_DAY.equals(openingHours)) {
+            return false;
         }
+        String[] times = openingHours.split(" - ");
+        LocalTime openTime = LocalTime.parse(times[0]);
+        LocalTime closeTime = LocalTime.parse(times[1]);
+        LocalTime currentTime = now.toLocalTime();
 
-        LocalTime tomorrowOpenTime = null;
-        LocalTime tomorrowCloseTime = null;
-        if (!Objects.equals(tomorrowOpeningHour, CLOSING_DAY)) {
-            String[] splitTomorrowOpeningHour = tomorrowOpeningHour.split(" - ");
-            tomorrowOpenTime = LocalTime.parse(splitTomorrowOpeningHour[0], formatter);
-            tomorrowCloseTime = LocalTime.parse(splitTomorrowOpeningHour[1], formatter);
-        }
-
-        boolean isOpenYesterday = isOpen(now, yesterdayOpenTime, yesterdayCloseTime);
-        boolean isOpenToday = isOpen(now, todayOpenTime, todayCloseTime);
-        boolean isOpenTomorrow = isOpen(now, tomorrowOpenTime, tomorrowCloseTime);
-
-        boolean isOpeningSoonToday = isOpeningSoon(now, todayOpenTime);
-        boolean isClosingSoonToday = isClosingSoon(now, todayCloseTime);
-        boolean isBeforeOpeningToday = isBeforeOpening(now, todayOpenTime);
-
-        boolean isOpeningSoonTomorrow = isOpeningSoon(now, tomorrowOpenTime);
-        boolean isBeforeOpeningTomorrow = isBeforeOpening(now, tomorrowOpenTime);
-
-        CurrentOpeningInfo info;
-        if (isOpenYesterday) {
-            if (isClosingSoonToday && !isOpenToday) {
-                info = CurrentOpeningInfo.CLOSING_SOON;
-            } else {
-                info = CurrentOpeningInfo.OPEN_NOW;
-            }
-        } else if (todayOpeningHour.equals(CLOSING_DAY)) {
-            if (isOpenToday || isOpenTomorrow) {
-                info = CurrentOpeningInfo.OPEN_NOW;
-            } else {
-                info = CurrentOpeningInfo.HOLIDAY;
-            }
-        } else if (isOpeningSoonToday) {
-            info = CurrentOpeningInfo.OPENING_SOON;
-        } else if (isBeforeOpeningToday) {
-            info = CurrentOpeningInfo.BEFORE_OPENING;
-        } else if (isOpenToday) {
-            if (isClosingSoonToday) {
-                info = CurrentOpeningInfo.CLOSING_SOON;
-            } else {
-                info = CurrentOpeningInfo.OPEN_NOW;
-            }
-        } else if (isOpeningSoonTomorrow) {
-            info = CurrentOpeningInfo.OPENING_SOON;
-        } else if (isBeforeOpeningTomorrow) {
-            info = CurrentOpeningInfo.BEFORE_OPENING;
+        if (closeTime.isBefore(openTime)) {
+            return currentTime.isAfter(openTime) || currentTime.isBefore(closeTime);
         } else {
-            info = CurrentOpeningInfo.CLOSED_NOW;
+            return currentTime.isAfter(openTime) && currentTime.isBefore(closeTime);
+        }
+    }
+
+    private static String getOpeningStatus(String openingHours, LocalDateTime now) {
+        String[] times = openingHours.split(" - ");
+        LocalTime openTime = LocalTime.parse(times[0]);
+        LocalTime closeTime = LocalTime.parse(times[1]);
+        LocalTime currentTime = now.toLocalTime();
+
+        if (closeTime.isBefore(openTime)) { // 오늘 영업시간이 내일까지
+            if (currentTime.isBefore(closeTime)) {
+                return CurrentOpeningInfo.OPEN_NOW.getResponse();
+            } else if (currentTime.isBefore(
+                openTime.minusMinutes(CurrentOpeningInfo.SOON_STANDARD))) {
+                return CurrentOpeningInfo.BEFORE_OPENING.getResponse();
+            } else if (currentTime.isBefore(openTime)) {
+                return CurrentOpeningInfo.OPENING_SOON.getResponse();
+            }
+        } else {
+            if (currentTime.isBefore(openTime.minusMinutes(CurrentOpeningInfo.SOON_STANDARD))) {
+                return CurrentOpeningInfo.BEFORE_OPENING.getResponse();
+            } else if (currentTime.isBefore(openTime)) {
+                return CurrentOpeningInfo.OPENING_SOON.getResponse();
+            } else if (currentTime.isBefore(
+                closeTime.minusMinutes(CurrentOpeningInfo.SOON_STANDARD))) {
+                return CurrentOpeningInfo.OPEN_NOW.getResponse();
+            } else if (currentTime.isBefore(closeTime)) {
+                return CurrentOpeningInfo.CLOSING_SOON.getResponse();
+            }
         }
 
-        return info.response;
+        return CurrentOpeningInfo.CLOSED_NOW.getResponse();
     }
 
     public static Expression<?>[] getSurroundingDateOpeningHourExpressions() {
