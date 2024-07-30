@@ -62,6 +62,7 @@ public class SecurityConfig {
             .addFilterBefore(swaggerBasicAuthFilter,
                 UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/admin/*").hasRole("ADMIN")
                 .anyRequest().permitAll());
 
         return httpSecurity.build();

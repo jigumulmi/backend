@@ -35,4 +35,5 @@ public class AdminCreatePlaceRequestDto {
     private String registrantComment;
     private Boolean isApproved = false;
     private List<Long> subwayStationIdList;
+    private String kakaoPlaceId;
 }

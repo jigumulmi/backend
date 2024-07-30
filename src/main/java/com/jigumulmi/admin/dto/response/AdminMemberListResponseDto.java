@@ -28,6 +28,7 @@ public class AdminMemberListResponseDto {
                 .email(member.getEmail())
                 .KakaoUserId(member.getKakaoUserId())
                 .deregisteredAt(member.getDeregisteredAt())
+                .isAdmin(member.getIsAdmin())
                 .build();
         }
 

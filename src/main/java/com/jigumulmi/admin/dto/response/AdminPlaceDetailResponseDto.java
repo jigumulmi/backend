@@ -20,6 +20,7 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
     private LocalDateTime modifiedAt;
     private String registrantComment;
     private Boolean isApproved;
+    private String kakaoPlaceId;
 
     public static AdminPlaceDetailResponseDto from(Place place) {
         List<SubwayStationPlace> subwayStationPlaceList = place.getSubwayStationPlaceList();
@@ -70,6 +71,7 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
             )
             .subwayStationList(subwayStationDtoList)
             .menuList(menuList)
+            .kakaoPlaceId(place.getKakaoPlaceId())
             .build();
     }
 }
