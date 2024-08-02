@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -183,6 +184,10 @@ public class Place extends Timestamped {
             String[] categoryList = categoryName.split(" > ");
             String finalCategory = categoryList[categoryList.length - 1];
 
+            if (Objects.equals(finalCategory, "제과,베이커리")) {
+                finalCategory = "베이커리";
+            }
+
             this.name = document.getPlaceName();
             this.category = finalCategory;
             this.address = document.getRoadAddressName();
@@ -193,19 +198,21 @@ public class Place extends Timestamped {
             this.kakaoPlaceId = document.getId();
         } finally {
             RegularOpeningHours regularOpeningHours = googlePlaceApiResponseDto.getRegularOpeningHours();
-            Map<Integer, String> periodMap = new HashMap<>();
-            for (Period period : regularOpeningHours.getPeriods()) {
-                Integer day = period.getOpen().getDay();
-                periodMap.put(day, Period.makeString(period));
-            }
+            if (regularOpeningHours != null) {
+                Map<Integer, String> periodMap = new HashMap<>();
+                for (Period period : regularOpeningHours.getPeriods()) {
+                    Integer day = period.getOpen().getDay();
+                    periodMap.put(day, Period.makeString(period));
+                }
 
-            this.openingHourSun = periodMap.getOrDefault(0, CLOSING_DAY);
-            this.openingHourMon = periodMap.getOrDefault(1, CLOSING_DAY);
-            this.openingHourTue = periodMap.getOrDefault(2, CLOSING_DAY);
-            this.openingHourWed = periodMap.getOrDefault(3, CLOSING_DAY);
-            this.openingHourThu = periodMap.getOrDefault(4, CLOSING_DAY);
-            this.openingHourFri = periodMap.getOrDefault(5, CLOSING_DAY);
-            this.openingHourSat = periodMap.getOrDefault(6, CLOSING_DAY);
+                this.openingHourSun = periodMap.getOrDefault(0, CLOSING_DAY);
+                this.openingHourMon = periodMap.getOrDefault(1, CLOSING_DAY);
+                this.openingHourTue = periodMap.getOrDefault(2, CLOSING_DAY);
+                this.openingHourWed = periodMap.getOrDefault(3, CLOSING_DAY);
+                this.openingHourThu = periodMap.getOrDefault(4, CLOSING_DAY);
+                this.openingHourFri = periodMap.getOrDefault(5, CLOSING_DAY);
+                this.openingHourSat = periodMap.getOrDefault(6, CLOSING_DAY);
+            }
         }
     }
 }
