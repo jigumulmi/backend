@@ -85,7 +85,7 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update Success");
     }
 
-    @Operation(summary = "장소 기본 정보 등록")
+    @Operation(summary = "장소 기본 정보 불러오기")
     @ApiResponse(responseCode = "204")
     @PatchMapping("/place")
     public ResponseEntity<?> savePlaceBasic(
