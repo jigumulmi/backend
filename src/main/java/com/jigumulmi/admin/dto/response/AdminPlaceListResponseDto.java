@@ -18,6 +18,8 @@ public class AdminPlaceListResponseDto {
 
         private String category;
         private Boolean isApproved;
+        private Boolean isFromAdmin;
+        private String googlePlaceId;
     }
 
     private List<PlaceDto> data;
