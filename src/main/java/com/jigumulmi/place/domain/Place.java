@@ -5,11 +5,9 @@ import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.RegularOpeningHours;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.RegularOpeningHours.Period;
-import com.jigumulmi.admin.dto.response.KakaoPlaceApiResponseDto;
-import com.jigumulmi.admin.dto.response.KakaoPlaceApiResponseDto.Document;
+import com.jigumulmi.admin.dto.response.KakaoPlaceApiPlaceDetailResponseDto;
+import com.jigumulmi.admin.dto.response.KakaoPlaceApiPlaceDetailResponseDto.Document;
 import com.jigumulmi.config.common.Timestamped;
-import com.jigumulmi.config.exception.CustomException;
-import com.jigumulmi.config.exception.errorCode.AdminErrorCode;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import jakarta.persistence.CascadeType;
@@ -26,7 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -189,7 +186,7 @@ public class Place extends Timestamped {
     public static final String CLOSING_DAY = "정기휴무";
 
     public void adminSaveBasic(GooglePlaceApiResponseDto googlePlaceApiResponseDto,
-        KakaoPlaceApiResponseDto kakaoPlaceApiResponseDto) {
+        KakaoPlaceApiPlaceDetailResponseDto kakaoPlaceApiResponseDto) {
 
         RegularOpeningHours regularOpeningHours = googlePlaceApiResponseDto.getRegularOpeningHours();
         this.googlePlaceId = googlePlaceApiResponseDto.getId();

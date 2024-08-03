@@ -11,7 +11,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
-public class KakaoPlaceApiResponseDto {
+public class KakaoPlaceApiPlaceDetailResponseDto {
 
     @Getter
     @Setter
