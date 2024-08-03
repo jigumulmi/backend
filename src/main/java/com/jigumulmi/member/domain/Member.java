@@ -44,7 +44,7 @@ public class Member extends Timestamped {
         this.email = email;
         this.kakaoUserId = kakaoUserId;
         this.deregisteredAt = deregisteredAt;
-        this.isAdmin = isAdmin;
+        this.isAdmin = (isAdmin != null) ? isAdmin : false;
     }
 
     /**

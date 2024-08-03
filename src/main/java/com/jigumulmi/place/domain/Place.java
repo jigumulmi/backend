@@ -5,8 +5,8 @@ import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.RegularOpeningHours;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.RegularOpeningHours.Period;
-import com.jigumulmi.admin.dto.response.KakaoPlaceApiResponseDto;
-import com.jigumulmi.admin.dto.response.KakaoPlaceApiResponseDto.Document;
+import com.jigumulmi.admin.dto.response.KakaoPlaceApiPlaceDetailResponseDto;
+import com.jigumulmi.admin.dto.response.KakaoPlaceApiPlaceDetailResponseDto.Document;
 import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
@@ -80,6 +80,7 @@ public class Place extends Timestamped {
 
     private String registrantComment;
 
+    @Column(nullable = false)
     @ColumnDefault("false")
     private Boolean isApproved;
 
@@ -101,6 +102,11 @@ public class Place extends Timestamped {
     private List<PlaceImage> placeImageList = new ArrayList<>();
 
     private String kakaoPlaceId;
+    private String googlePlaceId;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private Boolean isFromAdmin;
 
     @Builder
     public Place(String name, String category, String address, String contact, List<Menu> menuList,
@@ -109,7 +115,9 @@ public class Place extends Timestamped {
         String placeUrl, Double longitude, Double latitude, String registrantComment,
         Boolean isApproved, List<Review> reviewList,
         List<SubwayStationPlace> subwayStationPlaceList,
-        List<PlaceImage> placeImageList, String kakaoPlaceId) {
+        List<PlaceImage> placeImageList, String kakaoPlaceId,
+        Boolean isFromAdmin, String googlePlaceId
+    ) {
         this.name = name;
         this.category = category;
         this.address = address;
@@ -127,11 +135,13 @@ public class Place extends Timestamped {
         this.longitude = longitude;
         this.latitude = latitude;
         this.registrantComment = registrantComment;
-        this.isApproved = isApproved;
+        this.isApproved = (isApproved != null) ? isApproved : false;
         this.reviewList = reviewList;
         this.subwayStationPlaceList = subwayStationPlaceList;
         this.placeImageList = placeImageList;
         this.kakaoPlaceId = kakaoPlaceId;
+        this.googlePlaceId = googlePlaceId;
+        this.isFromAdmin = (isFromAdmin != null) ? isFromAdmin : false;
     }
 
     public void addChildren(List<SubwayStationPlace> subwayStationPlaceList,
@@ -175,11 +185,30 @@ public class Place extends Timestamped {
 
     public static final String CLOSING_DAY = "정기휴무";
 
-    public void saveBasic(GooglePlaceApiResponseDto googlePlaceApiResponseDto,
-        KakaoPlaceApiResponseDto kakaoPlaceApiResponseDto) {
+    public void adminSaveBasic(GooglePlaceApiResponseDto googlePlaceApiResponseDto,
+        KakaoPlaceApiPlaceDetailResponseDto kakaoPlaceApiResponseDto) {
 
-        try {
-            Document document = kakaoPlaceApiResponseDto.getDocuments().getFirst();
+        RegularOpeningHours regularOpeningHours = googlePlaceApiResponseDto.getRegularOpeningHours();
+        this.googlePlaceId = googlePlaceApiResponseDto.getId();
+        if (regularOpeningHours != null) {
+            Map<Integer, String> periodMap = new HashMap<>();
+            for (Period period : regularOpeningHours.getPeriods()) {
+                Integer day = period.getOpen().getDay();
+                periodMap.put(day, Period.makeString(period));
+            }
+
+            this.openingHourSun = periodMap.getOrDefault(0, CLOSING_DAY);
+            this.openingHourMon = periodMap.getOrDefault(1, CLOSING_DAY);
+            this.openingHourTue = periodMap.getOrDefault(2, CLOSING_DAY);
+            this.openingHourWed = periodMap.getOrDefault(3, CLOSING_DAY);
+            this.openingHourThu = periodMap.getOrDefault(4, CLOSING_DAY);
+            this.openingHourFri = periodMap.getOrDefault(5, CLOSING_DAY);
+            this.openingHourSat = periodMap.getOrDefault(6, CLOSING_DAY);
+        }
+
+        List<Document> documents = kakaoPlaceApiResponseDto.getDocuments();
+        if (!documents.isEmpty()) {
+            Document document = documents.getFirst();
             String categoryName = document.getCategoryName();
             String[] categoryList = categoryName.split(" > ");
             String finalCategory = categoryList[categoryList.length - 1];
@@ -196,23 +225,6 @@ public class Place extends Timestamped {
             this.longitude = Double.valueOf(document.getX());
             this.latitude = Double.valueOf(document.getY());
             this.kakaoPlaceId = document.getId();
-        } finally {
-            RegularOpeningHours regularOpeningHours = googlePlaceApiResponseDto.getRegularOpeningHours();
-            if (regularOpeningHours != null) {
-                Map<Integer, String> periodMap = new HashMap<>();
-                for (Period period : regularOpeningHours.getPeriods()) {
-                    Integer day = period.getOpen().getDay();
-                    periodMap.put(day, Period.makeString(period));
-                }
-
-                this.openingHourSun = periodMap.getOrDefault(0, CLOSING_DAY);
-                this.openingHourMon = periodMap.getOrDefault(1, CLOSING_DAY);
-                this.openingHourTue = periodMap.getOrDefault(2, CLOSING_DAY);
-                this.openingHourWed = periodMap.getOrDefault(3, CLOSING_DAY);
-                this.openingHourThu = periodMap.getOrDefault(4, CLOSING_DAY);
-                this.openingHourFri = periodMap.getOrDefault(5, CLOSING_DAY);
-                this.openingHourSat = periodMap.getOrDefault(6, CLOSING_DAY);
-            }
         }
     }
 }

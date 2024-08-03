@@ -41,7 +41,9 @@ public class CustomAdminRepository {
                         subwayStationPlace.isMain
                     ).as("subwayStation"),
                     place.category,
-                    place.isApproved
+                    place.isApproved,
+                    place.isFromAdmin,
+                    place.googlePlaceId
                 )
             )
             .from(place)

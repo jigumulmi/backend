@@ -14,7 +14,9 @@ import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.Location;
-import com.jigumulmi.admin.dto.response.KakaoPlaceApiResponseDto;
+import com.jigumulmi.admin.dto.response.KakaoPlaceApiAddressResponseDto;
+import com.jigumulmi.admin.dto.response.KakaoPlaceApiAddressResponseDto.Document;
+import com.jigumulmi.admin.dto.response.KakaoPlaceApiPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.PageDto;
 import com.jigumulmi.admin.repository.CustomAdminRepository;
 import com.jigumulmi.config.exception.CustomException;
@@ -130,6 +132,7 @@ public class AdminService {
             .registrantComment(requestDto.getRegistrantComment())
             .isApproved(requestDto.getIsApproved())
             .kakaoPlaceId(requestDto.getKakaoPlaceId())
+            .isFromAdmin(true)
             .build();
 
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(
@@ -217,21 +220,57 @@ public class AdminService {
         Place place = placeRepository.findById(requestDto.getPlaceId())
             .orElse(
                 Place.builder()
-                    .registrantComment(requestDto.getGooglePlaceId())
+                    .googlePlaceId(requestDto.getGooglePlaceId())
+                    .isFromAdmin(true)
                     .build()
             );
 
         GooglePlaceApiResponseDto googlePlaceApiResponseDto = getDataFromGoogle(requestDto);
-        String placeName = googlePlaceApiResponseDto.getDisplayName().getText();
-        Location location = googlePlaceApiResponseDto.getLocation();
+        String placeNameFromGoogle = googlePlaceApiResponseDto.getDisplayName().getText();
+        Location locationFromGoogle = googlePlaceApiResponseDto.getLocation();
 
-        KakaoPlaceApiResponseDto kakaoPlaceApiResponseDto = getDataFromKakao(placeName, location);
+        // 카카오 좌표 -> 주소 변환 api
+        // 지번 주소가 있다면 해당 주소를 카카오 장소 상세 api 키워드로 사용
+        // 지번 주소가 없다면 구글 장소 이름을 키워드로 사용
+        KakaoPlaceApiAddressResponseDto kakaoPlaceApiAddressResponseDto = getAddressFromKakao(
+            locationFromGoogle);
+        Integer addressTotalCount = kakaoPlaceApiAddressResponseDto.getMeta().getTotalCount();
+        String addressFromKakao = null;
+        if (addressTotalCount == 1) {
+            Document document = kakaoPlaceApiAddressResponseDto.getDocuments().getFirst();
+            addressFromKakao = document.getAddress().getAddressName();
+        }
 
-        place.saveBasic(googlePlaceApiResponseDto, kakaoPlaceApiResponseDto);
+        String keyword = (addressFromKakao == null) ? placeNameFromGoogle : addressFromKakao;
+        KakaoPlaceApiPlaceDetailResponseDto kakaoPlaceApiPlaceDetailResponseDto = getPlaceDetailFromKakao(
+            keyword, locationFromGoogle);
+
+        place.adminSaveBasic(googlePlaceApiResponseDto, kakaoPlaceApiPlaceDetailResponseDto);
         placeRepository.save(place);
     }
 
-    private KakaoPlaceApiResponseDto getDataFromKakao(String placeName, Location location) {
+    private KakaoPlaceApiAddressResponseDto getAddressFromKakao(Location location) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "KakaoAK " + KAKAO_ADMIN_KEY);
+        HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(headers);
+
+        String uri = UriComponentsBuilder
+            .fromUriString("https://dapi.kakao.com/v2/local/geo/coord2address.json")
+            .queryParam("x", location.getLongitude())
+            .queryParam("y", location.getLatitude())
+            .build()
+            .toUriString();
+
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<KakaoPlaceApiAddressResponseDto> response = rt.exchange(uri, HttpMethod.GET,
+            requestHeader,
+            KakaoPlaceApiAddressResponseDto.class);
+
+        return response.getBody();
+    }
+
+    private KakaoPlaceApiPlaceDetailResponseDto getPlaceDetailFromKakao(String placeName,
+        Location location) {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "KakaoAK " + KAKAO_ADMIN_KEY);
         HttpEntity<MultiValueMap<String, String>> requestHeader = new HttpEntity<>(headers);
@@ -241,15 +280,16 @@ public class AdminService {
             .queryParam("query", placeName)
             .queryParam("x", location.getLongitude())
             .queryParam("y", location.getLatitude())
-            .queryParam("radius", 20) // 단위: 미터
+            .queryParam("radius", 500) // 단위: 미터
             .queryParam("size", 1)
             .build()
             .toUriString();
 
         RestTemplate rt = new RestTemplate();
-        ResponseEntity<KakaoPlaceApiResponseDto> response = rt.exchange(uri, HttpMethod.GET,
+        ResponseEntity<KakaoPlaceApiPlaceDetailResponseDto> response = rt.exchange(uri,
+            HttpMethod.GET,
             requestHeader,
-            KakaoPlaceApiResponseDto.class);
+            KakaoPlaceApiPlaceDetailResponseDto.class);
 
         return response.getBody();
     }
@@ -263,7 +303,7 @@ public class AdminService {
             .fromUriString("https://places.googleapis.com")
             .path("/v1/places/" + requestDto.getGooglePlaceId())
             .queryParam("fields",
-                "location,regularOpeningHours,displayName")
+                "id,location,regularOpeningHours,displayName")
             .queryParam("languageCode", "ko")
             .queryParam("regionCode", "KR")
             .build()
