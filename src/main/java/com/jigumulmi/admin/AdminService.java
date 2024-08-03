@@ -130,6 +130,7 @@ public class AdminService {
             .registrantComment(requestDto.getRegistrantComment())
             .isApproved(requestDto.getIsApproved())
             .kakaoPlaceId(requestDto.getKakaoPlaceId())
+            .isFromAdmin(true)
             .build();
 
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(
@@ -217,7 +218,8 @@ public class AdminService {
         Place place = placeRepository.findById(requestDto.getPlaceId())
             .orElse(
                 Place.builder()
-                    .registrantComment(requestDto.getGooglePlaceId())
+                    .googlePlaceId(requestDto.getGooglePlaceId())
+                    .isFromAdmin(true)
                     .build()
             );
 
@@ -263,7 +265,7 @@ public class AdminService {
             .fromUriString("https://places.googleapis.com")
             .path("/v1/places/" + requestDto.getGooglePlaceId())
             .queryParam("fields",
-                "location,regularOpeningHours,displayName")
+                "id,location,regularOpeningHours,displayName")
             .queryParam("languageCode", "ko")
             .queryParam("regionCode", "KR")
             .build()

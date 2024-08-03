@@ -105,6 +105,11 @@ public class Place extends Timestamped {
     private List<PlaceImage> placeImageList = new ArrayList<>();
 
     private String kakaoPlaceId;
+    private String googlePlaceId;
+
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private Boolean isFromAdmin;
 
     @Builder
     public Place(String name, String category, String address, String contact, List<Menu> menuList,
@@ -113,7 +118,9 @@ public class Place extends Timestamped {
         String placeUrl, Double longitude, Double latitude, String registrantComment,
         Boolean isApproved, List<Review> reviewList,
         List<SubwayStationPlace> subwayStationPlaceList,
-        List<PlaceImage> placeImageList, String kakaoPlaceId) {
+        List<PlaceImage> placeImageList, String kakaoPlaceId,
+        Boolean isFromAdmin, String googlePlaceId
+    ) {
         this.name = name;
         this.category = category;
         this.address = address;
@@ -136,6 +143,8 @@ public class Place extends Timestamped {
         this.subwayStationPlaceList = subwayStationPlaceList;
         this.placeImageList = placeImageList;
         this.kakaoPlaceId = kakaoPlaceId;
+        this.googlePlaceId = googlePlaceId;
+        this.isFromAdmin = (isFromAdmin != null) ? isFromAdmin : false;
     }
 
     public void addChildren(List<SubwayStationPlace> subwayStationPlaceList,
@@ -183,6 +192,7 @@ public class Place extends Timestamped {
         KakaoPlaceApiResponseDto kakaoPlaceApiResponseDto) {
 
         RegularOpeningHours regularOpeningHours = googlePlaceApiResponseDto.getRegularOpeningHours();
+        this.googlePlaceId = googlePlaceApiResponseDto.getId();
         if (regularOpeningHours != null) {
             Map<Integer, String> periodMap = new HashMap<>();
             for (Period period : regularOpeningHours.getPeriods()) {
