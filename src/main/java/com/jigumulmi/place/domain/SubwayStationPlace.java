@@ -41,6 +41,6 @@ public class SubwayStationPlace {
     public SubwayStationPlace(SubwayStation subwayStation, Place place, Boolean isMain) {
         this.subwayStation = subwayStation;
         this.place = place;
-        this.isMain = isMain;
+        this.isMain = (isMain != null) ? isMain : false;
     }
 }

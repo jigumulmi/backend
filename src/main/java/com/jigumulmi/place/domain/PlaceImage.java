@@ -38,7 +38,7 @@ public class PlaceImage {
     @Builder
     public PlaceImage(String url, Boolean isMain, Place place) {
         this.url = url;
-        this.isMain = isMain;
+        this.isMain = (isMain != null) ? isMain : false;
         this.place = place;
     }
 }

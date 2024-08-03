@@ -227,7 +227,7 @@ public class AdminService {
 
         KakaoPlaceApiResponseDto kakaoPlaceApiResponseDto = getDataFromKakao(placeName, location);
 
-        place.saveBasic(googlePlaceApiResponseDto, kakaoPlaceApiResponseDto);
+        place.adminSaveBasic(googlePlaceApiResponseDto, kakaoPlaceApiResponseDto);
         placeRepository.save(place);
     }
 
@@ -241,7 +241,7 @@ public class AdminService {
             .queryParam("query", placeName)
             .queryParam("x", location.getLongitude())
             .queryParam("y", location.getLatitude())
-            .queryParam("radius", 20) // 단위: 미터
+            .queryParam("radius", 500) // 단위: 미터
             .queryParam("size", 1)
             .build()
             .toUriString();
