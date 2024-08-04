@@ -3,6 +3,7 @@ package com.jigumulmi.admin;
 
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.ImageRequestDto;
+import com.jigumulmi.admin.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminSavePlaceBasicRequestDto;
@@ -315,5 +316,9 @@ public class AdminService {
             GooglePlaceApiResponseDto.class);
 
         return response.getBody();
+    }
+
+    public void deletePlace(AdminDeletePlaceRequestDto requestDto) {
+        placeRepository.deleteById(requestDto.getPlaceId());
     }
 }

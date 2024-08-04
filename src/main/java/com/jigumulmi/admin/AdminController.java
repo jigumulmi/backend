@@ -1,6 +1,7 @@
 package com.jigumulmi.admin;
 
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminSavePlaceBasicRequestDto;
@@ -16,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -73,7 +75,7 @@ public class AdminController {
     @PostMapping("/place")
     public ResponseEntity<?> createPlace(@RequestBody AdminCreatePlaceRequestDto requestDto) {
         adminService.createPlace(requestDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Create Success");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "장소 수정", description = "덮어쓰는 로직이므로 수정하지 않은 항목도 기존 조회된 데이터를 꼭 담아주세요")
@@ -82,7 +84,7 @@ public class AdminController {
     public ResponseEntity<?> updatePlaceDetail(
         @RequestBody AdminUpdatePlaceRequestDto requestDto) {
         adminService.updatePlaceDetail(requestDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update Success");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "장소 기본 정보 불러오기")
@@ -91,6 +93,15 @@ public class AdminController {
     public ResponseEntity<?> savePlaceBasic(
         @RequestBody AdminSavePlaceBasicRequestDto requestDto) {
         adminService.savePlaceBasic(requestDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Saved basic info");
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @Operation(summary = "장소 삭제")
+    @ApiResponse(responseCode = "204")
+    @DeleteMapping("/place")
+    public ResponseEntity<?> deletePlace(
+        @RequestBody AdminDeletePlaceRequestDto requestDto) {
+        adminService.deletePlace(requestDto);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
