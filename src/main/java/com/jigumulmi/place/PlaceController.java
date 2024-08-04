@@ -139,7 +139,7 @@ public class PlaceController {
     public ResponseEntity<?> updateReview(@Valid @RequestBody UpdateReviewRequestDto requestDto,
         @RequiredAuthUser Member member) {
         placeService.updateReview(requestDto, member);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update review success");
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "답글 수정")
@@ -149,7 +149,7 @@ public class PlaceController {
         @Valid @RequestBody UpdateReviewReplyRequestDto requestDto,
         @RequiredAuthUser Member member) {
         placeService.updateReviewReply(requestDto, member);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update review reply success");
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "리뷰 삭제")
@@ -158,7 +158,7 @@ public class PlaceController {
     public ResponseEntity<?> deleteReview(@PathVariable(name = "reviewId") Long reviewId,
         @RequiredAuthUser Member member) {
         placeService.deleteReview(reviewId, member);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review success");
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "답글 삭제")
@@ -168,7 +168,7 @@ public class PlaceController {
         @PathVariable(name = "reviewReplyId") Long reviewReplyId,
         @RequiredAuthUser Member member) {
         placeService.deleteReviewReply(reviewReplyId, member);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review reply success");
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "리뷰 좋아요 등록")
@@ -177,7 +177,7 @@ public class PlaceController {
     public ResponseEntity<?> createReviewLike(@PathVariable(name = "reviewId") Long reviewId,
         @RequiredAuthUser Member member) {
         placeService.createReviewLike(reviewId, member);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Like review success");
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "답글 좋아요 등록")
@@ -187,7 +187,7 @@ public class PlaceController {
         @PathVariable(name = "reviewReplyId") Long reviewReplyId,
         @RequiredAuthUser Member member) {
         placeService.createReviewReplyLike(reviewReplyId, member);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Like review reply success");
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "리뷰 좋아요 삭제")
@@ -197,7 +197,7 @@ public class PlaceController {
         @PathVariable(name = "reviewReactionId") Long reviewReactionId,
         @RequiredAuthUser Member member) {
         placeService.deleteReviewLike(reviewReactionId, member);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review reaction");
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "답글 좋아요 삭제")
@@ -207,6 +207,6 @@ public class PlaceController {
         @PathVariable(name = "reviewReplyReactionId") Long reviewReplyReactionId,
         @RequiredAuthUser Member member) {
         placeService.deleteReviewReplyLike(reviewReplyReactionId, member);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Delete review reply reaction");
+        return ResponseEntity.noContent().build();
     }
 }
