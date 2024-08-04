@@ -22,7 +22,6 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
     private Boolean isApproved;
     private String kakaoPlaceId;
     private String googlePlaceId;
-    private Boolean isFromAdmin;
 
     public static AdminPlaceDetailResponseDto from(Place place) {
         List<SubwayStationPlace> subwayStationPlaceList = place.getSubwayStationPlaceList();
@@ -75,7 +74,6 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
             .menuList(menuList)
             .kakaoPlaceId(place.getKakaoPlaceId())
             .googlePlaceId(place.getGooglePlaceId())
-            .isFromAdmin(place.getIsFromAdmin())
             .build();
     }
 }

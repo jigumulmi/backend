@@ -34,6 +34,6 @@ public class AdminMemberListResponseDto {
 
     }
 
-    private List<MemberDto> data;
     private PageDto page;
+    private List<MemberDto> data;
 }
