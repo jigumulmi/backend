@@ -23,7 +23,10 @@ public class AdminGetPlaceListRequestDto {
     @Parameter(description = "id 기준 오름차순/내림차순")
     @Schema(defaultValue = "ASC")
     private Direction direction = Direction.ASC;
-    
+
     @Parameter(description = "장소 검색어, 검색어로 시작하는 장소 조회")
     private String placeName;
+
+    @Parameter(description = "유저 등록 신청 -> false, 관리자 등록 -> true")
+    private Boolean isFromAdmin;
 }

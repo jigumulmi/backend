@@ -89,7 +89,7 @@ public class AdminService {
             Sort.by(requestDto.getDirection(), "id"));
 
         Page<PlaceDto> placePage = customAdminRepository.getPlaceList(pageable,
-            requestDto.getPlaceName());
+            requestDto);
 
         return AdminPlaceListResponseDto.builder()
             .data(placePage.getContent())
