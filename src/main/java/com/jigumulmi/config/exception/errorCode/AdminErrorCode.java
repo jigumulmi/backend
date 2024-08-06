@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 public enum AdminErrorCode implements ErrorCode {
-    KAKAO_PLACE_NOT_FOUND(HttpStatus.NOT_FOUND, "No search result from kakao api"),
+    KAKAO_DATA_UNAVAILABLE(HttpStatus.OK, "No search result from kakao api"),
     ;
 
     private final HttpStatus httpStatus;

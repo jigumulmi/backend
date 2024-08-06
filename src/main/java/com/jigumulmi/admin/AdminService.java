@@ -21,6 +21,7 @@ import com.jigumulmi.admin.dto.response.KakaoPlaceApiPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.PageDto;
 import com.jigumulmi.admin.repository.CustomAdminRepository;
 import com.jigumulmi.config.exception.CustomException;
+import com.jigumulmi.config.exception.errorCode.AdminErrorCode;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.place.domain.Menu;
@@ -247,7 +248,11 @@ public class AdminService {
             keyword, locationFromGoogle);
 
         place.adminSaveBasic(googlePlaceApiResponseDto, kakaoPlaceApiPlaceDetailResponseDto);
-        placeRepository.save(place);
+        placeRepository.saveAndFlush(place);
+
+        if (kakaoPlaceApiPlaceDetailResponseDto.getDocuments().isEmpty()) {
+            throw new CustomException(AdminErrorCode.KAKAO_DATA_UNAVAILABLE);
+        }
     }
 
     private KakaoPlaceApiAddressResponseDto getAddressFromKakao(Location location) {
