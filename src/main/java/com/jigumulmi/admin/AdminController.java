@@ -86,7 +86,7 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "장소 기본 정보 불러오기")
+    @Operation(summary = "장소 기본 정보 저장하기")
     @ApiResponse(responseCode = "204")
     @PatchMapping("/place")
     public ResponseEntity<?> savePlaceBasic(
