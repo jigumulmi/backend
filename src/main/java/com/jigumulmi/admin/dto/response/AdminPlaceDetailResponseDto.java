@@ -22,6 +22,7 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
     private Boolean isApproved;
     private String kakaoPlaceId;
     private String googlePlaceId;
+    private String placeUrl;
 
     public static AdminPlaceDetailResponseDto from(Place place) {
         List<SubwayStationPlace> subwayStationPlaceList = place.getSubwayStationPlaceList();
@@ -74,6 +75,7 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
             .menuList(menuList)
             .kakaoPlaceId(place.getKakaoPlaceId())
             .googlePlaceId(place.getGooglePlaceId())
+            .placeUrl(place.getPlaceUrl())
             .build();
     }
 }
