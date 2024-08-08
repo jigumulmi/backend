@@ -13,6 +13,7 @@ import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto.MemberDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
+import com.jigumulmi.admin.dto.response.AdminSavePlaceBasicResponseDto;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto;
 import com.jigumulmi.admin.dto.response.GooglePlaceApiResponseDto.Location;
 import com.jigumulmi.admin.dto.response.KakaoPlaceApiAddressResponseDto;
@@ -21,7 +22,6 @@ import com.jigumulmi.admin.dto.response.KakaoPlaceApiPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.PageDto;
 import com.jigumulmi.admin.repository.CustomAdminRepository;
 import com.jigumulmi.config.exception.CustomException;
-import com.jigumulmi.config.exception.errorCode.AdminErrorCode;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.place.domain.Menu;
@@ -44,6 +44,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -218,7 +219,8 @@ public class AdminService {
         placeRepository.save(place);
     }
 
-    public void savePlaceBasic(AdminSavePlaceBasicRequestDto requestDto) {
+    public ResponseEntity<AdminSavePlaceBasicResponseDto> savePlaceBasic(
+        AdminSavePlaceBasicRequestDto requestDto) {
         Place place = placeRepository.findById(requestDto.getPlaceId())
             .orElse(
                 Place.builder()
@@ -231,9 +233,11 @@ public class AdminService {
         String placeNameFromGoogle = googlePlaceApiResponseDto.getDisplayName().getText();
         Location locationFromGoogle = googlePlaceApiResponseDto.getLocation();
 
-        // 카카오 좌표 -> 주소 변환 api
-        // 지번 주소가 있다면 해당 주소를 카카오 장소 상세 api 키워드로 사용
-        // 지번 주소가 없다면 구글 장소 이름을 키워드로 사용
+        /*
+         카카오 좌표 -> 주소 변환 api
+         지번 주소가 있다면 해당 주소를 카카오 장소 상세 api 키워드로 사용
+         지번 주소가 없다면 구글 장소 이름을 키워드로 사용
+         */
         KakaoPlaceApiAddressResponseDto kakaoPlaceApiAddressResponseDto = getAddressFromKakao(
             locationFromGoogle);
         Integer addressTotalCount = kakaoPlaceApiAddressResponseDto.getMeta().getTotalCount();
@@ -248,10 +252,15 @@ public class AdminService {
             keyword, locationFromGoogle);
 
         place.adminSaveBasic(googlePlaceApiResponseDto, kakaoPlaceApiPlaceDetailResponseDto);
-        placeRepository.saveAndFlush(place);
+        Place savedPlace = placeRepository.save(place);
+
+        AdminSavePlaceBasicResponseDto responseDto = AdminSavePlaceBasicResponseDto.builder()
+            .placeId(savedPlace.getId()).build();
 
         if (kakaoPlaceApiPlaceDetailResponseDto.getDocuments().isEmpty()) {
-            throw new CustomException(AdminErrorCode.KAKAO_DATA_UNAVAILABLE);
+            return ResponseEntity.ok().body(responseDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
         }
     }
 
