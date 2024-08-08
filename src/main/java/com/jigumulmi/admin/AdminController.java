@@ -9,6 +9,7 @@ import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
+import com.jigumulmi.admin.dto.response.AdminSavePlaceBasicResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -87,12 +88,19 @@ public class AdminController {
     }
 
     @Operation(summary = "장소 기본 정보 저장하기")
-    @ApiResponse(responseCode = "204")
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200", description = "카카오 데이터 없이 저장 성공", content = {
+                @Content(schema = @Schema(implementation = AdminSavePlaceBasicResponseDto.class))}),
+            @ApiResponse(responseCode = "201", description = "저장 성공", content = {
+                @Content(schema = @Schema(implementation = AdminSavePlaceBasicResponseDto.class))}),
+            @ApiResponse(responseCode = "400", description = "중복된 장소 저장 요청")
+        }
+    )
     @PatchMapping("/place")
     public ResponseEntity<?> savePlaceBasic(
         @RequestBody AdminSavePlaceBasicRequestDto requestDto) {
-        adminService.savePlaceBasic(requestDto);
-        return ResponseEntity.noContent().build();
+        return adminService.savePlaceBasic(requestDto);
     }
 
     @Operation(summary = "장소 삭제")
