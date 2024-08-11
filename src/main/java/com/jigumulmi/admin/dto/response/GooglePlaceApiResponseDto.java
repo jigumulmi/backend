@@ -66,6 +66,7 @@ public class GooglePlaceApiResponseDto {
         private String text;
     }
 
+    private String id;
     private Location location;
     private RegularOpeningHours regularOpeningHours;
     private DisplayName displayName;

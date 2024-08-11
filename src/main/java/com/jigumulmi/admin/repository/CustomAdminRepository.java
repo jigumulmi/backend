@@ -1,6 +1,7 @@
 package com.jigumulmi.admin.repository;
 
 
+import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -29,7 +30,7 @@ public class CustomAdminRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public Page<PlaceDto> getPlaceList(Pageable pageable, String placeName) {
+    public Page<PlaceDto> getPlaceList(Pageable pageable, AdminGetPlaceListRequestDto requestDto) {
         List<PlaceDto> content = queryFactory
             .select(
                 Projections.fields(PlaceDto.class,
@@ -41,14 +42,16 @@ public class CustomAdminRepository {
                         subwayStationPlace.isMain
                     ).as("subwayStation"),
                     place.category,
-                    place.isApproved
+                    place.isApproved,
+                    place.googlePlaceId
                 )
             )
             .from(place)
             .leftJoin(place.subwayStationPlaceList, subwayStationPlace)
             .on(place.id.eq(subwayStationPlace.place.id).and(subwayStationPlace.isMain.eq(true)))
             .leftJoin(subwayStationPlace.subwayStation, subwayStation)
-            .where(placeCondition(placeName))
+            .where(place.isFromAdmin.eq(requestDto.getIsFromAdmin())
+                .and(placeCondition(requestDto.getPlaceName())))
             .orderBy(getOrderSpecifier(pageable.getSort(), Expressions.path(Place.class, "place")))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())

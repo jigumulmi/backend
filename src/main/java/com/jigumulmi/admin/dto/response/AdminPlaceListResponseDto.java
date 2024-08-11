@@ -18,8 +18,9 @@ public class AdminPlaceListResponseDto {
 
         private String category;
         private Boolean isApproved;
+        private String googlePlaceId;
     }
 
-    private List<PlaceDto> data;
     private PageDto page;
+    private List<PlaceDto> data;
 }

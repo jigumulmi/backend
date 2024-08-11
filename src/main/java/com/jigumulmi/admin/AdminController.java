@@ -1,6 +1,7 @@
 package com.jigumulmi.admin;
 
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminSavePlaceBasicRequestDto;
@@ -8,14 +9,15 @@ import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
+import com.jigumulmi.admin.dto.response.AdminSavePlaceBasicResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -73,7 +75,7 @@ public class AdminController {
     @PostMapping("/place")
     public ResponseEntity<?> createPlace(@RequestBody AdminCreatePlaceRequestDto requestDto) {
         adminService.createPlace(requestDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Create Success");
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "장소 수정", description = "덮어쓰는 로직이므로 수정하지 않은 항목도 기존 조회된 데이터를 꼭 담아주세요")
@@ -82,15 +84,31 @@ public class AdminController {
     public ResponseEntity<?> updatePlaceDetail(
         @RequestBody AdminUpdatePlaceRequestDto requestDto) {
         adminService.updatePlaceDetail(requestDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Update Success");
+        return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "장소 기본 정보 불러오기")
-    @ApiResponse(responseCode = "204")
+    @Operation(summary = "장소 기본 정보 저장하기")
+    @ApiResponses(
+        value = {
+            @ApiResponse(responseCode = "200", description = "카카오 데이터 없이 저장 성공", content = {
+                @Content(schema = @Schema(implementation = AdminSavePlaceBasicResponseDto.class))}),
+            @ApiResponse(responseCode = "201", description = "저장 성공", content = {
+                @Content(schema = @Schema(implementation = AdminSavePlaceBasicResponseDto.class))}),
+            @ApiResponse(responseCode = "400", description = "중복된 장소 저장 요청")
+        }
+    )
     @PatchMapping("/place")
     public ResponseEntity<?> savePlaceBasic(
         @RequestBody AdminSavePlaceBasicRequestDto requestDto) {
-        adminService.savePlaceBasic(requestDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Saved basic info");
+        return adminService.savePlaceBasic(requestDto);
+    }
+
+    @Operation(summary = "장소 삭제")
+    @ApiResponse(responseCode = "204")
+    @DeleteMapping("/place")
+    public ResponseEntity<?> deletePlace(
+        @RequestBody AdminDeletePlaceRequestDto requestDto) {
+        adminService.deletePlace(requestDto);
+        return ResponseEntity.noContent().build();
     }
 }
