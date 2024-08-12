@@ -4,6 +4,7 @@ import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,6 +35,10 @@ public class AdminCreatePlaceRequestDto {
     private String additionalInfo;
     private String registrantComment;
     private Boolean isApproved = false;
-    private List<Long> subwayStationIdList;
-    private String kakaoPlaceId;
+    private List<Long> subwayStationIdList = new ArrayList<>();
+    private String kakaoPlaceId = null;
+
+    private void setKakaoPlaceId(String kakaoPlaceId) {
+        this.kakaoPlaceId = (Objects.equals(kakaoPlaceId, "")) ? null : kakaoPlaceId;
+    }
 }
