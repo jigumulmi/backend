@@ -1,6 +1,5 @@
 package com.jigumulmi.place.vo;
 
-import static com.jigumulmi.place.domain.Place.CLOSING_DAY;
 import static com.jigumulmi.place.domain.QPlace.place;
 
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
@@ -28,6 +27,7 @@ public enum CurrentOpeningInfo {
     private final String response;
 
     private static final Long SOON_STANDARD = 30L;
+    private static final String CLOSING_DAY = "정기휴무";
 
     public static String getCurrentOpeningInfo(
         SurroundingDateOpeningHour surroundingDateOpeningHour
