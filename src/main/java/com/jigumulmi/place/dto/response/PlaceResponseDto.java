@@ -1,6 +1,7 @@
 package com.jigumulmi.place.dto.response;
 
 import com.jigumulmi.place.domain.PlaceImage;
+import com.jigumulmi.place.vo.PlaceCategory;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -68,7 +69,7 @@ public class PlaceResponseDto {
 
     private SubwayStationResponseDto subwayStation;
 
-    private String category;
+    private PlaceCategory category;
 
     private SurroundingDateOpeningHour surroundingDateOpeningHour;
 

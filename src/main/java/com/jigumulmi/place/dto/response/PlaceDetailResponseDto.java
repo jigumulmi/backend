@@ -1,6 +1,7 @@
 package com.jigumulmi.place.dto.response;
 
 import com.jigumulmi.place.domain.Menu;
+import com.jigumulmi.place.vo.PlaceCategory;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,7 +53,7 @@ public class PlaceDetailResponseDto extends PlaceResponseDto {
         private String openingHourSat;
     }
 
-    private String category;
+    private PlaceCategory category;
 
     private String address;
 

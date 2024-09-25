@@ -1,5 +1,6 @@
 package com.jigumulmi.place.vo;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -19,5 +20,6 @@ public enum PlaceCategory {
     RECYCLING_CENTER("재활용센터"),
     ;
 
+    @JsonValue
     private final String title;
 }

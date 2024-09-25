@@ -3,10 +3,13 @@ package com.jigumulmi.place.domain;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.config.common.Timestamped;
+import com.jigumulmi.place.PlaceCategoryConverter;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.vo.PlaceCategory;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,7 +39,7 @@ public class Place extends Timestamped {
 
     private String name;
 
-    private String category;
+    private PlaceCategory category;
 
     private String address; // 도로명 주소
 
@@ -100,7 +103,7 @@ public class Place extends Timestamped {
     private Boolean isFromAdmin;
 
     @Builder
-    public Place(String name, String category, String address, String contact, List<Menu> menuList,
+    public Place(String name, PlaceCategory category, String address, String contact, List<Menu> menuList,
         String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed,
         String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo,
         String placeUrl, Double longitude, Double latitude, String registrantComment,

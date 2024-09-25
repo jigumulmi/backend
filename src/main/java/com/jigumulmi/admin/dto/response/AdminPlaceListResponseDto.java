@@ -1,6 +1,7 @@
 package com.jigumulmi.admin.dto.response;
 
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
+import com.jigumulmi.place.vo.PlaceCategory;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class AdminPlaceListResponseDto {
     @NoArgsConstructor
     public static class PlaceDto extends PlaceResponseDto {
 
-        private String category;
+        private PlaceCategory category;
         private Boolean isApproved;
     }
 

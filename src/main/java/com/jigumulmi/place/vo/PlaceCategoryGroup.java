@@ -1,5 +1,6 @@
 package com.jigumulmi.place.vo;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +18,7 @@ public enum PlaceCategoryGroup {
     EMPTY("없음", Collections.EMPTY_LIST)
     ;
 
+    @JsonValue
     private final String title;
     private final List<PlaceCategory> placeCategoryList;
 
