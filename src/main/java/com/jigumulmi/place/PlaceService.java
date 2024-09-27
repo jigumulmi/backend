@@ -108,6 +108,11 @@ public class PlaceService {
             List<ImageDto> imageList = responseDto.getImageList();
             responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
 
+            PlaceCategory category = responseDto.getCategory();
+            PlaceCategoryGroup placeCategoryGroup = PlaceCategoryGroup.findByPlaceCategory(
+                category);
+            responseDto.setCategoryGroup(placeCategoryGroup);
+
             SurroundingDateOpeningHour surroundingDateOpeningHour = responseDto.getSurroundingDateOpeningHour();
             String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
                 surroundingDateOpeningHour);
@@ -151,6 +156,9 @@ public class PlaceService {
             .statistics(reviewRatingStatMap)
             .build();
 
+        PlaceCategory category = place.getCategory();
+        PlaceCategoryGroup placeCategoryGroup = PlaceCategoryGroup.findByPlaceCategory(category);
+
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
             .name(place.getName())
@@ -161,7 +169,8 @@ public class PlaceService {
             .subwayStation(
                 place.getSubwayStation()
             )
-            .category(place.getCategory())
+            .categoryGroup(placeCategoryGroup)
+            .category(category)
             .address(place.getAddress())
             .contact(place.getContact())
             .menuList(menuList)
