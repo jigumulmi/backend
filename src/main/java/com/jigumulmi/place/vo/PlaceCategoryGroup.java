@@ -1,5 +1,6 @@
 package com.jigumulmi.place.vo;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +26,7 @@ public enum PlaceCategoryGroup {
     private final String title;
     private final List<PlaceCategory> placeCategoryList;
 
+    @JsonCreator
     public static PlaceCategoryGroup ofTitle(String title) {
         return Arrays.stream(PlaceCategoryGroup.values())
             .filter(categoryGroup -> categoryGroup.getTitle().equals(title))

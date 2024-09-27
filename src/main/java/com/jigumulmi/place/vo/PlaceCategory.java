@@ -1,6 +1,8 @@
 package com.jigumulmi.place.vo;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -22,4 +24,12 @@ public enum PlaceCategory {
 
     @JsonValue
     private final String title;
+
+    @JsonCreator
+    public static PlaceCategory ofTitle(String title) {
+        return Arrays.stream(PlaceCategory.values())
+            .filter(c -> c.getTitle().equals(title))
+            .findFirst()
+            .orElseThrow(IllegalArgumentException::new);
+    }
 }

@@ -5,6 +5,8 @@ import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import com.jigumulmi.place.vo.PlaceCategory;
+import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +43,17 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
 
         List<ImageDto> imageList = place.getPlaceImageList().stream().map(ImageDto::from).toList();
 
+        PlaceCategory category = place.getCategory();
+        PlaceCategoryGroup placeCategoryGroup = PlaceCategoryGroup.findByPlaceCategory(
+            category);
+
         return AdminPlaceDetailResponseDto.builder()
             .createdAt(place.getCreatedAt())
             .modifiedAt(place.getModifiedAt())
             .id(place.getId())
             .name(place.getName())
-            .category(place.getCategory())
+            .categoryGroup(placeCategoryGroup)
+            .category(category)
             .address(place.getAddress())
             .contact(place.getContact())
             .imageList(imageList)

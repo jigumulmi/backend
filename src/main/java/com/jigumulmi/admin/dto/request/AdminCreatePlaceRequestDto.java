@@ -3,6 +3,7 @@ package com.jigumulmi.admin.dto.request;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.vo.PlaceCategory;
+import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -25,6 +26,7 @@ public class AdminCreatePlaceRequestDto {
     }
 
     private String name;
+    private PlaceCategoryGroup categoryGroup;
     private PlaceCategory category;
     private String address;
     private String contact;
