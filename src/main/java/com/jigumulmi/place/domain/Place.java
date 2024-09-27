@@ -94,7 +94,6 @@ public class Place extends Timestamped {
     private List<PlaceImage> placeImageList = new ArrayList<>();
 
     private String kakaoPlaceId;
-    private String googlePlaceId;
 
     @Column(nullable = false)
     @ColumnDefault("false")
@@ -108,7 +107,7 @@ public class Place extends Timestamped {
         Boolean isApproved, List<Review> reviewList,
         List<SubwayStationPlace> subwayStationPlaceList,
         List<PlaceImage> placeImageList, String kakaoPlaceId,
-        Boolean isFromAdmin, String googlePlaceId
+        Boolean isFromAdmin
     ) {
         this.name = name;
         this.category = category;
@@ -132,7 +131,6 @@ public class Place extends Timestamped {
         this.subwayStationPlaceList = subwayStationPlaceList;
         this.placeImageList = placeImageList;
         this.kakaoPlaceId = kakaoPlaceId;
-        this.googlePlaceId = googlePlaceId;
         this.isFromAdmin = (isFromAdmin != null) ? isFromAdmin : false;
     }
 
