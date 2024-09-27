@@ -1,4 +1,4 @@
-package com.jigumulmi.place;
+package com.jigumulmi.place.converter;
 
 import com.jigumulmi.place.vo.PlaceCategory;
 import jakarta.persistence.AttributeConverter;
@@ -6,7 +6,7 @@ import jakarta.persistence.Converter;
 import java.util.stream.Stream;
 
 @Converter(autoApply = true)
-public class PlaceCategoryConverter implements AttributeConverter<PlaceCategory, String> {
+public class PlaceCategoryDatabaseConverter implements AttributeConverter<PlaceCategory, String> {
 
     @Override
     public String convertToDatabaseColumn(PlaceCategory category) {
