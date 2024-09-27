@@ -39,8 +39,11 @@ import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.CurrentOpeningInfo;
+import com.jigumulmi.place.vo.PlaceCategory;
+import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import com.jigumulmi.place.vo.Reaction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +108,11 @@ public class PlaceService {
             List<ImageDto> imageList = responseDto.getImageList();
             responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
 
+            PlaceCategory category = responseDto.getCategory();
+            PlaceCategoryGroup placeCategoryGroup = PlaceCategoryGroup.findByPlaceCategory(
+                category);
+            responseDto.setCategoryGroup(placeCategoryGroup);
+
             SurroundingDateOpeningHour surroundingDateOpeningHour = responseDto.getSurroundingDateOpeningHour();
             String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
                 surroundingDateOpeningHour);
@@ -148,6 +156,9 @@ public class PlaceService {
             .statistics(reviewRatingStatMap)
             .build();
 
+        PlaceCategory category = place.getCategory();
+        PlaceCategoryGroup placeCategoryGroup = PlaceCategoryGroup.findByPlaceCategory(category);
+
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
             .name(place.getName())
@@ -158,7 +169,8 @@ public class PlaceService {
             .subwayStation(
                 place.getSubwayStation()
             )
-            .category(place.getCategory())
+            .categoryGroup(placeCategoryGroup)
+            .category(category)
             .address(place.getAddress())
             .contact(place.getContact())
             .menuList(menuList)
@@ -294,5 +306,14 @@ public class PlaceService {
     public void deleteReviewReplyLike(Long reviewReplyReactionId, Member member) {
 
         reviewReplyReactionRepository.deleteByIdAndMemberId(reviewReplyReactionId, member.getId());
+    }
+
+    public List<PlaceCategoryGroup> getPlaceCategoryGroupList() {
+        return Arrays.stream(PlaceCategoryGroup.values()).toList();
+    }
+
+    public List<PlaceCategory> getPlaceCategoryList(PlaceCategoryGroup placeCategoryGroup) {
+        return placeCategoryGroup.getPlaceCategoryList();
+
     }
 }

@@ -16,7 +16,6 @@ public class AdminPlaceListResponseDto {
     @NoArgsConstructor
     public static class PlaceDto extends PlaceResponseDto {
 
-        private String category;
         private Boolean isApproved;
     }
 
