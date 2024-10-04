@@ -1,6 +1,7 @@
 package com.jigumulmi.place.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.CategoryRequestDto;
 import com.jigumulmi.place.domain.PlaceCategoryMapping;
 import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.vo.PlaceCategory;
@@ -37,11 +38,8 @@ public class PlaceResponseDto {
     }
 
     @Getter
-    @Builder
-    public static class CategoryResponseDto {
-
-        private PlaceCategoryGroup group;
-        private List<PlaceCategory> detail;
+    @SuperBuilder
+    public static class CategoryResponseDto extends CategoryRequestDto {
 
         public static List<CategoryResponseDto> fromMappingList(
             List<CategoryMappingDto> mappingList) {

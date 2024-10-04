@@ -28,5 +28,6 @@ public class AdminGetPlaceListRequestDto {
     private String placeName;
 
     @Parameter(description = "유저 등록 신청 -> false, 관리자 등록 -> true")
-    private Boolean isFromAdmin;
+    @Schema(defaultValue = "true")
+    private Boolean isFromAdmin = true;
 }

@@ -2,6 +2,7 @@ package com.jigumulmi.admin;
 
 
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.CategoryRequestDto;
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.ImageRequestDto;
 import com.jigumulmi.admin.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
@@ -19,6 +20,7 @@ import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.domain.PlaceCategoryMapping;
 import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
@@ -27,6 +29,7 @@ import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
+import com.jigumulmi.place.vo.PlaceCategory;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -105,7 +108,6 @@ public class AdminService {
 
         Place place = Place.builder()
             .name(requestDto.getName())
-            .category(requestDto.getCategory())
             .address(requestDto.getAddress())
             .contact(requestDto.getContact())
             .openingHourSun(openingHour.getOpeningHourSun())
@@ -157,7 +159,19 @@ public class AdminService {
             );
         }
 
-        place.addChildren(subwayStationPlaceList, menuList, imageList);
+        ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
+        CategoryRequestDto categoryRequestDto = requestDto.getCategory();
+        for (PlaceCategory category : categoryRequestDto.getDetail()) {
+            categoryMappingList.add(
+                PlaceCategoryMapping.builder()
+                    .category(category)
+                    .categoryGroup(categoryRequestDto.getGroup())
+                    .place(place)
+                    .build()
+            );
+        }
+
+        place.addChildren(categoryMappingList, subwayStationPlaceList, menuList, imageList);
 
         placeRepository.save(place);
     }
@@ -201,7 +215,20 @@ public class AdminService {
             );
         }
 
-        place.adminUpdate(requestDto, subwayStationPlaceList, menuList, imageList);
+        ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
+        CategoryRequestDto categoryRequestDto = requestDto.getCategory();
+        for (PlaceCategory category : categoryRequestDto.getDetail()) {
+            categoryMappingList.add(
+                PlaceCategoryMapping.builder()
+                    .category(category)
+                    .categoryGroup(categoryRequestDto.getGroup())
+                    .place(place)
+                    .build()
+            );
+        }
+
+        place.adminUpdate(requestDto, categoryMappingList, subwayStationPlaceList, menuList,
+            imageList);
 
         placeRepository.save(place);
     }

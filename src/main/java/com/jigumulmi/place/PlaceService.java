@@ -95,8 +95,8 @@ public class PlaceService {
             .isMain(true)
             .build();
 
-        newPlace.addChildren(Collections.singletonList(subwayStationPlace), menuList,
-            null);
+        newPlace.addChildren(null, Collections.singletonList(subwayStationPlace),
+            menuList, null);
 
         placeRepository.save(newPlace);
     }
