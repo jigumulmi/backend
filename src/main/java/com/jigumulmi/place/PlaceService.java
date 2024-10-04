@@ -24,6 +24,7 @@ import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
@@ -94,8 +95,8 @@ public class PlaceService {
             .isMain(true)
             .build();
 
-        newPlace.addChildren(Collections.singletonList(subwayStationPlace), menuList,
-            null);
+        newPlace.addChildren(null, Collections.singletonList(subwayStationPlace),
+            menuList, null);
 
         placeRepository.save(newPlace);
     }
@@ -108,10 +109,9 @@ public class PlaceService {
             List<ImageDto> imageList = responseDto.getImageList();
             responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
 
-            PlaceCategory category = responseDto.getCategory();
-            PlaceCategoryGroup placeCategoryGroup = PlaceCategoryGroup.findByPlaceCategory(
-                category);
-            responseDto.setCategoryGroup(placeCategoryGroup);
+            List<CategoryResponseDto> categoryData = CategoryResponseDto.fromMappingList(
+                responseDto.getCategoryMappingDtoList());
+            responseDto.setCategory(categoryData);
 
             SurroundingDateOpeningHour surroundingDateOpeningHour = responseDto.getSurroundingDateOpeningHour();
             String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
@@ -156,8 +156,8 @@ public class PlaceService {
             .statistics(reviewRatingStatMap)
             .build();
 
-        PlaceCategory category = place.getCategory();
-        PlaceCategoryGroup placeCategoryGroup = PlaceCategoryGroup.findByPlaceCategory(category);
+        List<CategoryResponseDto> categoryData = CategoryResponseDto.fromMappingList(
+            place.getCategoryMappingDtoList());
 
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
@@ -169,8 +169,7 @@ public class PlaceService {
             .subwayStation(
                 place.getSubwayStation()
             )
-            .categoryGroup(placeCategoryGroup)
-            .category(category)
+            .category(categoryData)
             .address(place.getAddress())
             .contact(place.getContact())
             .menuList(menuList)

@@ -17,9 +17,9 @@ public enum PlaceCategoryGroup {
             PlaceCategory.WESTERN_FOOD
         )
     ),
-    CAFE("카페", Arrays.asList(PlaceCategory.BEVERAGE, PlaceCategory.BAKERY, PlaceCategory.DESSERT)),
+    CAFE("카페", Arrays.asList(PlaceCategory.BEVERAGE, PlaceCategory.SNACK)),
     ZERO_WASTE_SHOP("제로웨이스트샵", List.of(PlaceCategory.ZERO_WASTE_SHOP)),
-    RECYCLING_CENTER("재활용센터", List.of(PlaceCategory.ZERO_WASTE_SHOP)),
+    RECYCLING_CENTER("재활용센터", List.of(PlaceCategory.RECYCLING_CENTER)),
     ;
 
     @JsonValue
@@ -32,17 +32,5 @@ public enum PlaceCategoryGroup {
             .filter(categoryGroup -> categoryGroup.getTitle().equals(title))
             .findFirst()
             .orElseThrow(IllegalArgumentException::new);
-    }
-
-    public static PlaceCategoryGroup findByPlaceCategory(PlaceCategory placeCategory) {
-        return Arrays.stream(PlaceCategoryGroup.values())
-            .filter(categoryGroup -> categoryGroup.hasPayCode(placeCategory))
-            .findAny()
-            .orElseThrow(IllegalArgumentException::new);
-    }
-
-    public boolean hasPayCode(PlaceCategory placeCategory) {
-        return placeCategoryList.stream()
-            .anyMatch(x -> x == placeCategory);
     }
 }

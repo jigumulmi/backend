@@ -2,6 +2,7 @@ package com.jigumulmi.admin;
 
 
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.CategoryRequestDto;
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.ImageRequestDto;
 import com.jigumulmi.admin.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
@@ -19,15 +20,16 @@ import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.domain.PlaceCategoryMapping;
 import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.PlaceCategory;
-import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +52,7 @@ public class AdminService {
     private final SubwayStationRepository subwayStationRepository;
 
     public AdminMemberListResponseDto getMemberList(AdminGetMemberListRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
+        Pageable pageable = PageRequest.of(requestDto.getPage(), DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
         Page<MemberDto> memberPage = memberRepository.findAll(pageable).map(MemberDto::from);
@@ -59,34 +61,35 @@ public class AdminService {
             .data(memberPage.getContent())
             .page(PageDto.builder()
                 .totalCount(memberPage.getTotalElements())
-                .currentPage(requestDto.getPage())
+                .currentPage(requestDto.getPage() + 1)
                 .totalPage(memberPage.getTotalPages())
-                .build())
+                .build()
+            )
             .build();
     }
 
     @Transactional(readOnly = true)
     public AdminPlaceListResponseDto getPlaceList(AdminGetPlaceListRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
+        Pageable pageable = PageRequest.of(requestDto.getPage(), DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
         Page<PlaceDto> placePage = customAdminRepository.getPlaceList(pageable,
             requestDto);
 
         for (PlaceDto placeDto : placePage.getContent()) {
-            PlaceCategory category = placeDto.getCategory();
-            PlaceCategoryGroup placeCategoryGroup = PlaceCategoryGroup.findByPlaceCategory(
-                category);
-            placeDto.setCategoryGroup(placeCategoryGroup);
+            List<CategoryResponseDto> categoryData = CategoryResponseDto.fromMappingList(
+                placeDto.getCategoryMappingDtoList());
+            placeDto.setCategory(categoryData);
         }
 
         return AdminPlaceListResponseDto.builder()
             .data(placePage.getContent())
             .page(PageDto.builder()
                 .totalCount(placePage.getTotalElements())
-                .currentPage(requestDto.getPage())
+                .currentPage(requestDto.getPage() + 1)
                 .totalPage(placePage.getTotalPages())
-                .build())
+                .build()
+            )
             .build();
     }
 
@@ -105,7 +108,6 @@ public class AdminService {
 
         Place place = Place.builder()
             .name(requestDto.getName())
-            .category(requestDto.getCategory())
             .address(requestDto.getAddress())
             .contact(requestDto.getContact())
             .openingHourSun(openingHour.getOpeningHourSun())
@@ -157,7 +159,19 @@ public class AdminService {
             );
         }
 
-        place.addChildren(subwayStationPlaceList, menuList, imageList);
+        ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
+        CategoryRequestDto categoryRequestDto = requestDto.getCategory();
+        for (PlaceCategory category : categoryRequestDto.getDetail()) {
+            categoryMappingList.add(
+                PlaceCategoryMapping.builder()
+                    .category(category)
+                    .categoryGroup(categoryRequestDto.getGroup())
+                    .place(place)
+                    .build()
+            );
+        }
+
+        place.addChildren(categoryMappingList, subwayStationPlaceList, menuList, imageList);
 
         placeRepository.save(place);
     }
@@ -201,7 +215,20 @@ public class AdminService {
             );
         }
 
-        place.adminUpdate(requestDto, subwayStationPlaceList, menuList, imageList);
+        ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
+        CategoryRequestDto categoryRequestDto = requestDto.getCategory();
+        for (PlaceCategory category : categoryRequestDto.getDetail()) {
+            categoryMappingList.add(
+                PlaceCategoryMapping.builder()
+                    .category(category)
+                    .categoryGroup(categoryRequestDto.getGroup())
+                    .place(place)
+                    .build()
+            );
+        }
+
+        place.adminUpdate(requestDto, categoryMappingList, subwayStationPlaceList, menuList,
+            imageList);
 
         placeRepository.save(place);
     }

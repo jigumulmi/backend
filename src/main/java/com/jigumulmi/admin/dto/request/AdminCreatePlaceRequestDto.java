@@ -10,6 +10,7 @@ import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @NoArgsConstructor
@@ -25,9 +26,18 @@ public class AdminCreatePlaceRequestDto {
         private Boolean isMain = false;
     }
 
+    @Getter
+    @SuperBuilder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CategoryRequestDto {
+
+        private PlaceCategoryGroup group;
+        private List<PlaceCategory> detail;
+    }
+
     private String name;
-    private PlaceCategoryGroup categoryGroup;
-    private PlaceCategory category;
+    private CategoryRequestDto category;
     private String address;
     private String contact;
     private List<String> menuList = new ArrayList<>();

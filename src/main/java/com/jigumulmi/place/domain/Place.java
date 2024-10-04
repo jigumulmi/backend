@@ -43,11 +43,6 @@ public class Place extends Timestamped {
 
     private String contact;
 
-    @BatchSize(size = 10)
-    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<Menu> menuList = new ArrayList<>();
-
     private String openingHourSun;
 
     private String openingHourMon;
@@ -77,6 +72,14 @@ public class Place extends Timestamped {
     @ColumnDefault("false")
     private Boolean isApproved;
 
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
+
+    @BatchSize(size = 10)
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Menu> menuList = new ArrayList<>();
 
     @OneToMany(mappedBy = "place")
     @JsonManagedReference
@@ -101,7 +104,9 @@ public class Place extends Timestamped {
     private Boolean isFromAdmin;
 
     @Builder
-    public Place(String name, PlaceCategory category, String address, String contact, List<Menu> menuList,
+    public Place(String name, PlaceCategory category,
+        List<PlaceCategoryMapping> categoryMappingList, String address, String contact,
+        List<Menu> menuList,
         String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed,
         String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo,
         String placeUrl, Double longitude, Double latitude, String registrantComment,
@@ -112,6 +117,7 @@ public class Place extends Timestamped {
     ) {
         this.name = name;
         this.category = category;
+        this.categoryMappingList = categoryMappingList;
         this.address = address;
         this.contact = contact;
         this.menuList = menuList;
@@ -135,21 +141,25 @@ public class Place extends Timestamped {
         this.isFromAdmin = (isFromAdmin != null) ? isFromAdmin : false;
     }
 
-    public void addChildren(List<SubwayStationPlace> subwayStationPlaceList,
+    public void addChildren(List<PlaceCategoryMapping> categoryMappingList,
+        List<SubwayStationPlace> subwayStationPlaceList,
         List<Menu> menuList, List<PlaceImage> placeImageList) {
+        this.categoryMappingList = categoryMappingList;
         this.menuList = menuList;
         this.subwayStationPlaceList = subwayStationPlaceList;
         this.placeImageList = placeImageList;
     }
 
     public void adminUpdate(AdminUpdatePlaceRequestDto requestDto,
+        List<PlaceCategoryMapping> categoryMappingList,
         List<SubwayStationPlace> subwayStationPlaceList,
         List<Menu> menuList, List<PlaceImage> placeImageList) {
         OpeningHourDto openingHour = requestDto.getOpeningHour();
         PositionDto position = requestDto.getPosition();
 
         this.name = requestDto.getName();
-        this.category = requestDto.getCategory();
+        this.categoryMappingList.clear();
+        this.categoryMappingList.addAll(categoryMappingList);
         this.address = requestDto.getAddress();
         this.contact = requestDto.getContact();
         this.menuList.clear();
