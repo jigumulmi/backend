@@ -49,7 +49,7 @@ public class AdminService {
     private final SubwayStationRepository subwayStationRepository;
 
     public AdminMemberListResponseDto getMemberList(AdminGetMemberListRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
+        Pageable pageable = PageRequest.of(requestDto.getPage(), DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
         Page<MemberDto> memberPage = memberRepository.findAll(pageable).map(MemberDto::from);
@@ -58,15 +58,16 @@ public class AdminService {
             .data(memberPage.getContent())
             .page(PageDto.builder()
                 .totalCount(memberPage.getTotalElements())
-                .currentPage(requestDto.getPage())
+                .currentPage(requestDto.getPage() + 1)
                 .totalPage(memberPage.getTotalPages())
-                .build())
+                .build()
+            )
             .build();
     }
 
     @Transactional(readOnly = true)
     public AdminPlaceListResponseDto getPlaceList(AdminGetPlaceListRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
+        Pageable pageable = PageRequest.of(requestDto.getPage(), DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
         Page<PlaceDto> placePage = customAdminRepository.getPlaceList(pageable,
@@ -82,9 +83,10 @@ public class AdminService {
             .data(placePage.getContent())
             .page(PageDto.builder()
                 .totalCount(placePage.getTotalElements())
-                .currentPage(requestDto.getPage())
+                .currentPage(requestDto.getPage() + 1)
                 .totalPage(placePage.getTotalPages())
-                .build())
+                .build()
+            )
             .build();
     }
 

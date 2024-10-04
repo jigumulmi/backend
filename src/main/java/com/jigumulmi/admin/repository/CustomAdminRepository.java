@@ -1,6 +1,15 @@
 package com.jigumulmi.admin.repository;
 
 
+import static com.jigumulmi.config.querydsl.Utils.getOrderSpecifier;
+import static com.jigumulmi.place.domain.QPlace.place;
+import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
+import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
+import static com.jigumulmi.place.domain.QSubwayStationPlace.subwayStationPlace;
+import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
+import static com.querydsl.core.types.dsl.Expressions.TRUE;
+
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.place.domain.Place;
@@ -11,22 +20,12 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
-
-import static com.jigumulmi.config.querydsl.Utils.getOrderSpecifier;
-import static com.jigumulmi.place.domain.QPlace.place;
-import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
-import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
-import static com.jigumulmi.place.domain.QSubwayStationPlace.subwayStationPlace;
-import static com.querydsl.core.group.GroupBy.groupBy;
-import static com.querydsl.core.group.GroupBy.list;
-import static com.querydsl.core.types.dsl.Expressions.TRUE;
 
 @Repository
 @RequiredArgsConstructor
@@ -56,7 +55,7 @@ public class CustomAdminRepository {
                             subwayStation.stationName,
                             subwayStationPlace.isMain
                         ).as("subwayStation"),
-                        list(Projections.constructor(CategoryMappingDto.class,
+                        list(Projections.fields(CategoryMappingDto.class,
                             placeCategoryMapping.categoryGroup,
                             placeCategoryMapping.category
                         )).as("categoryMappingDtoList"),
@@ -66,12 +65,11 @@ public class CustomAdminRepository {
             );
 
         JPAQuery<Long> totalCountQuery = queryFactory
-            .select(place.count())
+            .select(place.countDistinct())
             .from(place)
             .where(place.isFromAdmin.eq(requestDto.getIsFromAdmin())
                 .and(placeCondition(requestDto.getPlaceName()))
-            )
-            ;
+            );
 
         return PageableExecutionUtils.getPage(content, pageable, totalCountQuery::fetchOne);
     }
