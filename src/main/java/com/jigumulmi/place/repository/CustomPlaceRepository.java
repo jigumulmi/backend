@@ -5,6 +5,7 @@ import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.place.dto.response.*;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryMappingDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.jigumulmi.place.domain.QPlace.place;
+import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
 import static com.jigumulmi.place.domain.QPlaceImage.placeImage;
 import static com.jigumulmi.place.domain.QReview.review;
 import static com.jigumulmi.place.domain.QReviewReaction.reviewReaction;
@@ -61,6 +63,10 @@ public class CustomPlaceRepository {
                     Projections.fields(PlaceResponseDto.class,
                         place.id,
                         place.name,
+                        list(Projections.fields(CategoryMappingDto.class,
+                            placeCategoryMapping.categoryGroup,
+                            placeCategoryMapping.category
+                        )).as("categoryMappingDtoList"),
                         list(Projections.fields(ImageDto.class,
                             placeImage.id,
                             placeImage.url,
@@ -82,7 +88,6 @@ public class CustomPlaceRepository {
                                 )
                             ).as("subwayStationLineList")
                         ).as("subwayStation"),
-                        place.category,
                         Projections.fields(SurroundingDateOpeningHour.class,
                             getSurroundingDateOpeningHourExpressions()
                         ).as("surroundingDateOpeningHour")

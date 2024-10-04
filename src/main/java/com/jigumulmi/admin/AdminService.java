@@ -23,11 +23,10 @@ import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
-import com.jigumulmi.place.vo.PlaceCategory;
-import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -74,10 +73,9 @@ public class AdminService {
             requestDto);
 
         for (PlaceDto placeDto : placePage.getContent()) {
-            PlaceCategory category = placeDto.getCategory();
-            PlaceCategoryGroup placeCategoryGroup = PlaceCategoryGroup.findByPlaceCategory(
-                category);
-            placeDto.setCategoryGroup(placeCategoryGroup);
+            List<CategoryResponseDto> categoryData = CategoryResponseDto.fromMappingList(
+                placeDto.getCategoryMappingDtoList());
+            placeDto.setCategory(categoryData);
         }
 
         return AdminPlaceListResponseDto.builder()

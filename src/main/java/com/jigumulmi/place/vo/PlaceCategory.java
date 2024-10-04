@@ -15,8 +15,7 @@ public enum PlaceCategory {
     WESTERN_FOOD("양식"),
     //
     BEVERAGE("음료"),
-    DESSERT("디저트"),
-    BAKERY("베이커리"),
+    SNACK("간식"),
     //
     ZERO_WASTE_SHOP("제로웨이스트샵"),
     RECYCLING_CENTER("재활용센터"),
