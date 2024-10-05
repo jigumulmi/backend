@@ -1,16 +1,14 @@
 package com.jigumulmi.admin.dto.request;
 
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
-import com.jigumulmi.place.vo.PlaceCategory;
-import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @NoArgsConstructor
@@ -26,18 +24,8 @@ public class AdminCreatePlaceRequestDto {
         private Boolean isMain = false;
     }
 
-    @Getter
-    @SuperBuilder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CategoryRequestDto {
-
-        private PlaceCategoryGroup group;
-        private List<PlaceCategory> detail;
-    }
-
     private String name;
-    private List<CategoryRequestDto> category;
+    private List<CategoryDto> categoryList;
     private String address;
     private String contact;
     private List<String> menuList = new ArrayList<>();

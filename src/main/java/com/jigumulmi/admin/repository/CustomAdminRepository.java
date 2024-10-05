@@ -13,7 +13,7 @@ import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.place.domain.Place;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryMappingDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -55,10 +55,10 @@ public class CustomAdminRepository {
                             subwayStation.stationName,
                             subwayStationPlace.isMain
                         ).as("subwayStation"),
-                        list(Projections.fields(CategoryMappingDto.class,
+                        list(Projections.fields(CategoryDto.class,
                             placeCategoryMapping.categoryGroup,
                             placeCategoryMapping.category
-                        )).as("categoryMappingDtoList"),
+                        )).as("categoryList"),
                         place.isApproved
                     )
                 )
