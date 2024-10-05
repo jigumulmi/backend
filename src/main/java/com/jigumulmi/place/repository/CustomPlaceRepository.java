@@ -23,7 +23,7 @@ import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryMappingDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
@@ -68,10 +68,10 @@ public class CustomPlaceRepository {
                     Projections.fields(PlaceResponseDto.class,
                         place.id,
                         place.name,
-                        list(Projections.fields(CategoryMappingDto.class,
+                        list(Projections.fields(CategoryDto.class,
                             placeCategoryMapping.categoryGroup,
                             placeCategoryMapping.category
-                        )).as("categoryMappingDtoList"),
+                        )).as("categoryList"),
                         list(Projections.fields(ImageDto.class,
                             placeImage.id,
                             placeImage.url,
@@ -150,10 +150,10 @@ public class CustomPlaceRepository {
                                 )
                             ).as("subwayStationLineList")
                         ).as("subwayStation"),
-                        list(Projections.fields(CategoryMappingDto.class,
+                        list(Projections.fields(CategoryDto.class,
                             placeCategoryMapping.categoryGroup,
                             placeCategoryMapping.category
-                        )).as("categoryMappingDtoList"),
+                        )).as("categoryList"),
                         place.address,
                         place.contact,
                         Projections.fields(PlaceDetailResponseDto.OpeningHourDto.class,

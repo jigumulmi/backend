@@ -24,7 +24,6 @@ import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
@@ -109,10 +108,6 @@ public class PlaceService {
             List<ImageDto> imageList = responseDto.getImageList();
             responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
 
-            List<CategoryResponseDto> categoryData = CategoryResponseDto.fromMappingList(
-                responseDto.getCategoryMappingDtoList());
-            responseDto.setCategory(categoryData);
-
             SurroundingDateOpeningHour surroundingDateOpeningHour = responseDto.getSurroundingDateOpeningHour();
             String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
                 surroundingDateOpeningHour);
@@ -156,9 +151,6 @@ public class PlaceService {
             .statistics(reviewRatingStatMap)
             .build();
 
-        List<CategoryResponseDto> categoryData = CategoryResponseDto.fromMappingList(
-            place.getCategoryMappingDtoList());
-
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
             .name(place.getName())
@@ -169,7 +161,7 @@ public class PlaceService {
             .subwayStation(
                 place.getSubwayStation()
             )
-            .category(categoryData)
+            .categoryList(place.getCategoryList())
             .address(place.getAddress())
             .contact(place.getContact())
             .menuList(menuList)

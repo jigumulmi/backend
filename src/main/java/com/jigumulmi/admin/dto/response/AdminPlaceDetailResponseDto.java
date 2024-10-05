@@ -41,16 +41,15 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
 
         List<ImageDto> imageList = place.getPlaceImageList().stream().map(ImageDto::from).toList();
 
-        List<CategoryResponseDto> categoryData = CategoryResponseDto.fromMappingList(
-            place.getCategoryMappingList().stream()
-                .map(CategoryMappingDto::fromPlaceCategoryMapping).toList());
+        List<CategoryDto> categoryList = place.getCategoryMappingList().stream()
+            .map(CategoryDto::fromPlaceCategoryMapping).toList();
 
         return AdminPlaceDetailResponseDto.builder()
             .createdAt(place.getCreatedAt())
             .modifiedAt(place.getModifiedAt())
             .id(place.getId())
             .name(place.getName())
-            .category(categoryData)
+            .categoryList(categoryList)
             .address(place.getAddress())
             .contact(place.getContact())
             .imageList(imageList)
