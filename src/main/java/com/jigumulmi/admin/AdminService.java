@@ -30,6 +30,7 @@ import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.PlaceCategory;
+import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -160,15 +161,18 @@ public class AdminService {
         }
 
         ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
-        CategoryRequestDto categoryRequestDto = requestDto.getCategory();
-        for (PlaceCategory category : categoryRequestDto.getDetail()) {
-            categoryMappingList.add(
-                PlaceCategoryMapping.builder()
-                    .category(category)
-                    .categoryGroup(categoryRequestDto.getGroup())
-                    .place(place)
-                    .build()
-            );
+        List<CategoryRequestDto> categoryRequestDtoList = requestDto.getCategory();
+        for (CategoryRequestDto categoryRequestDto : categoryRequestDtoList) {
+            PlaceCategoryGroup group = categoryRequestDto.getGroup();
+            for (PlaceCategory detail : categoryRequestDto.getDetail()) {
+                categoryMappingList.add(
+                    PlaceCategoryMapping.builder()
+                        .category(detail)
+                        .categoryGroup(group)
+                        .place(place)
+                        .build()
+                );
+            }
         }
 
         place.addChildren(categoryMappingList, subwayStationPlaceList, menuList, imageList);
@@ -216,15 +220,18 @@ public class AdminService {
         }
 
         ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
-        CategoryRequestDto categoryRequestDto = requestDto.getCategory();
-        for (PlaceCategory category : categoryRequestDto.getDetail()) {
-            categoryMappingList.add(
-                PlaceCategoryMapping.builder()
-                    .category(category)
-                    .categoryGroup(categoryRequestDto.getGroup())
-                    .place(place)
-                    .build()
-            );
+        List<CategoryRequestDto> categoryRequestDtoList = requestDto.getCategory();
+        for (CategoryRequestDto categoryRequestDto : categoryRequestDtoList) {
+            PlaceCategoryGroup group = categoryRequestDto.getGroup();
+            for (PlaceCategory detail : categoryRequestDto.getDetail()) {
+                categoryMappingList.add(
+                    PlaceCategoryMapping.builder()
+                        .category(detail)
+                        .categoryGroup(group)
+                        .place(place)
+                        .build()
+                );
+            }
         }
 
         place.adminUpdate(requestDto, categoryMappingList, subwayStationPlaceList, menuList,

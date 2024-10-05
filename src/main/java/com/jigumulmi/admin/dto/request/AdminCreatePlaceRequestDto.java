@@ -37,7 +37,7 @@ public class AdminCreatePlaceRequestDto {
     }
 
     private String name;
-    private CategoryRequestDto category;
+    private List<CategoryRequestDto> category;
     private String address;
     private String contact;
     private List<String> menuList = new ArrayList<>();
