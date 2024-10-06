@@ -170,20 +170,15 @@ public class Place extends Timestamped {
         this.isApproved = requestDto.getIsApproved();
         this.kakaoPlaceId = requestDto.getKakaoPlaceId();
 
-        // 실제 쿼리는 insert 후 delete가 이루어지므로
-        // 제약조건이 걸리는 경우 위배되지 않는 데이터만 addAll 해야한다
-        // TODO 메서드화
-        List<PlaceCategoryMapping> intersectionWithElementsFromLeft = PlaceCategoryMapping.getIntersectionWithElementsFromLeft(
+        List<PlaceCategoryMapping> categoryMappingListToOverwrite = PlaceCategoryMapping.getCategoryMappingListToOverwrite(
             this.categoryMappingList, categoryMappingList);
-
-        categoryMappingList.removeAll(this.categoryMappingList);
-        categoryMappingList.addAll(intersectionWithElementsFromLeft);
 
         this.categoryMappingList.clear();
         this.menuList.clear();
         this.subwayStationPlaceList.clear();
         this.placeImageList.clear();
 
-        addChildren(categoryMappingList, subwayStationPlaceList, menuList, placeImageList);
+        addChildren(categoryMappingListToOverwrite, subwayStationPlaceList, menuList,
+            placeImageList);
     }
 }
