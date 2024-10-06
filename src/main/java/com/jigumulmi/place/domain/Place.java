@@ -5,7 +5,6 @@ import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
-import com.jigumulmi.place.vo.PlaceCategory;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -36,8 +35,6 @@ public class Place extends Timestamped {
     private Long id;
 
     private String name;
-
-    private PlaceCategory category;
 
     private String address; // 도로명 주소
 
@@ -104,9 +101,8 @@ public class Place extends Timestamped {
     private Boolean isFromAdmin;
 
     @Builder
-    public Place(String name, PlaceCategory category,
-        List<PlaceCategoryMapping> categoryMappingList, String address, String contact,
-        List<Menu> menuList,
+    public Place(String name, List<PlaceCategoryMapping> categoryMappingList, String address,
+        String contact, List<Menu> menuList,
         String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed,
         String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo,
         String placeUrl, Double longitude, Double latitude, String registrantComment,
@@ -116,7 +112,6 @@ public class Place extends Timestamped {
         Boolean isFromAdmin
     ) {
         this.name = name;
-        this.category = category;
         this.categoryMappingList = categoryMappingList;
         this.address = address;
         this.contact = contact;
@@ -144,10 +139,14 @@ public class Place extends Timestamped {
     public void addChildren(List<PlaceCategoryMapping> categoryMappingList,
         List<SubwayStationPlace> subwayStationPlaceList,
         List<Menu> menuList, List<PlaceImage> placeImageList) {
-        this.categoryMappingList = categoryMappingList;
-        this.menuList = menuList;
-        this.subwayStationPlaceList = subwayStationPlaceList;
-        this.placeImageList = placeImageList;
+        //this.categoryMappingList = categoryMappingList;
+        //this.menuList = menuList;
+        //this.subwayStationPlaceList = subwayStationPlaceList;
+        //this.placeImageList = placeImageList;
+        this.getCategoryMappingList().addAll(categoryMappingList);
+        this.getMenuList().addAll(menuList);
+        this.getSubwayStationPlaceList().addAll(subwayStationPlaceList);
+        this.getPlaceImageList().addAll(placeImageList);
     }
 
     public void adminUpdate(AdminUpdatePlaceRequestDto requestDto,
@@ -158,12 +157,8 @@ public class Place extends Timestamped {
         PositionDto position = requestDto.getPosition();
 
         this.name = requestDto.getName();
-        this.categoryMappingList.clear();
-        this.categoryMappingList.addAll(categoryMappingList);
         this.address = requestDto.getAddress();
         this.contact = requestDto.getContact();
-        this.menuList.clear();
-        this.menuList.addAll(menuList);
         this.openingHourSun = openingHour.getOpeningHourSun();
         this.openingHourMon = openingHour.getOpeningHourMon();
         this.openingHourTue = openingHour.getOpeningHourTue();
@@ -177,10 +172,15 @@ public class Place extends Timestamped {
         this.latitude = position.getLatitude();
         this.registrantComment = requestDto.getRegistrantComment();
         this.isApproved = requestDto.getIsApproved();
-        this.subwayStationPlaceList.clear();
-        this.subwayStationPlaceList.addAll(subwayStationPlaceList);
-        this.placeImageList.clear();
-        this.placeImageList.addAll(placeImageList);
         this.kakaoPlaceId = requestDto.getKakaoPlaceId();
+
+        // 실제 쿼리는 insert 후 delete가 이루어지므로
+        // 제약조건이 걸리는 경우 위배되지 않는 데이터만 addAll 해야한다
+        this.categoryMappingList.clear();
+        this.menuList.clear();
+        this.subwayStationPlaceList.clear();
+        this.placeImageList.clear();
+
+        addChildren(categoryMappingList, subwayStationPlaceList, menuList, placeImageList);
     }
 }
