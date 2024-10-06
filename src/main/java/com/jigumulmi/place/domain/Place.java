@@ -139,14 +139,10 @@ public class Place extends Timestamped {
     public void addChildren(List<PlaceCategoryMapping> categoryMappingList,
         List<SubwayStationPlace> subwayStationPlaceList,
         List<Menu> menuList, List<PlaceImage> placeImageList) {
-        //this.categoryMappingList = categoryMappingList;
-        //this.menuList = menuList;
-        //this.subwayStationPlaceList = subwayStationPlaceList;
-        //this.placeImageList = placeImageList;
-        this.getCategoryMappingList().addAll(categoryMappingList);
-        this.getMenuList().addAll(menuList);
-        this.getSubwayStationPlaceList().addAll(subwayStationPlaceList);
-        this.getPlaceImageList().addAll(placeImageList);
+        this.categoryMappingList.addAll(categoryMappingList);
+        this.menuList.addAll(menuList);
+        this.subwayStationPlaceList.addAll(subwayStationPlaceList);
+        this.placeImageList.addAll(placeImageList);
     }
 
     public void adminUpdate(AdminUpdatePlaceRequestDto requestDto,
@@ -176,6 +172,13 @@ public class Place extends Timestamped {
 
         // 실제 쿼리는 insert 후 delete가 이루어지므로
         // 제약조건이 걸리는 경우 위배되지 않는 데이터만 addAll 해야한다
+        // TODO 메서드화
+        List<PlaceCategoryMapping> intersectionWithElementsFromLeft = PlaceCategoryMapping.getIntersectionWithElementsFromLeft(
+            this.categoryMappingList, categoryMappingList);
+
+        categoryMappingList.removeAll(this.categoryMappingList);
+        categoryMappingList.addAll(intersectionWithElementsFromLeft);
+
         this.categoryMappingList.clear();
         this.menuList.clear();
         this.subwayStationPlaceList.clear();
