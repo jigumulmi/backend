@@ -36,7 +36,7 @@ public class CustomAdminRepository {
     public Page<PlaceDto> getPlaceList(Pageable pageable, AdminGetPlaceListRequestDto requestDto) {
         List<PlaceDto> content = queryFactory
             .selectFrom(place)
-            .join(place.categoryMappingList, placeCategoryMapping)
+            .leftJoin(place.categoryMappingList, placeCategoryMapping)
             .leftJoin(place.subwayStationPlaceList, subwayStationPlace)
             .on(place.id.eq(subwayStationPlace.place.id).and(subwayStationPlace.isMain.eq(true)))
             .leftJoin(subwayStationPlace.subwayStation, subwayStation)

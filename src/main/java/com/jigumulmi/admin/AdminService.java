@@ -28,8 +28,6 @@ import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
-import com.jigumulmi.place.vo.PlaceCategory;
-import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
