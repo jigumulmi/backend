@@ -39,8 +39,11 @@ import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.CurrentOpeningInfo;
+import com.jigumulmi.place.vo.PlaceCategory;
+import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import com.jigumulmi.place.vo.Reaction;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -91,8 +94,8 @@ public class PlaceService {
             .isMain(true)
             .build();
 
-        newPlace.addChildren(Collections.singletonList(subwayStationPlace), menuList,
-            null);
+        newPlace.addChildren(new ArrayList<>(), Collections.singletonList(subwayStationPlace),
+            menuList, new ArrayList<>());
 
         placeRepository.save(newPlace);
     }
@@ -158,7 +161,7 @@ public class PlaceService {
             .subwayStation(
                 place.getSubwayStation()
             )
-            .category(place.getCategory())
+            .categoryList(place.getCategoryList())
             .address(place.getAddress())
             .contact(place.getContact())
             .menuList(menuList)
@@ -294,5 +297,14 @@ public class PlaceService {
     public void deleteReviewReplyLike(Long reviewReplyReactionId, Member member) {
 
         reviewReplyReactionRepository.deleteByIdAndMemberId(reviewReplyReactionId, member.getId());
+    }
+
+    public List<PlaceCategoryGroup> getPlaceCategoryGroupList() {
+        return Arrays.stream(PlaceCategoryGroup.values()).toList();
+    }
+
+    public List<PlaceCategory> getPlaceCategoryList(PlaceCategoryGroup placeCategoryGroup) {
+        return placeCategoryGroup.getPlaceCategoryList();
+
     }
 }

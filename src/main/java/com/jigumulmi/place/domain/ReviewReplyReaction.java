@@ -28,7 +28,7 @@ public class ReviewReplyReaction extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String category;
+    private String category; // TODO @Converter 사용
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")

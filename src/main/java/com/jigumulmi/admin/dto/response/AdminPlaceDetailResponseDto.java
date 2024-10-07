@@ -21,7 +21,6 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
     private String registrantComment;
     private Boolean isApproved;
     private String kakaoPlaceId;
-    private String googlePlaceId;
     private String placeUrl;
 
     public static AdminPlaceDetailResponseDto from(Place place) {
@@ -42,12 +41,15 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
 
         List<ImageDto> imageList = place.getPlaceImageList().stream().map(ImageDto::from).toList();
 
+        List<CategoryDto> categoryList = place.getCategoryMappingList().stream()
+            .map(CategoryDto::fromPlaceCategoryMapping).toList();
+
         return AdminPlaceDetailResponseDto.builder()
             .createdAt(place.getCreatedAt())
             .modifiedAt(place.getModifiedAt())
             .id(place.getId())
             .name(place.getName())
-            .category(place.getCategory())
+            .categoryList(categoryList)
             .address(place.getAddress())
             .contact(place.getContact())
             .imageList(imageList)
@@ -74,7 +76,6 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
             .subwayStationList(subwayStationDtoList)
             .menuList(menuList)
             .kakaoPlaceId(place.getKakaoPlaceId())
-            .googlePlaceId(place.getGooglePlaceId())
             .placeUrl(place.getPlaceUrl())
             .build();
     }

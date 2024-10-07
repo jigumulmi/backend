@@ -1,6 +1,7 @@
 package com.jigumulmi.admin.dto.request;
 
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,7 @@ public class AdminCreatePlaceRequestDto {
     }
 
     private String name;
-    private String category;
+    private List<CategoryDto> categoryList;
     private String address;
     private String contact;
     private List<String> menuList = new ArrayList<>();

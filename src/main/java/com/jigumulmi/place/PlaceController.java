@@ -14,6 +14,8 @@ import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import com.jigumulmi.place.vo.PlaceCategory;
+import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -63,6 +65,30 @@ public class PlaceController {
     public ResponseEntity<?> registerPlace(@Valid @RequestBody CreatePlaceRequestDto requestDto) {
         placeService.registerPlace(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Register success");
+    }
+
+    @Operation(summary = "장소 상위 카테고리 조회")
+    @ApiResponses(
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = PlaceCategoryGroup.class)))})}
+    )
+    @GetMapping("/category-group")
+    public ResponseEntity<?> getPlaceCategoryGroupList() {
+        List<PlaceCategoryGroup> placeCategoryGroupList = placeService.getPlaceCategoryGroupList();
+        return ResponseEntity.ok().body(placeCategoryGroupList);
+    }
+
+    @Operation(summary = "장소 하위 카테고리 조회")
+    @ApiResponses(
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = PlaceCategory.class)))})}
+    )
+    @GetMapping("/category")
+    public ResponseEntity<?> getPlaceCategoryList(
+        @RequestParam(name = "placeCategoryGroup") PlaceCategoryGroup placeCategoryGroup) {
+        List<PlaceCategory> placeCategoryList = placeService.getPlaceCategoryList(
+            placeCategoryGroup);
+        return ResponseEntity.ok().body(placeCategoryList);
     }
 
     @Operation(summary = "장소 리스트 조회")

@@ -1,6 +1,9 @@
 package com.jigumulmi.place.dto.response;
 
+import com.jigumulmi.place.domain.PlaceCategoryMapping;
 import com.jigumulmi.place.domain.PlaceImage;
+import com.jigumulmi.place.vo.PlaceCategory;
+import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +17,20 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 public class PlaceResponseDto {
+
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CategoryDto {
+
+        private PlaceCategoryGroup categoryGroup;
+        private PlaceCategory category;
+
+        public static CategoryDto fromPlaceCategoryMapping(PlaceCategoryMapping mapping) {
+            return CategoryDto.builder().categoryGroup(mapping.getCategoryGroup()).category(mapping.getCategory()).build();
+        }
+    }
 
     @Getter
     @Builder
@@ -68,7 +85,7 @@ public class PlaceResponseDto {
 
     private SubwayStationResponseDto subwayStation;
 
-    private String category;
+    private List<CategoryDto> categoryList;
 
     private SurroundingDateOpeningHour surroundingDateOpeningHour;
 

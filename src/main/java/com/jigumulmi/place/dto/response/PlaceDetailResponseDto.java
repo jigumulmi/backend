@@ -52,8 +52,6 @@ public class PlaceDetailResponseDto extends PlaceResponseDto {
         private String openingHourSat;
     }
 
-    private String category;
-
     private String address;
 
     private String contact;
