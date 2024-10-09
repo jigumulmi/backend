@@ -30,6 +30,7 @@ import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -50,7 +51,7 @@ public class AdminService {
     private final SubwayStationRepository subwayStationRepository;
 
     public AdminMemberListResponseDto getMemberList(AdminGetMemberListRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage(), DEFAULT_PAGE_SIZE,
+        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
         Page<MemberDto> memberPage = memberRepository.findAll(pageable).map(MemberDto::from);
@@ -59,7 +60,7 @@ public class AdminService {
             .data(memberPage.getContent())
             .page(PageDto.builder()
                 .totalCount(memberPage.getTotalElements())
-                .currentPage(requestDto.getPage() + 1)
+                .currentPage(requestDto.getPage())
                 .totalPage(memberPage.getTotalPages())
                 .build()
             )
@@ -68,17 +69,20 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public AdminPlaceListResponseDto getPlaceList(AdminGetPlaceListRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage(), DEFAULT_PAGE_SIZE,
+        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
-        Page<PlaceDto> placePage = customAdminRepository.getPlaceList(pageable,
+        Page<Place> placePage = customAdminRepository.getPlaceList(pageable,
             requestDto);
 
+        List<PlaceDto> placeDtoList = placePage.getContent().stream()
+            .map(PlaceDto::from).collect(Collectors.toList());
+
         return AdminPlaceListResponseDto.builder()
-            .data(placePage.getContent())
+            .data(placeDtoList)
             .page(PageDto.builder()
                 .totalCount(placePage.getTotalElements())
-                .currentPage(requestDto.getPage() + 1)
+                .currentPage(requestDto.getPage())
                 .totalPage(placePage.getTotalPages())
                 .build()
             )

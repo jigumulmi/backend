@@ -24,11 +24,13 @@ import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
@@ -108,6 +110,17 @@ public class PlaceService {
             List<ImageDto> imageList = responseDto.getImageList();
             responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
 
+            List<CategoryDto> distinctCategoryList = responseDto.getCategoryList().stream()
+                .distinct().toList();
+            responseDto.setCategoryList(distinctCategoryList);
+
+            SubwayStationResponseDto subwayStation = responseDto.getSubwayStation();
+            List<SubwayStationLineDto> distinctLineList = subwayStation.getSubwayStationLineList()
+                .stream()
+                .distinct().toList();
+            subwayStation.setSubwayStationLineList(distinctLineList);
+            responseDto.setSubwayStation(subwayStation);
+
             SurroundingDateOpeningHour surroundingDateOpeningHour = responseDto.getSurroundingDateOpeningHour();
             String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
                 surroundingDateOpeningHour);
@@ -121,9 +134,14 @@ public class PlaceService {
     public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
         PlaceDetailResponseDto place = customPlaceRepository.getPlaceDetail(placeId);
 
-        SurroundingDateOpeningHour surroundingDateOpeningHour = place.getSurroundingDateOpeningHour();
-        String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
-            surroundingDateOpeningHour);
+        List<CategoryDto> distinctCategoryList = place.getCategoryList().stream().distinct()
+            .toList();
+
+        SubwayStationResponseDto subwayStation = place.getSubwayStation();
+        List<SubwayStationLineDto> distinctLineList = subwayStation.getSubwayStationLineList()
+            .stream()
+            .distinct().toList();
+        subwayStation.setSubwayStationLineList(distinctLineList);
 
         List<MenuDto> menuList = menuRepository.findAllByPlaceId(placeId).stream()
             .map(MenuDto::from).toList();
@@ -151,6 +169,10 @@ public class PlaceService {
             .statistics(reviewRatingStatMap)
             .build();
 
+        SurroundingDateOpeningHour surroundingDateOpeningHour = place.getSurroundingDateOpeningHour();
+        String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
+            surroundingDateOpeningHour);
+
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
             .name(place.getName())
@@ -158,10 +180,8 @@ public class PlaceService {
             .position(
                 place.getPosition()
             )
-            .subwayStation(
-                place.getSubwayStation()
-            )
-            .categoryList(place.getCategoryList())
+            .subwayStation(subwayStation)
+            .categoryList(distinctCategoryList)
             .address(place.getAddress())
             .contact(place.getContact())
             .menuList(menuList)

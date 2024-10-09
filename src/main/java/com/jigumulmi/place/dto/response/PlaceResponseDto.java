@@ -7,6 +7,7 @@ import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,6 +23,7 @@ public class PlaceResponseDto {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
+    @EqualsAndHashCode
     public static class CategoryDto {
 
         private PlaceCategoryGroup categoryGroup;
@@ -83,8 +85,10 @@ public class PlaceResponseDto {
 
     private PositionDto position;
 
+    @Setter
     private SubwayStationResponseDto subwayStation;
 
+    @Setter
     private List<CategoryDto> categoryList;
 
     private SurroundingDateOpeningHour surroundingDateOpeningHour;
