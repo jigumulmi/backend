@@ -51,7 +51,7 @@ public class AdminService {
     private final SubwayStationRepository subwayStationRepository;
 
     public AdminMemberListResponseDto getMemberList(AdminGetMemberListRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage(), DEFAULT_PAGE_SIZE,
+        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
         Page<MemberDto> memberPage = memberRepository.findAll(pageable).map(MemberDto::from);
@@ -60,7 +60,7 @@ public class AdminService {
             .data(memberPage.getContent())
             .page(PageDto.builder()
                 .totalCount(memberPage.getTotalElements())
-                .currentPage(requestDto.getPage() + 1)
+                .currentPage(requestDto.getPage())
                 .totalPage(memberPage.getTotalPages())
                 .build()
             )

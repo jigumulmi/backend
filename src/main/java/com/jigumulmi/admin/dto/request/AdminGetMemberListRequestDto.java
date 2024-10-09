@@ -16,9 +16,9 @@ import org.springframework.data.domain.Sort.Direction;
 @ParameterObject
 public class AdminGetMemberListRequestDto {
 
-    @Parameter(description = "0부터 시작하는 페이지 번호")
-    @Schema(defaultValue = "0")
-    private int page = 0;
+    @Parameter(description = "1부터 시작하는 페이지 번호")
+    @Schema(defaultValue = "1")
+    private int page = 1;
 
     @Parameter(description = "id 기준 오름차순/내림차순")
     @Schema(defaultValue = "ASC")
