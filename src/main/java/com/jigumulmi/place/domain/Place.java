@@ -21,7 +21,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
@@ -73,7 +72,6 @@ public class Place extends Timestamped {
     @JsonManagedReference
     private List<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
 
-    @BatchSize(size = 10)
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Menu> menuList = new ArrayList<>();
@@ -82,13 +80,11 @@ public class Place extends Timestamped {
     @JsonManagedReference
     private List<Review> reviewList = new ArrayList<>();
 
-    @BatchSize(size = 10)
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("isMain DESC")
     @JsonManagedReference
     private List<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
 
-    @BatchSize(size = 10)
     @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("isMain DESC")
     @JsonManagedReference

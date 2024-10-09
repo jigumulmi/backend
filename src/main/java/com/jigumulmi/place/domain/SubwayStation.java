@@ -13,7 +13,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.BatchSize;
 
 @Entity
 @Getter
@@ -26,7 +25,6 @@ public class SubwayStation {
 
     private String stationName;
 
-    @BatchSize(size = 10)
     @OneToMany(mappedBy = "subwayStation")
     @OrderBy("isMain DESC")
     @JsonManagedReference

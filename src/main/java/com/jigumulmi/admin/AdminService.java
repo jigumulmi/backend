@@ -26,10 +26,12 @@ import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -68,17 +70,32 @@ public class AdminService {
 
     @Transactional(readOnly = true)
     public AdminPlaceListResponseDto getPlaceList(AdminGetPlaceListRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage(), DEFAULT_PAGE_SIZE,
+        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
             Sort.by(requestDto.getDirection(), "id"));
 
-        Page<PlaceDto> placePage = customAdminRepository.getPlaceList(pageable,
+        Page<Place> placePage = customAdminRepository.getPlaceList(pageable,
             requestDto);
 
+        List<PlaceDto> placeDtoList = placePage.getContent().stream()
+            .map(p -> PlaceDto.builder()
+                .id(p.getId())
+                .name(p.getName())
+                .position(
+                    PositionDto.builder().latitude(p.getLatitude()).longitude(p.getLongitude())
+                        .build())
+                .subwayStation(SubwayStationResponseDto.from(
+                    p.getSubwayStationPlaceList().getFirst().getSubwayStation()))
+                .categoryList(p.getCategoryMappingList().stream()
+                    .map(CategoryDto::fromPlaceCategoryMapping).toList())
+                .isApproved(p.getIsApproved())
+                .build()
+            ).collect(Collectors.toList());
+
         return AdminPlaceListResponseDto.builder()
-            .data(placePage.getContent())
+            .data(placeDtoList)
             .page(PageDto.builder()
                 .totalCount(placePage.getTotalElements())
-                .currentPage(requestDto.getPage() + 1)
+                .currentPage(requestDto.getPage())
                 .totalPage(placePage.getTotalPages())
                 .build()
             )
