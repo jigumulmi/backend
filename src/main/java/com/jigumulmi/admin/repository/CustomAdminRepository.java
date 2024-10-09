@@ -36,7 +36,7 @@ public class CustomAdminRepository {
             ;
 
         JPAQuery<Long> totalCountQuery = queryFactory
-            .select(place.countDistinct())
+            .select(place.count())
             .from(place)
             .where(place.isFromAdmin.eq(requestDto.getIsFromAdmin())
                 .and(placeCondition(requestDto.getPlaceName()))

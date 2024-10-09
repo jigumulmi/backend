@@ -26,7 +26,6 @@ import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
-import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import java.util.ArrayList;
@@ -77,19 +76,7 @@ public class AdminService {
             requestDto);
 
         List<PlaceDto> placeDtoList = placePage.getContent().stream()
-            .map(p -> PlaceDto.builder()
-                .id(p.getId())
-                .name(p.getName())
-                .position(
-                    PositionDto.builder().latitude(p.getLatitude()).longitude(p.getLongitude())
-                        .build())
-                .subwayStation(SubwayStationResponseDto.from(
-                    p.getSubwayStationPlaceList().getFirst().getSubwayStation()))
-                .categoryList(p.getCategoryMappingList().stream()
-                    .map(CategoryDto::fromPlaceCategoryMapping).toList())
-                .isApproved(p.getIsApproved())
-                .build()
-            ).collect(Collectors.toList());
+            .map(PlaceDto::from).collect(Collectors.toList());
 
         return AdminPlaceListResponseDto.builder()
             .data(placeDtoList)
