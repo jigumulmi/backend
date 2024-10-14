@@ -3,7 +3,6 @@ package com.jigumulmi.admin.repository;
 
 import static com.jigumulmi.config.querydsl.Utils.getOrderSpecifier;
 import static com.jigumulmi.place.domain.QPlace.place;
-import static com.querydsl.core.types.dsl.Expressions.TRUE;
 
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.place.domain.Place;
@@ -47,7 +46,7 @@ public class CustomAdminRepository {
 
     public BooleanExpression placeCondition(String placeName) {
         if (placeName == null) {
-            return TRUE;
+            return null;
         } else {
             return place.name.startsWith(placeName);
         }

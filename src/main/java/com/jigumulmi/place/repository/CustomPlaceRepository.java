@@ -21,6 +21,7 @@ import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
+import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
@@ -32,6 +33,7 @@ import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
+import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
@@ -50,7 +52,7 @@ public class CustomPlaceRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<PlaceResponseDto> getPlaceList(Long subwayStationId) {
+    public List<PlaceResponseDto> getPlaceList(GetPlaceListRequestDto requestDto) {
 
         return queryFactory
             .selectFrom(place)
@@ -62,7 +64,11 @@ public class CustomPlaceRepository {
             .join(subwayStationPlace.subwayStation, subwayStation)
             .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
             .join(subwayStationLineMapping.subwayStationLine, subwayStationLine)
-            .where(place.isApproved.eq(true), placeCondition(subwayStationId))
+            .where(place.isApproved.eq(true),
+                subwayStationCondition(requestDto.getSubwayStationId()),
+                categoryGroupCondition(requestDto.getCategoryGroup()),
+                nameCondition(requestDto.getPlaceName())
+            )
             .transform(
                 groupBy(place.id).list(
                     Projections.fields(PlaceResponseDto.class,
@@ -101,7 +107,7 @@ public class CustomPlaceRepository {
             );
     }
 
-    public BooleanExpression placeCondition(Long subwayStationId) {
+    public BooleanExpression subwayStationCondition(Long subwayStationId) {
         if (subwayStationId == null) {
             return null;
         } else {
@@ -112,6 +118,22 @@ public class CustomPlaceRepository {
                     .join(place.subwayStationPlaceList, subwayStationPlace)
                     .where(subwayStationPlace.subwayStation.id.eq(subwayStationId))
             );
+        }
+    }
+
+    public BooleanExpression nameCondition(String placeName) {
+        if (placeName == null) {
+            return null;
+        } else {
+            return place.name.startsWith(placeName);
+        }
+    }
+
+    public BooleanExpression categoryGroupCondition(PlaceCategoryGroup categoryGroup) {
+        if (categoryGroup == null) {
+            return null;
+        } else {
+            return placeCategoryMapping.categoryGroup.eq(categoryGroup);
         }
     }
 
