@@ -3,7 +3,6 @@ package com.jigumulmi.admin.repository;
 
 import static com.jigumulmi.config.querydsl.Utils.getOrderSpecifier;
 import static com.jigumulmi.place.domain.QPlace.place;
-import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
 
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.place.domain.Place;
@@ -30,7 +29,6 @@ public class CustomAdminRepository {
     public Page<Place> getPlaceList(Pageable pageable, AdminGetPlaceListRequestDto requestDto) {
         List<Place> content = queryFactory
             .selectFrom(place)
-            .join(place.categoryMappingList, placeCategoryMapping)
             .where(placeCondition(requestDto))
             .orderBy(getOrderSpecifier(pageable.getSort(), Expressions.path(Place.class, "place")))
             .offset(pageable.getOffset())
@@ -40,7 +38,6 @@ public class CustomAdminRepository {
         JPAQuery<Long> totalCountQuery = queryFactory
             .select(place.count())
             .from(place)
-            .join(place.categoryMappingList, placeCategoryMapping)
             .where(placeCondition(requestDto)
             );
 

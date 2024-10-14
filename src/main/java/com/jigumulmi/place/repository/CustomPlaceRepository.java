@@ -113,9 +113,8 @@ public class CustomPlaceRepository {
         } else {
             return place.id.in(
                 JPAExpressions
-                    .select(place.id)
-                    .from(place)
-                    .join(place.subwayStationPlaceList, subwayStationPlace)
+                    .select(subwayStationPlace.place.id)
+                    .from(subwayStationPlace)
                     .where(subwayStationPlace.subwayStation.id.eq(subwayStationId))
             );
         }
@@ -133,7 +132,12 @@ public class CustomPlaceRepository {
         if (categoryGroup == null) {
             return null;
         } else {
-            return placeCategoryMapping.categoryGroup.eq(categoryGroup);
+            return place.id.in(
+                JPAExpressions
+                    .select(placeCategoryMapping.place.id)
+                    .from(placeCategoryMapping)
+                    .where(placeCategoryMapping.categoryGroup.eq(categoryGroup))
+            );
         }
     }
 
