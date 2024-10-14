@@ -2,18 +2,20 @@ package com.jigumulmi.admin;
 
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminDeletePlaceRequestDto;
-import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
+import com.jigumulmi.config.common.PageableParams;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,10 +39,11 @@ public class AdminController {
         value = {@ApiResponse(responseCode = "200", content = {
             @Content(schema = @Schema(implementation = AdminMemberListResponseDto.class))})}
     )
+    @PageableParams
     @GetMapping("/member")
     public ResponseEntity<?> getMemberList(
-        @ModelAttribute AdminGetMemberListRequestDto requestDto) {
-        AdminMemberListResponseDto memberList = adminService.getMemberList(requestDto);
+        @ParameterObject Pageable pageable) {
+        AdminMemberListResponseDto memberList = adminService.getMemberList(pageable);
         return ResponseEntity.ok().body(memberList);
     }
 
@@ -50,9 +53,12 @@ public class AdminController {
         value = {@ApiResponse(responseCode = "200", content = {
             @Content(schema = @Schema(implementation = AdminPlaceListResponseDto.class))})}
     )
+    @PageableParams
     @GetMapping("/place")
-    public ResponseEntity<?> getPlaceList(@ModelAttribute AdminGetPlaceListRequestDto requestDto) {
-        AdminPlaceListResponseDto placeList = adminService.getPlaceList(requestDto);
+    public ResponseEntity<?> getPlaceList(
+        @ParameterObject Pageable pageable,
+        @ModelAttribute AdminGetPlaceListRequestDto requestDto) {
+        AdminPlaceListResponseDto placeList = adminService.getPlaceList(pageable, requestDto);
         return ResponseEntity.ok().body(placeList);
     }
 
