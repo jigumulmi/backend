@@ -15,9 +15,10 @@ import org.springdoc.core.annotations.ParameterObject;
 @ParameterObject
 public class GetPlaceListRequestDto {
 
+    @Parameter(description = "지하철 ID")
     private Long subwayStationId;
 
-    @Parameter(description = "장소 이름 검색어, 검색어로 시작하는 장소 조회")
+    @Parameter(description = "장소 이름, 검색어로 시작하는 장소 조회")
     private String placeName;
 
     @Parameter(description = "장소 상위 카테고리")
