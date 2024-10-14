@@ -25,7 +25,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -98,7 +97,7 @@ public class PlaceController {
     )
     @GetMapping("")
     public ResponseEntity<?> getPlaceList(
-        @ParameterObject @ModelAttribute GetPlaceListRequestDto requestDto) {
+        @ModelAttribute GetPlaceListRequestDto requestDto) {
         List<PlaceResponseDto> placeList = placeService.getPlaceList(requestDto);
         return ResponseEntity.ok().body(placeList);
     }

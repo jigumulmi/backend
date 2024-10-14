@@ -3,10 +3,10 @@ package com.jigumulmi.admin.repository;
 
 import static com.jigumulmi.config.querydsl.Utils.getOrderSpecifier;
 import static com.jigumulmi.place.domain.QPlace.place;
-import static com.querydsl.core.types.dsl.Expressions.TRUE;
 
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -24,32 +24,32 @@ public class CustomAdminRepository {
 
     private final JPAQueryFactory queryFactory;
 
+    private final CustomPlaceRepository customPlaceRepository;
+
     public Page<Place> getPlaceList(Pageable pageable, AdminGetPlaceListRequestDto requestDto) {
         List<Place> content = queryFactory
             .selectFrom(place)
-            .where(place.isFromAdmin.eq(requestDto.getIsFromAdmin())
-                .and(placeCondition(requestDto.getPlaceName())))
+            .where(placeCondition(requestDto))
             .orderBy(getOrderSpecifier(pageable.getSort(), Expressions.path(Place.class, "place")))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
-            .fetch()
-            ;
+            .fetch();
 
         JPAQuery<Long> totalCountQuery = queryFactory
             .select(place.count())
             .from(place)
-            .where(place.isFromAdmin.eq(requestDto.getIsFromAdmin())
-                .and(placeCondition(requestDto.getPlaceName()))
+            .where(placeCondition(requestDto)
             );
 
         return PageableExecutionUtils.getPage(content, pageable, totalCountQuery::fetchOne);
     }
 
-    public BooleanExpression placeCondition(String placeName) {
-        if (placeName == null) {
-            return TRUE;
-        } else {
-            return place.name.startsWith(placeName);
-        }
+    public BooleanExpression placeCondition(AdminGetPlaceListRequestDto requestDto) {
+        return (
+            place.isFromAdmin.eq(requestDto.getIsFromAdmin())
+                .and(customPlaceRepository.subwayStationCondition(requestDto.getSubwayStationId()))
+                .and(customPlaceRepository.categoryGroupCondition(requestDto.getCategoryGroup()))
+                .and(customPlaceRepository.nameCondition(requestDto.getPlaceName()))
+        );
     }
 }

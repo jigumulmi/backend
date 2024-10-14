@@ -4,7 +4,6 @@ package com.jigumulmi.admin;
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.ImageRequestDto;
 import com.jigumulmi.admin.dto.request.AdminDeletePlaceRequestDto;
-import com.jigumulmi.admin.dto.request.AdminGetMemberListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
@@ -33,9 +32,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,24 +40,19 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AdminService {
 
-    private final int DEFAULT_PAGE_SIZE = 15;
-
     private final CustomAdminRepository customAdminRepository;
     private final MemberRepository memberRepository;
     private final PlaceRepository placeRepository;
     private final SubwayStationRepository subwayStationRepository;
 
-    public AdminMemberListResponseDto getMemberList(AdminGetMemberListRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
-            Sort.by(requestDto.getDirection(), "id"));
-
+    public AdminMemberListResponseDto getMemberList(Pageable pageable) {
         Page<MemberDto> memberPage = memberRepository.findAll(pageable).map(MemberDto::from);
 
         return AdminMemberListResponseDto.builder()
             .data(memberPage.getContent())
             .page(PageDto.builder()
                 .totalCount(memberPage.getTotalElements())
-                .currentPage(requestDto.getPage())
+                .currentPage(pageable.getPageNumber() + 1)
                 .totalPage(memberPage.getTotalPages())
                 .build()
             )
@@ -68,10 +60,7 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public AdminPlaceListResponseDto getPlaceList(AdminGetPlaceListRequestDto requestDto) {
-        Pageable pageable = PageRequest.of(requestDto.getPage() - 1, DEFAULT_PAGE_SIZE,
-            Sort.by(requestDto.getDirection(), "id"));
-
+    public AdminPlaceListResponseDto getPlaceList(Pageable pageable, AdminGetPlaceListRequestDto requestDto) {
         Page<Place> placePage = customAdminRepository.getPlaceList(pageable,
             requestDto);
 
@@ -82,7 +71,7 @@ public class AdminService {
             .data(placeDtoList)
             .page(PageDto.builder()
                 .totalCount(placePage.getTotalElements())
-                .currentPage(requestDto.getPage())
+                .currentPage(pageable.getPageNumber() + 1)
                 .totalPage(placePage.getTotalPages())
                 .build()
             )
