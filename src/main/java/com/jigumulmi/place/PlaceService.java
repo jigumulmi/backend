@@ -103,9 +103,7 @@ public class PlaceService {
     }
 
     public List<PlaceResponseDto> getPlaceList(GetPlaceListRequestDto requestDto) {
-        Long subwayStationId = requestDto.getSubwayStationId();
-
-        List<PlaceResponseDto> placeList = customPlaceRepository.getPlaceList(subwayStationId);
+        List<PlaceResponseDto> placeList = customPlaceRepository.getPlaceList(requestDto);
         for (PlaceResponseDto responseDto : placeList) {
             List<ImageDto> imageList = responseDto.getImageList();
             responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
