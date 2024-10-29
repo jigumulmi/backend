@@ -13,6 +13,9 @@ public enum PlaceCategory {
     JAPANESE_FOOD("일식"),
     CHINESE_FOOD("중식"),
     WESTERN_FOOD("양식"),
+    ASIAN_FOOD("아시안"),
+    SANDWICH("샌드위치"),
+    SALAD("샐러드"),
     //
     BEVERAGE("음료"),
     SNACK("간식"),
