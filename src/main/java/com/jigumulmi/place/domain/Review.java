@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -58,10 +60,15 @@ public class Review extends Timestamped {
     @JsonManagedReference
     private List<ReviewReaction> reviewReactionList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("createdAt DESC")
+    @JsonManagedReference
+    private List<ReviewImage> reviewImageList = new ArrayList<>();
+
     @Builder
     public Review(Integer rating, String content, Member member, Place place,
         List<ReviewReply> reviewReplyList, LocalDateTime deletedAt,
-        List<ReviewReaction> reviewReactionList) {
+        List<ReviewReaction> reviewReactionList, List<ReviewImage> reviewImageList) {
         this.rating = rating;
         this.content = content;
         this.member = member;
@@ -69,7 +76,9 @@ public class Review extends Timestamped {
         this.reviewReplyList = reviewReplyList;
         this.deletedAt = deletedAt;
         this.reviewReactionList = reviewReactionList;
+        this.reviewImageList = reviewImageList;
     }
+
 
     public void updateReview(Integer rating, String content) {
         if (rating != null) {
