@@ -108,10 +108,11 @@ public class Place extends Timestamped {
         Boolean isFromAdmin
     ) {
         this.name = name;
-        this.categoryMappingList = categoryMappingList;
+        this.categoryMappingList =
+            categoryMappingList != null ? categoryMappingList : new ArrayList<>();
         this.address = address;
         this.contact = contact;
-        this.menuList = menuList;
+        this.menuList = menuList != null ? menuList : new ArrayList<>();
         this.openingHourSun = openingHourSun;
         this.openingHourMon = openingHourMon;
         this.openingHourTue = openingHourTue;
@@ -125,9 +126,10 @@ public class Place extends Timestamped {
         this.latitude = latitude;
         this.registrantComment = registrantComment;
         this.isApproved = (isApproved != null) ? isApproved : false;
-        this.reviewList = reviewList;
-        this.subwayStationPlaceList = subwayStationPlaceList;
-        this.placeImageList = placeImageList;
+        this.reviewList = reviewList != null ? reviewList : new ArrayList<>();
+        this.subwayStationPlaceList =
+            subwayStationPlaceList != null ? subwayStationPlaceList : new ArrayList<>();
+        this.placeImageList = placeImageList != null ? placeImageList : new ArrayList<>();
         this.kakaoPlaceId = kakaoPlaceId;
         this.isFromAdmin = (isFromAdmin != null) ? isFromAdmin : false;
     }
