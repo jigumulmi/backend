@@ -1,6 +1,5 @@
 package com.jigumulmi.config.security;
 
-import com.jigumulmi.config.swagger.SwaggerBasicAuthFilter;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final SwaggerBasicAuthFilter swaggerBasicAuthFilter;
+    private final HttpTestBasicAuthFilter httpTestBasicAuthFilter;
 
     private final String[] origins = new String[]{"http://localhost:3000", "https://jigumulmi.com",
         "https://www.jigumulmi.com", "https://dev.jigumulmi.com"};
@@ -59,7 +58,7 @@ public class SecurityConfig {
             .httpBasic(HttpBasicConfigurer::disable)
             .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-            .addFilterBefore(swaggerBasicAuthFilter,
+            .addFilterBefore(httpTestBasicAuthFilter,
                 UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/admin/*").hasRole("ADMIN")

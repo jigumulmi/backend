@@ -1,6 +1,5 @@
-package com.jigumulmi.config.swagger;
+package com.jigumulmi.config.security;
 
-import com.jigumulmi.config.security.UserDetailsServiceImpl;
 import com.jigumulmi.member.domain.Member;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,7 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
-public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
+public class HttpTestBasicAuthFilter extends OncePerRequestFilter {
 
     @Value("${swagger.password}")
     private String swaggerPassword;
@@ -32,8 +31,13 @@ public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
             String referer = request.getHeader("Referer");
             boolean isFromSwagger = referer.endsWith("/swagger-ui/index.html");
 
+            String userAgent = request.getHeader("User-Agent");
+            boolean isFromPostman = userAgent.startsWith("PostmanRuntime");
+
+            boolean isTesting = isFromSwagger || isFromPostman;
+
             String authHeader = request.getHeader("Authorization");
-            if (authHeader != null && authHeader.startsWith("Basic ") && isFromSwagger) {
+            if (authHeader.startsWith("Basic ") && isTesting) {
                 String[] credentials = extractAndDecodeHeader(authHeader);
                 String password = credentials[1];
                 if (password.equals(swaggerPassword)) {
@@ -41,8 +45,8 @@ public class SwaggerBasicAuthFilter extends OncePerRequestFilter {
                     Long id = Long.valueOf(username);
 
                     HttpSession session = request.getSession();
-                    Member swaggerMember = new Member(id, "swagger");
-                    UserDetailsServiceImpl.setSecurityContextAndSession(swaggerMember, session);
+                    Member testMember = new Member(id, "testMember");
+                    UserDetailsServiceImpl.setSecurityContextAndSession(testMember, session);
                 }
             }
         } catch (Exception e) {
