@@ -11,7 +11,6 @@ import org.springframework.web.multipart.MultipartFile;
 @Getter
 public class CreateReviewRequestDto {
     @Schema(name = "image", requiredMode = RequiredMode.NOT_REQUIRED)
-    @NotNull
     private List<MultipartFile> imageList;
 
     @NotNull

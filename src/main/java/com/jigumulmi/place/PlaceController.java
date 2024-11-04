@@ -120,7 +120,7 @@ public class PlaceController {
     @PostMapping(path = "/review", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> postReview(
         @Valid @ModelAttribute CreateReviewRequestDto requestDto,
-        @RequiredAuthUser Member member) throws IOException {
+        @RequiredAuthUser Member member) {
         placeService.postReview(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
     }

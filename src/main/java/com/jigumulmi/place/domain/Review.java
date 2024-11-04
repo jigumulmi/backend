@@ -73,12 +73,12 @@ public class Review extends Timestamped {
         this.content = content;
         this.member = member;
         this.place = place;
-        this.reviewReplyList = reviewReplyList;
+        this.reviewReplyList = reviewReplyList != null ? reviewReplyList : new ArrayList<>();
         this.deletedAt = deletedAt;
-        this.reviewReactionList = reviewReactionList;
-        this.reviewImageList = reviewImageList;
+        this.reviewReactionList =
+            reviewReactionList != null ? reviewReactionList : new ArrayList<>();
+        this.reviewImageList = reviewImageList != null ? reviewImageList : new ArrayList<>();
     }
-
 
     public void updateReview(Integer rating, String content) {
         if (rating != null) {
@@ -91,5 +91,9 @@ public class Review extends Timestamped {
 
     public void deleteReviewWithReplies() {
         this.deletedAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+    }
+
+    public void addReviewImageList(List<ReviewImage> reviewImageList) {
+        this.reviewImageList.addAll(reviewImageList);
     }
 }

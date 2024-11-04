@@ -9,6 +9,7 @@ import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.Review;
+import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.ReviewReaction;
 import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.domain.ReviewReplyReaction;
@@ -55,7 +56,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -206,22 +209,8 @@ public class PlaceService {
             .build();
     }
 
-    public void postReview(CreateReviewRequestDto requestDto, Member member) throws IOException {
-        for (MultipartFile image : requestDto.getImageList()) {
-            String s3Key = "reviewImage/" + requestDto.getPlaceId() + "/" + UUID.randomUUID();
-
-            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucket)
-                .key(s3Key)
-                .contentType(image.getContentType())
-                .contentLength(image.getSize())
-                .build();
-
-            PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest,
-                RequestBody.fromInputStream(image.getInputStream(), image.getSize())
-            );
-        }
-
+    @Transactional
+    public void postReview(CreateReviewRequestDto requestDto, Member member) {
         boolean canPostReview = reviewRepository.findTopByPlaceIdAndMemberIdAndDeletedAtIsNull(
             requestDto.getPlaceId(),
             member.getId()
@@ -235,8 +224,45 @@ public class PlaceService {
                 .content(requestDto.getContent())
                 .rating(requestDto.getRating())
                 .member(member)
-                .reviewReplyList(Collections.emptyList())
                 .build();
+
+            ArrayList<String> s3KeyList = new ArrayList<>();
+            try {
+                for (MultipartFile image : requestDto.getImageList()) {
+                    String fileExtension = StringUtils.getFilenameExtension(
+                        image.getOriginalFilename());
+                    String s3Key =
+                        "reviewImage/" + requestDto.getPlaceId() + "/" + UUID.randomUUID() + "."
+                            + fileExtension;
+
+                    s3KeyList.add(s3Key);
+
+                    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(s3Key)
+                        .contentType(image.getContentType())
+                        .contentLength(image.getSize())
+                        .build();
+
+                    PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest,
+                        RequestBody.fromInputStream(image.getInputStream(), image.getSize())
+                    );
+                }
+            } catch (SdkException | IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            List<ReviewImage> reviewImageList = new ArrayList<>();
+            for (String s3Key : s3KeyList) {
+                reviewImageList.add(
+                    ReviewImage.builder()
+                        .s3Key(s3Key)
+                        .review(review)
+                        .build()
+                );
+            }
+
+            review.addReviewImageList(reviewImageList);
 
             reviewRepository.save(review);
         } else {

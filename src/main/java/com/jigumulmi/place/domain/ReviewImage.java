@@ -24,7 +24,7 @@ public class ReviewImage extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 1024)
+    @Column(name = "s3_key", length = 1024)
     private String s3Key;
 
     @ManyToOne(fetch = FetchType.LAZY)
