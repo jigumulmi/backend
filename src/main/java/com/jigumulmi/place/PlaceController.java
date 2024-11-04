@@ -23,9 +23,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -115,9 +117,10 @@ public class PlaceController {
 
     @Operation(summary = "리뷰 등록")
     @ApiResponse(responseCode = "201")
-    @PostMapping("/review")
-    public ResponseEntity<?> postReview(@Valid @RequestBody CreateReviewRequestDto requestDto,
-        @RequiredAuthUser Member member) {
+    @PostMapping(path = "/review", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> postReview(
+        @Valid @ModelAttribute CreateReviewRequestDto requestDto,
+        @RequiredAuthUser Member member) throws IOException {
         placeService.postReview(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
     }

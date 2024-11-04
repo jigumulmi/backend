@@ -44,18 +44,31 @@ import com.jigumulmi.place.vo.CurrentOpeningInfo;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import com.jigumulmi.place.vo.Reaction;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 @Service
 @RequiredArgsConstructor
 public class PlaceService {
+
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+    private final S3Client s3Client;
 
     private final SubwayStationRepository subwayStationRepository;
     private final PlaceRepository placeRepository;
@@ -193,7 +206,22 @@ public class PlaceService {
             .build();
     }
 
-    public void postReview(CreateReviewRequestDto requestDto, Member member) {
+    public void postReview(CreateReviewRequestDto requestDto, Member member) throws IOException {
+        for (MultipartFile image : requestDto.getImageList()) {
+            String s3Key = "reviewImage/" + requestDto.getPlaceId() + "/" + UUID.randomUUID();
+
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucket)
+                .key(s3Key)
+                .contentType(image.getContentType())
+                .contentLength(image.getSize())
+                .build();
+
+            PutObjectResponse putObjectResponse = s3Client.putObject(putObjectRequest,
+                RequestBody.fromInputStream(image.getInputStream(), image.getSize())
+            );
+        }
+
         boolean canPostReview = reviewRepository.findTopByPlaceIdAndMemberIdAndDeletedAtIsNull(
             requestDto.getPlaceId(),
             member.getId()
