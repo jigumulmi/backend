@@ -10,16 +10,18 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+@Slf4j
 @Component
 public class HttpTestBasicAuthFilter extends OncePerRequestFilter {
 
     @Value("${swagger.password}")
-    private String swaggerPassword;
+    private String password;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -29,18 +31,18 @@ public class HttpTestBasicAuthFilter extends OncePerRequestFilter {
         // http 요청에 담긴 세션을 조회하려는 경우 HttpServletRequest의 getSession(false) 사용 (세션 없으면 null 반환)
         try {
             String referer = request.getHeader("Referer");
-            boolean isFromSwagger = referer.endsWith("/swagger-ui/index.html");
+            boolean isFromSwagger = referer != null && referer.endsWith("/swagger-ui/index.html");
 
             String userAgent = request.getHeader("User-Agent");
-            boolean isFromPostman = userAgent.startsWith("PostmanRuntime");
+            boolean isFromPostman = userAgent != null && userAgent.startsWith("PostmanRuntime");
 
             boolean isTesting = isFromSwagger || isFromPostman;
 
             String authHeader = request.getHeader("Authorization");
-            if (authHeader.startsWith("Basic ") && isTesting) {
+            if (authHeader != null && authHeader.startsWith("Basic ") && isTesting) {
                 String[] credentials = extractAndDecodeHeader(authHeader);
-                String password = credentials[1];
-                if (password.equals(swaggerPassword)) {
+                String passwordFromRequest = credentials[1];
+                if (password.equals(passwordFromRequest)) {
                     String username = credentials[0];
                     Long id = Long.valueOf(username);
 
@@ -50,6 +52,7 @@ public class HttpTestBasicAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
+            log.error("HttpTestBasicAuthFilter Error: " + e.getMessage());
             SecurityContextHolder.clearContext();
         } finally {
             filterChain.doFilter(request, response);
