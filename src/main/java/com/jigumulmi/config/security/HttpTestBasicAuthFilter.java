@@ -12,6 +12,7 @@ import java.util.Base64;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -30,16 +31,10 @@ public class HttpTestBasicAuthFilter extends OncePerRequestFilter {
         // 컨트롤러에서 HttpSession을 인자로 받으면 request.getSession(true)와 동일하게 세션 없는 경우 생성
         // http 요청에 담긴 세션을 조회하려는 경우 HttpServletRequest의 getSession(false) 사용 (세션 없으면 null 반환)
         try {
-            String referer = request.getHeader("Referer");
-            boolean isFromSwagger = referer != null && referer.endsWith("/swagger-ui/index.html");
-
-            String userAgent = request.getHeader("User-Agent");
-            boolean isFromPostman = userAgent != null && userAgent.startsWith("PostmanRuntime");
-
-            boolean isTesting = isFromSwagger || isFromPostman;
-
-            String authHeader = request.getHeader("Authorization");
-            if (authHeader != null && authHeader.startsWith("Basic ") && isTesting) {
+            // 테스트가 아닌 클라이언트 서버의 API 호출은 Authorization으로 넘어오는 헤더가 없음
+            String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+            boolean isBasicAuth = authHeader != null && authHeader.startsWith("Basic ");
+            if (isBasicAuth) {
                 String[] credentials = extractAndDecodeHeader(authHeader);
                 String passwordFromRequest = credentials[1];
                 if (password.equals(passwordFromRequest)) {
