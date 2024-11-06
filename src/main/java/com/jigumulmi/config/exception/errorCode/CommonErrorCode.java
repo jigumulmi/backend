@@ -14,7 +14,8 @@ public enum CommonErrorCode implements ErrorCode {
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "Invalid parameter included"),
     RDB_INTEGRITY_VIOLATION(HttpStatus.BAD_REQUEST, "Cannot execute sql statement"),
     UNPROCESSABLE_ENTITY(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid http request"),
-    FORBIDDEN(HttpStatus.FORBIDDEN, "Not authenticated"),
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Login required"),
+    FORBIDDEN(HttpStatus.FORBIDDEN, "Admin role required"),
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "Resource not exists"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
     ;

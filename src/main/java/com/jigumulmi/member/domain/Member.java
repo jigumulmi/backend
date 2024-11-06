@@ -57,7 +57,7 @@ public class Member extends Timestamped {
     }
 
     /**
-     * 스웨거로 인증된 사용자
+     * 스웨거 또는 포스트맨으로 인증된 테스트 사용자
      */
     public Member(Long id, String nickname) {
         this.id = id;
