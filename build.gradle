@@ -48,6 +48,9 @@ dependencies {
 
     // aws sdk
     implementation("software.amazon.awssdk:s3:2.29.4")
+
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.1'
+    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.1'
 }
 
 tasks.named('test') {

@@ -5,11 +5,13 @@ import com.jigumulmi.member.dto.vo.MemberRole;
 import java.util.ArrayList;
 import java.util.Collection;
 import lombok.Getter;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Getter
+@ToString
 public class UserDetailsImpl implements UserDetails {
 
     private final Member member;
