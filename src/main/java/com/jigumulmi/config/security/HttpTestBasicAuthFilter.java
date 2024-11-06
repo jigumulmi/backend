@@ -52,7 +52,7 @@ public class HttpTestBasicAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            log.error("HttpTestBasicAuthFilter Error: " + e.getMessage());
+            log.info("HttpTestBasicAuthFilter", e);
             SecurityContextHolder.clearContext();
         } finally {
             filterChain.doFilter(request, response);
