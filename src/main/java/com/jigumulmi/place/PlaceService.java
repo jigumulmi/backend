@@ -292,7 +292,17 @@ public class PlaceService {
     }
 
     public List<ReviewResponseDto> getReviewList(Member member, Long placeId) {
-        return customPlaceRepository.getReviewListByPlaceId(placeId, member.getId());
+        List<ReviewResponseDto> reviewList = customPlaceRepository.getReviewListByPlaceId(
+            placeId, member.getId());
+
+        Map<Long, Long> reviewReplyCount = customPlaceRepository.getReviewReplyCount(placeId);
+
+        for (ReviewResponseDto reviewDto : reviewList) {
+            Long count = reviewReplyCount.getOrDefault(reviewDto.getId(), 0L);
+            reviewDto.setReplyCount(count);
+        }
+
+        return reviewList;
     }
 
 
