@@ -63,4 +63,6 @@ public class PlaceDetailResponseDto extends PlaceResponseDto {
     private String additionalInfo;
 
     private OverallReviewResponseDto overallReview;
+
+    private List<ReviewImageResponseDto> reviewImageList;
 }

@@ -28,6 +28,7 @@ import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
+import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -36,6 +37,7 @@ import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
+import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.ReviewReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
@@ -82,6 +84,7 @@ public class PlaceService {
     private final ReviewReplyReactionRepository reviewReplyReactionRepository;
     private final CustomPlaceRepository customPlaceRepository;
     private final PlaceImageRepository placeImageRepository;
+    private final ReviewImageRepository reviewImageRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         return subwayStationRepository.findAllByStationNameStartsWith(stationName)
@@ -160,7 +163,7 @@ public class PlaceService {
         List<MenuDto> menuList = menuRepository.findAllByPlaceId(placeId).stream()
             .map(MenuDto::from).toList();
 
-        List<ImageDto> imageList = placeImageRepository.findAllByPlaceId(placeId).stream()
+        List<ImageDto> imageList = placeImageRepository.findByPlace_Id(placeId).stream()
             .map(ImageDto::from).toList();
 
         Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
@@ -187,6 +190,10 @@ public class PlaceService {
         String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
             surroundingDateOpeningHour);
 
+        List<ReviewImageResponseDto> reviewImageList = reviewImageRepository.findAllByReview_Place_IdOrderByCreatedAtDesc(
+                placeId)
+            .stream().map(ReviewImageResponseDto::from).toList();
+
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
             .name(place.getName())
@@ -206,6 +213,7 @@ public class PlaceService {
             .overallReview(overallReviewResponseDto)
             .surroundingDateOpeningHour(surroundingDateOpeningHour)
             .currentOpeningInfo(currentOpeningInfo)
+            .reviewImageList(reviewImageList)
             .build();
     }
 

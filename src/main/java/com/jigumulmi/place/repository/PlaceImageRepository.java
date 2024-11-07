@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PlaceImageRepository extends JpaRepository<PlaceImage, Long> {
 
-    List<PlaceImage> findAllByPlaceId(Long placeId);
+    List<PlaceImage> findByPlace_Id(Long placeId);
 }
