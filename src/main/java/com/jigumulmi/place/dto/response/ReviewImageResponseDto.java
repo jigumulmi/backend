@@ -2,11 +2,15 @@ package com.jigumulmi.place.dto.response;
 
 import com.jigumulmi.place.domain.ReviewImage;
 import java.time.LocalDateTime;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReviewImageResponseDto {
 
     private Long id;
