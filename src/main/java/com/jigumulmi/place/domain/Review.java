@@ -80,13 +80,16 @@ public class Review extends Timestamped {
         this.reviewImageList = reviewImageList != null ? reviewImageList : new ArrayList<>();
     }
 
-    public void updateReview(Integer rating, String content) {
+    public void updateReview(Integer rating, String content, List<ReviewImage> newReviewImageList,
+        List<ReviewImage> trashReviewImageList) {
         if (rating != null) {
             this.rating = rating;
         }
         if (content != null) {
             this.content = content;
         }
+        this.reviewImageList.addAll(newReviewImageList);
+        this.reviewImageList.removeAll(trashReviewImageList);
     }
 
     public void deleteReviewWithReplies() {
