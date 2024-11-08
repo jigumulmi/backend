@@ -391,6 +391,21 @@ public class PlaceService {
     @Transactional
     public void deleteReview(Long reviewId, Member member) {
         Review review = reviewRepository.findByIdAndMember(reviewId, member);
+        List<ReviewImage> reviewImageList = review.getReviewImageList();
+
+        try {
+            List<ObjectIdentifier> objectIdentifierList = reviewImageList.stream().map(
+                i -> ObjectIdentifier.builder().key(i.getS3Key()).build()
+            ).toList();
+            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                .bucket(bucket)
+                .delete(Delete.builder().objects(objectIdentifierList).build())
+                .build();
+
+            s3Client.deleteObjects(deleteObjectsRequest);
+        } catch (SdkException e) {
+            System.out.println("S3 DeleteObjects Error: " + e.getMessage());
+        }
 
         List<ReviewReply> reviewReplyList = review.getReviewReplyList();
         if (reviewReplyList.isEmpty()) {
