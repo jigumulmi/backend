@@ -23,7 +23,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
-import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -161,10 +160,10 @@ public class PlaceController {
         return ResponseEntity.ok().body(reviewReplyList);
     }
 
-    @Operation(summary = "리뷰 수정", description = "rating과 content 중 수정하지 않는 값은 null로 부탁드립니다")
+    @Operation(summary = "리뷰 수정")
     @ApiResponse(responseCode = "204")
-    @PutMapping("/review")
-    public ResponseEntity<?> updateReview(@Valid @RequestBody UpdateReviewRequestDto requestDto,
+    @PutMapping(path = "/review", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> updateReview(@Valid @ModelAttribute UpdateReviewRequestDto requestDto,
         @RequiredAuthUser Member member) {
         placeService.updateReview(requestDto, member);
         return ResponseEntity.noContent().build();
