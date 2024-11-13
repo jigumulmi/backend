@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -58,29 +60,43 @@ public class Review extends Timestamped {
     @JsonManagedReference
     private List<ReviewReaction> reviewReactionList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("createdAt DESC")
+    @JsonManagedReference
+    private List<ReviewImage> reviewImageList = new ArrayList<>();
+
     @Builder
     public Review(Integer rating, String content, Member member, Place place,
         List<ReviewReply> reviewReplyList, LocalDateTime deletedAt,
-        List<ReviewReaction> reviewReactionList) {
+        List<ReviewReaction> reviewReactionList, List<ReviewImage> reviewImageList) {
         this.rating = rating;
         this.content = content;
         this.member = member;
         this.place = place;
-        this.reviewReplyList = reviewReplyList;
+        this.reviewReplyList = reviewReplyList != null ? reviewReplyList : new ArrayList<>();
         this.deletedAt = deletedAt;
-        this.reviewReactionList = reviewReactionList;
+        this.reviewReactionList =
+            reviewReactionList != null ? reviewReactionList : new ArrayList<>();
+        this.reviewImageList = reviewImageList != null ? reviewImageList : new ArrayList<>();
     }
 
-    public void updateReview(Integer rating, String content) {
+    public void updateReview(Integer rating, String content, List<ReviewImage> newReviewImageList,
+        List<ReviewImage> trashReviewImageList) {
         if (rating != null) {
             this.rating = rating;
         }
         if (content != null) {
             this.content = content;
         }
+        this.reviewImageList.addAll(newReviewImageList);
+        this.reviewImageList.removeAll(trashReviewImageList);
     }
 
     public void deleteReviewWithReplies() {
         this.deletedAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+    }
+
+    public void addReviewImageList(List<ReviewImage> reviewImageList) {
+        this.reviewImageList.addAll(reviewImageList);
     }
 }

@@ -14,7 +14,8 @@ public enum PlaceCategoryGroup {
     RESTAURANT("음식점",
         Arrays.asList(
             PlaceCategory.KOREAN_FOOD, PlaceCategory.JAPANESE_FOOD, PlaceCategory.CHINESE_FOOD,
-            PlaceCategory.WESTERN_FOOD
+            PlaceCategory.WESTERN_FOOD, PlaceCategory.ASIAN_FOOD, PlaceCategory.SANDWICH,
+            PlaceCategory.SALAD
         )
     ),
     CAFE("카페", Arrays.asList(PlaceCategory.BEVERAGE, PlaceCategory.SNACK)),

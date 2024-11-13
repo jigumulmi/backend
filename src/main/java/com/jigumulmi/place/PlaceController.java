@@ -26,6 +26,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -115,8 +116,9 @@ public class PlaceController {
 
     @Operation(summary = "리뷰 등록")
     @ApiResponse(responseCode = "201")
-    @PostMapping("/review")
-    public ResponseEntity<?> postReview(@Valid @RequestBody CreateReviewRequestDto requestDto,
+    @PostMapping(path = "/review", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> postReview(
+        @Valid @ModelAttribute CreateReviewRequestDto requestDto,
         @RequiredAuthUser Member member) {
         placeService.postReview(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
@@ -158,10 +160,10 @@ public class PlaceController {
         return ResponseEntity.ok().body(reviewReplyList);
     }
 
-    @Operation(summary = "리뷰 수정", description = "rating과 content 중 수정하지 않는 값은 null로 부탁드립니다")
+    @Operation(summary = "리뷰 수정")
     @ApiResponse(responseCode = "204")
-    @PutMapping("/review")
-    public ResponseEntity<?> updateReview(@Valid @RequestBody UpdateReviewRequestDto requestDto,
+    @PutMapping(path = "/review", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> updateReview(@Valid @ModelAttribute UpdateReviewRequestDto requestDto,
         @RequiredAuthUser Member member) {
         placeService.updateReview(requestDto, member);
         return ResponseEntity.noContent().build();

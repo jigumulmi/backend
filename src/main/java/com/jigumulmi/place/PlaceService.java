@@ -9,6 +9,7 @@ import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.Review;
+import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.ReviewReaction;
 import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.domain.ReviewReplyReaction;
@@ -27,6 +28,7 @@ import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
+import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -35,6 +37,7 @@ import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
+import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.ReviewReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
@@ -44,18 +47,37 @@ import com.jigumulmi.place.vo.CurrentOpeningInfo;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import com.jigumulmi.place.vo.Reaction;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.exception.SdkException;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.Delete;
+import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Service
 @RequiredArgsConstructor
 public class PlaceService {
+
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucket;
+    private final S3Client s3Client;
 
     private final SubwayStationRepository subwayStationRepository;
     private final PlaceRepository placeRepository;
@@ -66,6 +88,7 @@ public class PlaceService {
     private final ReviewReplyReactionRepository reviewReplyReactionRepository;
     private final CustomPlaceRepository customPlaceRepository;
     private final PlaceImageRepository placeImageRepository;
+    private final ReviewImageRepository reviewImageRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         return subwayStationRepository.findAllByStationNameStartsWith(stationName)
@@ -144,7 +167,7 @@ public class PlaceService {
         List<MenuDto> menuList = menuRepository.findAllByPlaceId(placeId).stream()
             .map(MenuDto::from).toList();
 
-        List<ImageDto> imageList = placeImageRepository.findAllByPlaceId(placeId).stream()
+        List<ImageDto> imageList = placeImageRepository.findByPlace_Id(placeId).stream()
             .map(ImageDto::from).toList();
 
         Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
@@ -171,6 +194,10 @@ public class PlaceService {
         String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
             surroundingDateOpeningHour);
 
+        List<ReviewImageResponseDto> reviewImageList = reviewImageRepository.findAllByReview_Place_IdOrderByCreatedAtDesc(
+                placeId)
+            .stream().map(ReviewImageResponseDto::from).toList();
+
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
             .name(place.getName())
@@ -190,9 +217,11 @@ public class PlaceService {
             .overallReview(overallReviewResponseDto)
             .surroundingDateOpeningHour(surroundingDateOpeningHour)
             .currentOpeningInfo(currentOpeningInfo)
+            .reviewImageList(reviewImageList)
             .build();
     }
 
+    @Transactional
     public void postReview(CreateReviewRequestDto requestDto, Member member) {
         boolean canPostReview = reviewRepository.findTopByPlaceIdAndMemberIdAndDeletedAtIsNull(
             requestDto.getPlaceId(),
@@ -207,8 +236,45 @@ public class PlaceService {
                 .content(requestDto.getContent())
                 .rating(requestDto.getRating())
                 .member(member)
-                .reviewReplyList(Collections.emptyList())
                 .build();
+
+            ArrayList<String> s3KeyList = new ArrayList<>();
+            try {
+                for (MultipartFile image : requestDto.getImageList()) {
+                    String fileExtension = StringUtils.getFilenameExtension(
+                        image.getOriginalFilename());
+                    String s3Key =
+                        "reviewImage/" + requestDto.getPlaceId() + "/" + UUID.randomUUID() + "."
+                            + fileExtension;
+
+                    s3KeyList.add(s3Key);
+
+                    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                        .bucket(bucket)
+                        .key(s3Key)
+                        .contentType(image.getContentType())
+                        .contentLength(image.getSize())
+                        .build();
+
+                    s3Client.putObject(putObjectRequest,
+                        RequestBody.fromInputStream(image.getInputStream(), image.getSize())
+                    );
+                }
+            } catch (SdkException | IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            List<ReviewImage> reviewImageList = new ArrayList<>();
+            for (String s3Key : s3KeyList) {
+                reviewImageList.add(
+                    ReviewImage.builder()
+                        .s3Key(s3Key)
+                        .review(review)
+                        .build()
+                );
+            }
+
+            review.addReviewImageList(reviewImageList);
 
             reviewRepository.save(review);
         } else {
@@ -230,7 +296,17 @@ public class PlaceService {
     }
 
     public List<ReviewResponseDto> getReviewList(Member member, Long placeId) {
-        return customPlaceRepository.getReviewListByPlaceId(placeId, member.getId());
+        List<ReviewResponseDto> reviewList = customPlaceRepository.getReviewListByPlaceId(
+            placeId, member.getId());
+
+        Map<Long, Long> reviewReplyCount = customPlaceRepository.getReviewReplyCount(placeId);
+
+        for (ReviewResponseDto reviewDto : reviewList) {
+            Long count = reviewReplyCount.getOrDefault(reviewDto.getId(), 0L);
+            reviewDto.setReplyCount(count);
+        }
+
+        return reviewList;
     }
 
 
@@ -238,10 +314,71 @@ public class PlaceService {
         return customPlaceRepository.getReviewReplyListByReviewId(member.getId(), reviewId);
     }
 
+    @Transactional
     public void updateReview(UpdateReviewRequestDto requestDto, Member member) {
         Review review = reviewRepository.findByIdAndMember(requestDto.getReviewId(), member);
-        review.updateReview(requestDto.getRating(), requestDto.getContent());
+        Long placeId = review.getPlace().getId();
+
+        ArrayList<String> s3KeyList = new ArrayList<>();
+        try {
+            for (MultipartFile image : requestDto.getNewImageList()) {
+                String fileExtension = StringUtils.getFilenameExtension(
+                    image.getOriginalFilename());
+                String s3Key =
+                    "reviewImage/" + placeId + "/" + UUID.randomUUID() + "."
+                        + fileExtension;
+
+                s3KeyList.add(s3Key);
+
+                PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(s3Key)
+                    .contentType(image.getContentType())
+                    .contentLength(image.getSize())
+                    .build();
+
+                s3Client.putObject(putObjectRequest,
+                    RequestBody.fromInputStream(image.getInputStream(), image.getSize())
+                );
+            }
+        } catch (SdkException | IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        List<ReviewImage> newReviewImageList = new ArrayList<>();
+        for (String s3Key : s3KeyList) {
+            newReviewImageList.add(
+                ReviewImage.builder()
+                    .s3Key(s3Key)
+                    .review(review)
+                    .build()
+            );
+        }
+
+        List<ReviewImage> currentImageList = review.getReviewImageList();
+        Set<Long> trashImageIdSet = new HashSet<>(requestDto.getTrashImageIdList());
+        List<ReviewImage> trashReviewImageList = currentImageList.stream()
+            .filter(image -> trashImageIdSet.contains(image.getId()))
+            .toList();
+
+        review.updateReview(requestDto.getRating(), requestDto.getContent(), newReviewImageList,
+            trashReviewImageList);
+
         reviewRepository.save(review);
+
+        try {
+            List<ObjectIdentifier> objectIdentifierList = trashReviewImageList.stream().map(
+                i -> ObjectIdentifier.builder().key(i.getS3Key()).build()
+            ).toList();
+            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                .bucket(bucket)
+                .delete(Delete.builder().objects(objectIdentifierList).build())
+                .build();
+
+            s3Client.deleteObjects(deleteObjectsRequest);
+        } catch (SdkException e) {
+            System.out.println("S3 DeleteObjects Error: " + e.getMessage());
+        }
     }
 
     public void updateReviewReply(UpdateReviewReplyRequestDto requestDto, Member member) {
@@ -254,6 +391,21 @@ public class PlaceService {
     @Transactional
     public void deleteReview(Long reviewId, Member member) {
         Review review = reviewRepository.findByIdAndMember(reviewId, member);
+        List<ReviewImage> reviewImageList = review.getReviewImageList();
+
+        try {
+            List<ObjectIdentifier> objectIdentifierList = reviewImageList.stream().map(
+                i -> ObjectIdentifier.builder().key(i.getS3Key()).build()
+            ).toList();
+            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
+                .bucket(bucket)
+                .delete(Delete.builder().objects(objectIdentifierList).build())
+                .build();
+
+            s3Client.deleteObjects(deleteObjectsRequest);
+        } catch (SdkException e) {
+            System.out.println("S3 DeleteObjects Error: " + e.getMessage());
+        }
 
         List<ReviewReply> reviewReplyList = review.getReviewReplyList();
         if (reviewReplyList.isEmpty()) {

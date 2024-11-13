@@ -5,9 +5,8 @@ import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
 import static com.jigumulmi.place.domain.QPlaceImage.placeImage;
 import static com.jigumulmi.place.domain.QReview.review;
-import static com.jigumulmi.place.domain.QReviewReaction.reviewReaction;
+import static com.jigumulmi.place.domain.QReviewImage.reviewImage;
 import static com.jigumulmi.place.domain.QReviewReply.reviewReply;
-import static com.jigumulmi.place.domain.QReviewReplyReaction.reviewReplyReaction;
 import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
 import static com.jigumulmi.place.domain.QSubwayStationLine.subwayStationLine;
 import static com.jigumulmi.place.domain.QSubwayStationLineMapping.subwayStationLineMapping;
@@ -28,14 +27,13 @@ import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
-import com.jigumulmi.place.dto.response.ReactionDto;
+import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import com.querydsl.core.types.ConstantImpl;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
@@ -217,51 +215,58 @@ public class CustomPlaceRepository {
         // 엔티티인 상태로 탐색하는 것이 fetchJoin이기 때문
 
         return queryFactory
-            .select(
-                Projections.fields(ReviewResponseDto.class,
-                    stringTemplate(
-                        "DATE_FORMAT({0}, {1})",
-                        review.modifiedAt,
-                        ConstantImpl.create("%Y.%m.%d")
-                    ).as("reviewedAt"),
-                    review.deletedAt,
-                    review.createdAt,
-                    review.id,
-                    review.rating,
-                    review.content,
-                    review.reviewReplyList.size().as("replyCount"),
-                    new CaseBuilder()
-                        .when(review.member.id.eq(requestMemberId)).then(true)
-                        .otherwise(false).as("isEditable"),
-                    Projections.fields(MemberDetailResponseDto.class,
-                        review.member.createdAt,
-                        review.member.deregisteredAt,
-                        review.member.id,
-                        review.member.nickname,
-                        review.member.email).as("member"),
-                    Projections.fields(ReactionDto.class,
-                        ExpressionUtils.as(JPAExpressions.select(reviewReaction.count())
-                                .from(reviewReaction)
-                                .where(reviewReaction.review.id.eq(review.id)),
-                            "likeReactionCount"),
-                        reviewReaction.id.as("likeReactionId")
-                    ).as("reaction"),
-                    new CaseBuilder()
-                        .when(review.createdAt.eq(review.modifiedAt)).then(false)
-                        .otherwise(true).as("isEdited")
-                )
-            ).distinct()
-            .from(review)
+            .selectFrom(review)
             .join(review.member)
-            .leftJoin(review.reviewReplyList)
-            .leftJoin(review.reviewReactionList, reviewReaction)
-            .on(reviewReaction.review.id.eq(review.id)
-                .and(reviewReaction.member.id.eq(requestMemberId)))
+            .leftJoin(review.reviewImageList, reviewImage)
             .where(review.place.id.eq(placeId))
-            .orderBy(review.createdAt.desc())
-            .fetch();
+            .orderBy(review.createdAt.desc(), reviewImage.createdAt.desc())
+            .transform(
+                groupBy(review.id).list(
+                    Projections.fields(ReviewResponseDto.class,
+                        stringTemplate(
+                            "DATE_FORMAT({0}, {1})",
+                            review.modifiedAt,
+                            ConstantImpl.create("%Y.%m.%d")
+                        ).as("reviewedAt"),
+                        review.deletedAt,
+                        review.createdAt,
+                        review.id,
+                        review.rating,
+                        review.content,
+                        new CaseBuilder()
+                            .when(review.member.id.eq(requestMemberId)).then(true)
+                            .otherwise(false).as("isEditable"),
+                        Projections.fields(MemberDetailResponseDto.class,
+                            review.member.createdAt,
+                            review.member.deregisteredAt,
+                            review.member.id,
+                            review.member.nickname,
+                            review.member.email).as("member"),
+                        new CaseBuilder()
+                            .when(review.createdAt.eq(review.modifiedAt)).then(false)
+                            .otherwise(true).as("isEdited"),
+                        list(
+                            Projections.fields(
+                                ReviewImageResponseDto.class,
+                                reviewImage.id,
+                                reviewImage.s3Key,
+                                reviewImage.createdAt
+                            ).skipNulls()
+                        ).as("imageList")
+                    )
+                )
+            );
     }
 
+    public Map<Long, Long> getReviewReplyCount(Long placeId) {
+
+        return queryFactory
+            .selectFrom(review)
+            .join(review.reviewReplyList, reviewReply)
+            .where(review.place.id.eq(placeId))
+            .groupBy(review.id)
+            .transform(groupBy(review.id).as(reviewReply.count()));
+    }
 
     public List<ReviewReplyResponseDto> getReviewReplyListByReviewId(Long requestMemberId,
         Long reviewId) {
@@ -286,13 +291,6 @@ public class CustomPlaceRepository {
                         reviewReply.member.id,
                         reviewReply.member.nickname,
                         reviewReply.member.email).as("member"),
-                    Projections.fields(ReactionDto.class,
-                        ExpressionUtils.as(JPAExpressions.select(reviewReplyReaction.count())
-                                .from(reviewReplyReaction)
-                                .where(reviewReplyReaction.reviewReply.id.eq(reviewReply.id)),
-                            "likeReactionCount"),
-                        reviewReplyReaction.id.as("likeReactionId")
-                    ).as("reaction"),
                     new CaseBuilder()
                         .when(reviewReply.createdAt.eq(reviewReply.modifiedAt)).then(false)
                         .otherwise(true).as("isEdited")
@@ -301,11 +299,7 @@ public class CustomPlaceRepository {
             .from(reviewReply)
             .where(reviewReply.review.id.eq(reviewId))
             .join(reviewReply.member)
-            .leftJoin(reviewReply.reviewReplyReactionList, reviewReplyReaction)
-            .on(reviewReplyReaction.reviewReply.id.eq(reviewReply.id)
-                .and(reviewReplyReaction.member.id.eq(requestMemberId)))
             .orderBy(reviewReply.createdAt.asc())
             .fetch();
     }
-
 }

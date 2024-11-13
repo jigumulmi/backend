@@ -1,6 +1,5 @@
 package com.jigumulmi.config.security;
 
-import com.jigumulmi.config.swagger.SwaggerBasicAuthFilter;
 import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -22,10 +23,20 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final SwaggerBasicAuthFilter swaggerBasicAuthFilter;
+    private final HttpTestBasicAuthFilter httpTestBasicAuthFilter;
 
     private final String[] origins = new String[]{"http://localhost:3000", "https://jigumulmi.com",
         "https://www.jigumulmi.com", "https://dev.jigumulmi.com"};
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler() {
+        return new AccessDeniedHandlerImpl();
+    }
+
+    @Bean
+    public AuthenticationEntryPoint authenticationEntryPoint() {
+        return new AuthenticationEntryPointImpl();
+    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -59,11 +70,18 @@ public class SecurityConfig {
             .httpBasic(HttpBasicConfigurer::disable)
             .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
-            .addFilterBefore(swaggerBasicAuthFilter,
-                UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(httpTestBasicAuthFilter,
+                UsernamePasswordAuthenticationFilter.class
+            )
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/admin/*").hasRole("ADMIN")
-                .anyRequest().permitAll());
+                .anyRequest().permitAll()
+            )
+            .exceptionHandling(
+                e -> e.authenticationEntryPoint(authenticationEntryPoint())
+                    .accessDeniedHandler(accessDeniedHandler())
+            )
+        ;
 
         return httpSecurity.build();
     }
