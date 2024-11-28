@@ -20,15 +20,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"category", "member_id", "review_reply_id"})})
-public class ReviewReplyReaction extends Timestamped {
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"member_id", "place_id"})})
+public class PlaceLike extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String category; // TODO @Converter 사용
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -36,14 +33,12 @@ public class ReviewReplyReaction extends Timestamped {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_reply_id")
-    @JsonBackReference
-    private ReviewReply reviewReply;
+    @JoinColumn(name = "place_id")
+    private Place place;
 
     @Builder
-    public ReviewReplyReaction(String category, Member member, ReviewReply reviewReply) {
-        this.category = category;
+    public PlaceLike(Member member, Place place) {
         this.member = member;
-        this.reviewReply = reviewReply;
+        this.place = place;
     }
 }

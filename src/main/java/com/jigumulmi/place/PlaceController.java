@@ -198,42 +198,14 @@ public class PlaceController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "리뷰 좋아요 등록")
+    @Operation(summary = "장소 좋아요 등록/삭제 토글")
     @ApiResponse(responseCode = "204")
-    @PostMapping("/review/{reviewId}/reaction")
-    public ResponseEntity<?> createReviewLike(@PathVariable(name = "reviewId") Long reviewId,
+    @PostMapping("/{placeId}/like")
+    public ResponseEntity<?> togglePlaceLike(
+        @PathVariable(name = "placeId") Long placeId,
+        @RequestParam(name = "toggleOn") Boolean toggleOn,
         @RequiredAuthUser Member member) {
-        placeService.createReviewLike(reviewId, member);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "답글 좋아요 등록")
-    @ApiResponse(responseCode = "204")
-    @PostMapping("/review/reply/{reviewReplyId}/reaction")
-    public ResponseEntity<?> createReviewReplyLike(
-        @PathVariable(name = "reviewReplyId") Long reviewReplyId,
-        @RequiredAuthUser Member member) {
-        placeService.createReviewReplyLike(reviewReplyId, member);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "리뷰 좋아요 삭제")
-    @ApiResponse(responseCode = "204")
-    @DeleteMapping("/review/reaction/{reviewReactionId}")
-    public ResponseEntity<?> deleteReviewLike(
-        @PathVariable(name = "reviewReactionId") Long reviewReactionId,
-        @RequiredAuthUser Member member) {
-        placeService.deleteReviewLike(reviewReactionId, member);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "답글 좋아요 삭제")
-    @ApiResponse(responseCode = "204")
-    @DeleteMapping("/review/reply/reaction/{reviewReplyReactionId}")
-    public ResponseEntity<?> deleteReviewReplyLike(
-        @PathVariable(name = "reviewReplyReactionId") Long reviewReplyReactionId,
-        @RequiredAuthUser Member member) {
-        placeService.deleteReviewReplyLike(reviewReplyReactionId, member);
+        placeService.togglePlaceLike(placeId, toggleOn, member);
         return ResponseEntity.noContent().build();
     }
 }
