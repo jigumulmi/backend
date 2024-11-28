@@ -442,11 +442,12 @@ public class PlaceService {
 
     }
 
+    @Transactional
     public void togglePlaceLike(Long placeId, Boolean toggleOn, Member member) {
-        Place place = placeRepository.findById(placeId)
-            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
         if (toggleOn) {
+            Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
             PlaceLike placeLike = PlaceLike.builder()
                 .member(member)
                 .place(place)
@@ -454,7 +455,7 @@ public class PlaceService {
 
             placeLikeRepository.save(placeLike);
         } else {
-            placeLikeRepository.deleteByPlaceAndMember(place, member);
+            placeLikeRepository.deleteByPlace_IdAndMember(placeId, member);
         }
     }
 }
