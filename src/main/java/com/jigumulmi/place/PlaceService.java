@@ -194,6 +194,8 @@ public class PlaceService {
                 placeId)
             .stream().map(ReviewImageResponseDto::from).toList();
 
+        Long likeCount = customPlaceRepository.getPlaceLikeCount(placeId);
+
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
             .name(place.getName())
@@ -214,6 +216,8 @@ public class PlaceService {
             .surroundingDateOpeningHour(surroundingDateOpeningHour)
             .currentOpeningInfo(currentOpeningInfo)
             .reviewImageList(reviewImageList)
+            .showLikeCount(likeCount != 0)
+            .likeCount(likeCount)
             .build();
     }
 

@@ -65,4 +65,7 @@ public class PlaceDetailResponseDto extends PlaceResponseDto {
     private OverallReviewResponseDto overallReview;
 
     private List<ReviewImageResponseDto> reviewImageList;
+
+    private Boolean showLikeCount;
+    private Long likeCount;
 }
