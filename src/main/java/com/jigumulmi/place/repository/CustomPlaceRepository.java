@@ -4,6 +4,7 @@ package com.jigumulmi.place.repository;
 import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
 import static com.jigumulmi.place.domain.QPlaceImage.placeImage;
+import static com.jigumulmi.place.domain.QPlaceLike.placeLike;
 import static com.jigumulmi.place.domain.QReview.review;
 import static com.jigumulmi.place.domain.QReviewImage.reviewImage;
 import static com.jigumulmi.place.domain.QReviewReply.reviewReply;
@@ -197,6 +198,14 @@ public class CustomPlaceRepository {
                 )
             ).stream().findFirst()
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+    }
+
+    public Long getPlaceLikeCount(Long placeId) {
+        return queryFactory
+            .select(placeLike.id.count())
+            .from(placeLike)
+            .where(placeLike.place.id.eq(placeId))
+            .fetchOne();
     }
 
 

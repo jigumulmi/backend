@@ -1,13 +1,18 @@
 package com.jigumulmi.member.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.config.common.Timestamped;
+import com.jigumulmi.place.domain.PlaceLike;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,14 +42,19 @@ public class Member extends Timestamped {
     @ColumnDefault("false")
     private Boolean isAdmin;
 
+    @OneToMany(mappedBy = "member")
+    @JsonManagedReference
+    private List<PlaceLike> placeLikeList = new ArrayList<>();
+
     @Builder
     public Member(String nickname, String email, Long kakaoUserId, LocalDateTime deregisteredAt,
-        Boolean isAdmin) {
+        Boolean isAdmin, List<PlaceLike> placeLikeList) {
         this.nickname = nickname;
         this.email = email;
         this.kakaoUserId = kakaoUserId;
         this.deregisteredAt = deregisteredAt;
         this.isAdmin = (isAdmin != null) ? isAdmin : false;
+        this.placeLikeList = placeLikeList != null ? placeLikeList : new ArrayList<>();
     }
 
     /**

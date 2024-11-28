@@ -8,11 +8,10 @@ import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.domain.PlaceLike;
 import com.jigumulmi.place.domain.Review;
 import com.jigumulmi.place.domain.ReviewImage;
-import com.jigumulmi.place.domain.ReviewReaction;
 import com.jigumulmi.place.domain.ReviewReply;
-import com.jigumulmi.place.domain.ReviewReplyReaction;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
@@ -36,17 +35,15 @@ import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLi
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
+import com.jigumulmi.place.repository.PlaceLikeRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.ReviewImageRepository;
-import com.jigumulmi.place.repository.ReviewReactionRepository;
-import com.jigumulmi.place.repository.ReviewReplyReactionRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.CurrentOpeningInfo;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
-import com.jigumulmi.place.vo.Reaction;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -84,11 +81,10 @@ public class PlaceService {
     private final MenuRepository menuRepository;
     private final ReviewRepository reviewRepository;
     private final ReviewReplyRepository reviewReplyRepository;
-    private final ReviewReactionRepository reviewReactionRepository;
-    private final ReviewReplyReactionRepository reviewReplyReactionRepository;
     private final CustomPlaceRepository customPlaceRepository;
     private final PlaceImageRepository placeImageRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final PlaceLikeRepository placeLikeRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         return subwayStationRepository.findAllByStationNameStartsWith(stationName)
@@ -198,6 +194,8 @@ public class PlaceService {
                 placeId)
             .stream().map(ReviewImageResponseDto::from).toList();
 
+        Long likeCount = customPlaceRepository.getPlaceLikeCount(placeId);
+
         return PlaceDetailResponseDto.builder()
             .id(place.getId())
             .name(place.getName())
@@ -218,6 +216,8 @@ public class PlaceService {
             .surroundingDateOpeningHour(surroundingDateOpeningHour)
             .currentOpeningInfo(currentOpeningInfo)
             .reviewImageList(reviewImageList)
+            .showLikeCount(likeCount != 0)
+            .likeCount(likeCount)
             .build();
     }
 
@@ -433,42 +433,6 @@ public class PlaceService {
         }
     }
 
-    public void createReviewLike(Long reviewId, Member member) {
-        Review review = reviewRepository.findById(reviewId)
-            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
-
-        ReviewReaction reviewReaction = ReviewReaction.builder()
-            .member(member)
-            .review(review)
-            .category(Reaction.LIKE.name())
-            .build();
-
-        reviewReactionRepository.save(reviewReaction);
-    }
-
-    public void createReviewReplyLike(Long reviewReplyId, Member member) {
-        ReviewReply reviewReply = reviewReplyRepository.findById(reviewReplyId)
-            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
-
-        ReviewReplyReaction reviewReplyReaction = ReviewReplyReaction.builder()
-            .member(member)
-            .reviewReply(reviewReply)
-            .category(Reaction.LIKE.name())
-            .build();
-
-        reviewReplyReactionRepository.save(reviewReplyReaction);
-    }
-
-    public void deleteReviewLike(Long reviewReactionId, Member member) {
-
-        reviewReactionRepository.deleteByIdAndMemberId(reviewReactionId, member.getId());
-    }
-
-    public void deleteReviewReplyLike(Long reviewReplyReactionId, Member member) {
-
-        reviewReplyReactionRepository.deleteByIdAndMemberId(reviewReplyReactionId, member.getId());
-    }
-
     public List<PlaceCategoryGroup> getPlaceCategoryGroupList() {
         return Arrays.stream(PlaceCategoryGroup.values()).toList();
     }
@@ -476,5 +440,22 @@ public class PlaceService {
     public List<PlaceCategory> getPlaceCategoryList(PlaceCategoryGroup placeCategoryGroup) {
         return placeCategoryGroup.getPlaceCategoryList();
 
+    }
+
+    @Transactional
+    public void togglePlaceLike(Long placeId, Boolean toggleOn, Member member) {
+
+        if (toggleOn) {
+            Place place = placeRepository.findById(placeId)
+                .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+            PlaceLike placeLike = PlaceLike.builder()
+                .member(member)
+                .place(place)
+                .build();
+
+            placeLikeRepository.save(placeLike);
+        } else {
+            placeLikeRepository.deleteByPlace_IdAndMember(placeId, member);
+        }
     }
 }
