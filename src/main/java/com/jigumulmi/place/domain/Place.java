@@ -3,15 +3,19 @@ package com.jigumulmi.place.domain;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.config.common.Timestamped;
+import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
@@ -96,6 +100,10 @@ public class Place extends Timestamped {
     @ColumnDefault("false")
     private Boolean isFromAdmin;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
     @Builder
     public Place(String name, List<PlaceCategoryMapping> categoryMappingList, String address,
         String contact, List<Menu> menuList,
@@ -105,7 +113,7 @@ public class Place extends Timestamped {
         Boolean isApproved, List<Review> reviewList,
         List<SubwayStationPlace> subwayStationPlaceList,
         List<PlaceImage> placeImageList, String kakaoPlaceId,
-        Boolean isFromAdmin
+        Boolean isFromAdmin, Member member
     ) {
         this.name = name;
         this.categoryMappingList =
@@ -132,6 +140,7 @@ public class Place extends Timestamped {
         this.placeImageList = placeImageList != null ? placeImageList : new ArrayList<>();
         this.kakaoPlaceId = kakaoPlaceId;
         this.isFromAdmin = (isFromAdmin != null) ? isFromAdmin : false;
+        this.member = member;
     }
 
     public void addChildren(List<PlaceCategoryMapping> categoryMappingList,

@@ -92,12 +92,13 @@ public class PlaceService {
     }
 
     @Transactional
-    public void registerPlace(CreatePlaceRequestDto requestDto) {
+    public void registerPlace(CreatePlaceRequestDto requestDto, Member member) {
 
         Place newPlace = Place.builder()
             .name(requestDto.getName())
             .registrantComment(requestDto.getRegistrantComment())
             .isApproved(false)
+            .member(member)
             .build();
 
         ArrayList<Menu> menuList = new ArrayList<>();
