@@ -104,6 +104,10 @@ public class Place extends Timestamped {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @OneToMany(mappedBy = "place")
+    @JsonManagedReference
+    private List<PlaceLike> placeLikeList = new ArrayList<>();
+
     @Builder
     public Place(String name, List<PlaceCategoryMapping> categoryMappingList, String address,
         String contact, List<Menu> menuList,
@@ -113,7 +117,7 @@ public class Place extends Timestamped {
         Boolean isApproved, List<Review> reviewList,
         List<SubwayStationPlace> subwayStationPlaceList,
         List<PlaceImage> placeImageList, String kakaoPlaceId,
-        Boolean isFromAdmin, Member member
+        Boolean isFromAdmin, Member member, List<PlaceLike> placeLikeList
     ) {
         this.name = name;
         this.categoryMappingList =
@@ -141,6 +145,7 @@ public class Place extends Timestamped {
         this.kakaoPlaceId = kakaoPlaceId;
         this.isFromAdmin = (isFromAdmin != null) ? isFromAdmin : false;
         this.member = member;
+        this.placeLikeList = placeLikeList != null ? placeLikeList : new ArrayList<>();
     }
 
     public void addChildren(List<PlaceCategoryMapping> categoryMappingList,

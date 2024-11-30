@@ -34,6 +34,7 @@ public class PlaceLike extends Timestamped {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "place_id")
+    @JsonBackReference
     private Place place;
 
     @Builder

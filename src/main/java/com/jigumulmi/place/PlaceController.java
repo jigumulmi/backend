@@ -101,8 +101,9 @@ public class PlaceController {
     )
     @GetMapping("")
     public ResponseEntity<?> getPlaceList(
-        @ModelAttribute GetPlaceListRequestDto requestDto) {
-        List<PlaceResponseDto> placeList = placeService.getPlaceList(requestDto);
+        @ModelAttribute GetPlaceListRequestDto requestDto,
+        @OptionalAuthUser Member member) {
+        List<PlaceResponseDto> placeList = placeService.getPlaceList(requestDto, member);
         return ResponseEntity.ok().body(placeList);
     }
 

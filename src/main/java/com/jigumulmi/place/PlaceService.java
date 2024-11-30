@@ -122,8 +122,8 @@ public class PlaceService {
         placeRepository.save(newPlace);
     }
 
-    public List<PlaceResponseDto> getPlaceList(GetPlaceListRequestDto requestDto) {
-        List<PlaceResponseDto> placeList = customPlaceRepository.getPlaceList(requestDto);
+    public List<PlaceResponseDto> getPlaceList(GetPlaceListRequestDto requestDto, Member member) {
+        List<PlaceResponseDto> placeList = customPlaceRepository.getPlaceList(requestDto, member);
         for (PlaceResponseDto responseDto : placeList) {
             List<ImageDto> imageList = responseDto.getImageList();
             responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
