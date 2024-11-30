@@ -2,6 +2,7 @@ package com.jigumulmi.place.dto.request;
 
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,4 +24,8 @@ public class GetPlaceListRequestDto {
 
     @Parameter(description = "장소 상위 카테고리")
     private PlaceCategoryGroup categoryGroup;
+
+    @Parameter(description = "좋아요 필터")
+    @Schema(defaultValue = "false")
+    private Boolean showLikedOnly = false;
 }

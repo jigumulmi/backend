@@ -25,6 +25,7 @@ import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberBasicResponseDto;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
+import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
@@ -44,6 +45,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Map;
@@ -56,9 +58,9 @@ public class CustomPlaceRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public List<PlaceResponseDto> getPlaceList(GetPlaceListRequestDto requestDto) {
+    public List<PlaceResponseDto> getPlaceList(GetPlaceListRequestDto requestDto, Member member) {
 
-        return queryFactory
+        JPAQuery<Place> query = queryFactory
             .selectFrom(place)
             .join(place.categoryMappingList, placeCategoryMapping)
             .join(place.placeImageList, placeImage)
@@ -72,7 +74,14 @@ public class CustomPlaceRepository {
                 subwayStationCondition(requestDto.getSubwayStationId()),
                 categoryGroupCondition(requestDto.getCategoryGroup()),
                 nameCondition(requestDto.getPlaceName())
-            )
+            );
+
+        if (requestDto.getShowLikedOnly()) {
+            query = query.join(place.placeLikeList, placeLike)
+                .on(place.id.eq(placeLike.place.id).and(placeLike.member.eq(member)));
+        }
+
+        return query
             .transform(
                 groupBy(place.id).list(
                     Projections.fields(PlaceResponseDto.class,
