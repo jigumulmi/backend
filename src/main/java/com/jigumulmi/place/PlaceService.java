@@ -219,6 +219,7 @@ public class PlaceService {
             .reviewImageList(reviewImageList)
             .showLikeCount(likeCount != 0)
             .likeCount(likeCount)
+            .member(!place.getIsFromAdmin() ? place.getMember() : null)
             .build();
     }
 

@@ -1,5 +1,7 @@
 package com.jigumulmi.place.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jigumulmi.member.dto.response.MemberBasicResponseDto;
 import com.jigumulmi.place.domain.Menu;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -68,4 +70,8 @@ public class PlaceDetailResponseDto extends PlaceResponseDto {
 
     private Boolean showLikeCount;
     private Long likeCount;
+
+    private MemberBasicResponseDto member;
+    @JsonIgnore
+    private Boolean isFromAdmin;
 }

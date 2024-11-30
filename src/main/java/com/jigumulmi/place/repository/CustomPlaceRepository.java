@@ -23,6 +23,7 @@ import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.member.dto.response.MemberBasicResponseDto;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
@@ -157,6 +158,7 @@ public class CustomPlaceRepository {
             .join(subwayStationPlace.subwayStation, subwayStation)
             .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
             .join(subwayStationLineMapping.subwayStationLine)
+            .leftJoin(place.member, member)
             .where(place.id.eq(placeId).and(place.isApproved.eq(true)))
             .transform(
                 groupBy(place.id).list(
@@ -197,7 +199,13 @@ public class CustomPlaceRepository {
                         place.additionalInfo,
                         Projections.fields(SurroundingDateOpeningHour.class,
                             getSurroundingDateOpeningHourExpressions()
-                        ).as("surroundingDateOpeningHour")
+                        ).as("surroundingDateOpeningHour"),
+                        Projections.fields(
+                            MemberBasicResponseDto.class,
+                            member.id,
+                            member.nickname
+                        ).as("member"),
+                        place.isFromAdmin
                     )
                 )
             ).stream().findFirst()
