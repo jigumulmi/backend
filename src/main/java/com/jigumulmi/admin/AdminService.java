@@ -16,6 +16,7 @@ import com.jigumulmi.admin.repository.CustomAdminRepository;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
+import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.PlaceCategoryMapping;
@@ -87,7 +88,7 @@ public class AdminService {
     }
 
     @Transactional
-    public void createPlace(AdminCreatePlaceRequestDto requestDto) {
+    public void createPlace(AdminCreatePlaceRequestDto requestDto, Member member) {
         OpeningHourDto openingHour = requestDto.getOpeningHour();
         PositionDto position = requestDto.getPosition();
 
@@ -110,6 +111,7 @@ public class AdminService {
             .isApproved(requestDto.getIsApproved())
             .kakaoPlaceId(requestDto.getKakaoPlaceId())
             .isFromAdmin(true)
+            .member(member)
             .build();
 
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(

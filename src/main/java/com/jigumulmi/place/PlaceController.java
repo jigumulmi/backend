@@ -62,8 +62,11 @@ public class PlaceController {
     @Operation(summary = "장소 등록 신청")
     @ApiResponse(responseCode = "201")
     @PostMapping("")
-    public ResponseEntity<?> registerPlace(@Valid @RequestBody CreatePlaceRequestDto requestDto) {
-        placeService.registerPlace(requestDto);
+    public ResponseEntity<?> registerPlace(
+        @Valid @RequestBody CreatePlaceRequestDto requestDto,
+        @OptionalAuthUser Member member
+    ) {
+        placeService.registerPlace(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Register success");
     }
 

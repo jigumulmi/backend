@@ -10,12 +10,10 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class MemberDetailResponseDto {
+public class MemberDetailResponseDto extends MemberBasicResponseDto{
 
     private LocalDateTime createdAt;
     private LocalDateTime deregisteredAt;
-    private Long id;
-    private String nickname;
     private String email;
     private Boolean isAdmin;
 }

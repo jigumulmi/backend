@@ -92,12 +92,13 @@ public class PlaceService {
     }
 
     @Transactional
-    public void registerPlace(CreatePlaceRequestDto requestDto) {
+    public void registerPlace(CreatePlaceRequestDto requestDto, Member member) {
 
         Place newPlace = Place.builder()
             .name(requestDto.getName())
             .registrantComment(requestDto.getRegistrantComment())
             .isApproved(false)
+            .member(member)
             .build();
 
         ArrayList<Menu> menuList = new ArrayList<>();
@@ -218,6 +219,7 @@ public class PlaceService {
             .reviewImageList(reviewImageList)
             .showLikeCount(likeCount != 0)
             .likeCount(likeCount)
+            .member(!place.getIsFromAdmin() ? place.getMember() : null)
             .build();
     }
 
@@ -297,7 +299,7 @@ public class PlaceService {
 
     public List<ReviewResponseDto> getReviewList(Member member, Long placeId) {
         List<ReviewResponseDto> reviewList = customPlaceRepository.getReviewListByPlaceId(
-            placeId, member.getId());
+            placeId, member);
 
         Map<Long, Long> reviewReplyCount = customPlaceRepository.getReviewReplyCount(placeId);
 
@@ -311,7 +313,7 @@ public class PlaceService {
 
 
     public List<ReviewReplyResponseDto> getReviewReplyList(Member member, Long reviewId) {
-        return customPlaceRepository.getReviewReplyListByReviewId(member.getId(), reviewId);
+        return customPlaceRepository.getReviewReplyListByReviewId(member, reviewId);
     }
 
     @Transactional
