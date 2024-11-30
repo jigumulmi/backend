@@ -17,6 +17,7 @@ import static com.jigumulmi.place.domain.QSubwayStationPlace.subwayStationPlace;
 import static com.jigumulmi.place.vo.CurrentOpeningInfo.getSurroundingDateOpeningHourExpressions;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
+import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
@@ -133,12 +134,8 @@ public class CustomPlaceRepository {
         }
     }
 
-    public BooleanExpression nameCondition(String placeName) {
-        if (placeName == null) {
-            return null;
-        } else {
-            return place.name.startsWith(placeName);
-        }
+    public BooleanBuilder nameCondition(String placeName) {
+        return nullSafeBuilder(() -> place.name.startsWith(placeName));
     }
 
     public BooleanExpression categoryGroupCondition(PlaceCategoryGroup categoryGroup) {
@@ -288,8 +285,12 @@ public class CustomPlaceRepository {
             );
     }
 
-    private BooleanBuilder memberEq(Member requestMember) {
-        return nullSafeBuilder(() -> member.eq(requestMember));
+    private BooleanExpression memberEq(Member requestMember) {
+        if (requestMember == null) {
+            return FALSE;
+        } else {
+            return member.eq(requestMember);
+        }
     }
 
     public Map<Long, Long> getReviewReplyCount(Long placeId) {
