@@ -64,9 +64,9 @@ public class CustomPlaceRepository {
             .selectFrom(place)
             .join(place.categoryMappingList, placeCategoryMapping)
             .join(place.placeImageList, placeImage)
-            .on(place.id.eq(placeImage.place.id).and(placeImage.isMain.eq(true)))
+            .on(placeImage.isMain.eq(true))
             .join(place.subwayStationPlaceList, subwayStationPlace)
-            .on(place.id.eq(subwayStationPlace.place.id).and(subwayStationPlace.isMain.eq(true)))
+            .on(subwayStationPlace.isMain.eq(true))
             .join(subwayStationPlace.subwayStation, subwayStation)
             .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
             .join(subwayStationLineMapping.subwayStationLine, subwayStationLine)
@@ -76,9 +76,9 @@ public class CustomPlaceRepository {
                 nameCondition(requestDto.getPlaceName())
             );
 
-        if (requestDto.getShowLikedOnly()) {
+        if (requestDto.getShowLikedOnly() && member != null) {
             query = query.join(place.placeLikeList, placeLike)
-                .on(place.id.eq(placeLike.place.id).and(placeLike.member.eq(member)));
+                .on(placeLike.member.eq(member));
         }
 
         return query
@@ -163,7 +163,7 @@ public class CustomPlaceRepository {
             .from(place)
             .join(place.categoryMappingList, placeCategoryMapping)
             .join(place.subwayStationPlaceList, subwayStationPlace)
-            .on(subwayStationPlace.place.id.eq(place.id).and(subwayStationPlace.isMain.eq(true)))
+            .on(subwayStationPlace.isMain.eq(true))
             .join(subwayStationPlace.subwayStation, subwayStation)
             .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
             .join(subwayStationLineMapping.subwayStationLine)
