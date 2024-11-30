@@ -8,6 +8,8 @@ import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.config.common.PageableParams;
+import com.jigumulmi.config.security.RequiredAuthUser;
+import com.jigumulmi.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -76,8 +78,11 @@ public class AdminController {
     @Operation(summary = "장소 등록")
     @ApiResponse(responseCode = "204")
     @PostMapping("/place")
-    public ResponseEntity<?> createPlace(@RequestBody AdminCreatePlaceRequestDto requestDto) {
-        adminService.createPlace(requestDto);
+    public ResponseEntity<?> createPlace(
+        @RequestBody AdminCreatePlaceRequestDto requestDto,
+        @RequiredAuthUser Member member
+    ) {
+        adminService.createPlace(requestDto, member);
         return ResponseEntity.noContent().build();
     }
 

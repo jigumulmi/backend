@@ -25,7 +25,7 @@ public class AdminCreatePlaceRequestDto {
     }
 
     private String name;
-    private List<CategoryDto> categoryList;
+    private List<CategoryDto> categoryList = new ArrayList<>();
     private String address;
     private String contact;
     private List<String> menuList = new ArrayList<>();
