@@ -1,6 +1,8 @@
 package com.jigumulmi.place.repository;
 
 
+import static com.jigumulmi.config.querydsl.Utils.nullSafeBuilder;
+import static com.jigumulmi.member.domain.QMember.member;
 import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
 import static com.jigumulmi.place.domain.QPlaceImage.placeImage;
@@ -20,6 +22,7 @@ import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
+import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
@@ -34,6 +37,7 @@ import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -219,13 +223,13 @@ public class CustomPlaceRepository {
     }
 
 
-    public List<ReviewResponseDto> getReviewListByPlaceId(Long placeId, Long requestMemberId) {
+    public List<ReviewResponseDto> getReviewListByPlaceId(Long placeId, Member requestMember) {
         // fetchJoin() 과 Projections 동시 사용 불가
         // 엔티티인 상태로 탐색하는 것이 fetchJoin이기 때문
 
         return queryFactory
             .selectFrom(review)
-            .join(review.member)
+            .join(review.member, member)
             .leftJoin(review.reviewImageList, reviewImage)
             .where(review.place.id.eq(placeId))
             .orderBy(review.createdAt.desc(), reviewImage.createdAt.desc())
@@ -243,7 +247,7 @@ public class CustomPlaceRepository {
                         review.rating,
                         review.content,
                         new CaseBuilder()
-                            .when(review.member.id.eq(requestMemberId)).then(true)
+                            .when(memberEq(requestMember)).then(true)
                             .otherwise(false).as("isEditable"),
                         Projections.fields(MemberDetailResponseDto.class,
                             review.member.createdAt,
@@ -267,6 +271,10 @@ public class CustomPlaceRepository {
             );
     }
 
+    private BooleanBuilder memberEq(Member requestMember) {
+        return nullSafeBuilder(() -> member.eq(requestMember));
+    }
+
     public Map<Long, Long> getReviewReplyCount(Long placeId) {
 
         return queryFactory
@@ -277,7 +285,7 @@ public class CustomPlaceRepository {
             .transform(groupBy(review.id).as(reviewReply.count()));
     }
 
-    public List<ReviewReplyResponseDto> getReviewReplyListByReviewId(Long requestMemberId,
+    public List<ReviewReplyResponseDto> getReviewReplyListByReviewId(Member requestMember,
         Long reviewId) {
 
         return queryFactory
@@ -293,7 +301,7 @@ public class CustomPlaceRepository {
                     reviewReply.id,
                     reviewReply.content,
                     new CaseBuilder()
-                        .when(reviewReply.member.id.eq(requestMemberId)).then(true)
+                        .when(memberEq(requestMember)).then(true)
                         .otherwise(false).as("isEditable"),
                     Projections.fields(MemberDetailResponseDto.class,
                         reviewReply.member.createdAt,
@@ -307,7 +315,7 @@ public class CustomPlaceRepository {
             ).distinct()
             .from(reviewReply)
             .where(reviewReply.review.id.eq(reviewId))
-            .join(reviewReply.member)
+            .join(reviewReply.member, member)
             .orderBy(reviewReply.createdAt.asc())
             .fetch();
     }

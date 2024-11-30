@@ -298,7 +298,7 @@ public class PlaceService {
 
     public List<ReviewResponseDto> getReviewList(Member member, Long placeId) {
         List<ReviewResponseDto> reviewList = customPlaceRepository.getReviewListByPlaceId(
-            placeId, member.getId());
+            placeId, member);
 
         Map<Long, Long> reviewReplyCount = customPlaceRepository.getReviewReplyCount(placeId);
 
@@ -312,7 +312,7 @@ public class PlaceService {
 
 
     public List<ReviewReplyResponseDto> getReviewReplyList(Member member, Long reviewId) {
-        return customPlaceRepository.getReviewReplyListByReviewId(member.getId(), reviewId);
+        return customPlaceRepository.getReviewReplyListByReviewId(member, reviewId);
     }
 
     @Transactional

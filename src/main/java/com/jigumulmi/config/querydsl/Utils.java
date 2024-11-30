@@ -1,12 +1,15 @@
 package com.jigumulmi.config.querydsl;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.SimplePath;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import org.springframework.data.domain.Sort;
 
 public class Utils {
@@ -32,6 +35,14 @@ public class Utils {
         );
 
         return orders.toArray(OrderSpecifier[]::new);
+    }
+
+    public static BooleanBuilder nullSafeBuilder(Supplier<BooleanExpression> f) {
+        try {
+            return new BooleanBuilder(f.get());
+        } catch (IllegalArgumentException e) {
+            return new BooleanBuilder();
+        }
     }
 
 }

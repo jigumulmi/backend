@@ -58,15 +58,6 @@ public class Member extends Timestamped {
     }
 
     /**
-     * 선택적으로 사용자 인증을 하는 api에서 인증되지 않은 요청의 경우 생성되는 가짜 사용자
-     *
-     * @param fakeId 가짜 사용자를 생성하기 위한 존재하지 않는 memberId
-     */
-    public Member(Long fakeId) {
-        this.id = fakeId;
-    }
-
-    /**
      * 스웨거 또는 포스트맨으로 인증된 테스트 사용자
      */
     public Member(Long id, String nickname) {
