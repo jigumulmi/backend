@@ -2,6 +2,7 @@ package com.jigumulmi.place;
 
 import static java.lang.Math.round;
 
+import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;
@@ -17,6 +18,8 @@ import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
+import com.jigumulmi.place.dto.request.CreateS3DeletePresignedUrlRequestDto;
+import com.jigumulmi.place.dto.request.CreateS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
@@ -30,6 +33,8 @@ import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningH
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
+import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
+import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
@@ -60,12 +65,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
-import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.Delete;
-import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +74,10 @@ public class PlaceService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-    private final S3Client s3Client;
+    private final String S3_REVIEW_IMAGE_PREFIX = "reviewImage/";
+    private final String S3_MENU_IMAGE_PREFIX = "menuImage/";
+
+    private final S3Service s3Service;
 
     private final SubwayStationRepository subwayStationRepository;
     private final PlaceRepository placeRepository;
@@ -246,21 +249,12 @@ public class PlaceService {
                     String fileExtension = StringUtils.getFilenameExtension(
                         image.getOriginalFilename());
                     String s3Key =
-                        "reviewImage/" + requestDto.getPlaceId() + "/" + UUID.randomUUID() + "."
-                            + fileExtension;
+                        S3_REVIEW_IMAGE_PREFIX + requestDto.getPlaceId() + "/" + UUID.randomUUID()
+                            + "." + fileExtension;
 
                     s3KeyList.add(s3Key);
 
-                    PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                        .bucket(bucket)
-                        .key(s3Key)
-                        .contentType(image.getContentType())
-                        .contentLength(image.getSize())
-                        .build();
-
-                    s3Client.putObject(putObjectRequest,
-                        RequestBody.fromInputStream(image.getInputStream(), image.getSize())
-                    );
+                    s3Service.putObject(bucket, s3Key, image);
                 }
             } catch (SdkException | IOException e) {
                 throw new RuntimeException(e);
@@ -327,21 +321,12 @@ public class PlaceService {
                 String fileExtension = StringUtils.getFilenameExtension(
                     image.getOriginalFilename());
                 String s3Key =
-                    "reviewImage/" + placeId + "/" + UUID.randomUUID() + "."
+                    S3_REVIEW_IMAGE_PREFIX + placeId + "/" + UUID.randomUUID() + "."
                         + fileExtension;
 
                 s3KeyList.add(s3Key);
 
-                PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                    .bucket(bucket)
-                    .key(s3Key)
-                    .contentType(image.getContentType())
-                    .contentLength(image.getSize())
-                    .build();
-
-                s3Client.putObject(putObjectRequest,
-                    RequestBody.fromInputStream(image.getInputStream(), image.getSize())
-                );
+                s3Service.putObject(bucket, s3Key, image);
             }
         } catch (SdkException | IOException e) {
             throw new RuntimeException(e);
@@ -372,12 +357,8 @@ public class PlaceService {
             List<ObjectIdentifier> objectIdentifierList = trashReviewImageList.stream().map(
                 i -> ObjectIdentifier.builder().key(i.getS3Key()).build()
             ).toList();
-            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
-                .bucket(bucket)
-                .delete(Delete.builder().objects(objectIdentifierList).build())
-                .build();
 
-            s3Client.deleteObjects(deleteObjectsRequest);
+            s3Service.deleteObjects(bucket, objectIdentifierList);
         } catch (SdkException e) {
             System.out.println("S3 DeleteObjects Error: " + e.getMessage());
         }
@@ -399,12 +380,8 @@ public class PlaceService {
             List<ObjectIdentifier> objectIdentifierList = reviewImageList.stream().map(
                 i -> ObjectIdentifier.builder().key(i.getS3Key()).build()
             ).toList();
-            DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
-                .bucket(bucket)
-                .delete(Delete.builder().objects(objectIdentifierList).build())
-                .build();
 
-            s3Client.deleteObjects(deleteObjectsRequest);
+            s3Service.deleteObjects(bucket, objectIdentifierList);
         } catch (SdkException e) {
             System.out.println("S3 DeleteObjects Error: " + e.getMessage());
         }
@@ -459,5 +436,24 @@ public class PlaceService {
         } else {
             placeLikeRepository.deleteByPlace_IdAndMember(placeId, member);
         }
+    }
+
+    public S3PutPresignedUrlResponseDto createS3PutPresignedUrl(
+        CreateS3PutPresignedUrlRequestDto requestDto) {
+        String filename = UUID.randomUUID().toString();
+        String s3Key = S3_MENU_IMAGE_PREFIX + requestDto.getPlaceId() + "/" + filename + "."
+            + requestDto.getFileExtension();
+
+        String url = s3Service.generatePutObjectPresignedUrl(bucket, s3Key);
+        return S3PutPresignedUrlResponseDto.builder()
+            .url(url)
+            .filename(filename)
+            .build();
+    }
+
+    public S3DeletePresignedUrlResponseDto createS3DeletePresignedUrl(
+        CreateS3DeletePresignedUrlRequestDto requestDto) {
+        String url = s3Service.generateDeleteObjectPresignedUrl(bucket, requestDto.getS3Key());
+        return S3DeletePresignedUrlResponseDto.builder().url(url).build();
     }
 }
