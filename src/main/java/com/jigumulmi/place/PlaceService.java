@@ -452,8 +452,7 @@ public class PlaceService {
 
     public S3DeletePresignedUrlResponseDto createS3DeletePresignedUrl(
         CreateS3DeletePresignedUrlRequestDto requestDto) {
-        String s3Key = S3_MENU_IMAGE_PREFIX + requestDto.getFullFilename();
-        String url = s3Service.generateDeleteObjectPresignedUrl(bucket, s3Key);
+        String url = s3Service.generateDeleteObjectPresignedUrl(bucket, requestDto.getS3Key());
         return S3DeletePresignedUrlResponseDto.builder().url(url).build();
     }
 }

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateS3DeletePresignedUrlRequestDto {
 
-    @Schema(description = "확장자 포함한 파일 이름")
+    @Schema(description = "메뉴 정보 조회 시 전달한 imageS3Key, 파일이름만 보내시면 안됩니다")
     @NotBlank
-    private String fullFilename;
+    private String s3Key;
 }
