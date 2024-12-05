@@ -441,8 +441,7 @@ public class PlaceService {
     public S3PutPresignedUrlResponseDto createS3PutPresignedUrl(
         CreateS3PutPresignedUrlRequestDto requestDto) {
         String filename = UUID.randomUUID().toString();
-        String s3Key = S3_MENU_IMAGE_PREFIX + requestDto.getPlaceId() + "/" + filename + "."
-            + requestDto.getFileExtension();
+        String s3Key = S3_MENU_IMAGE_PREFIX + filename + "." + requestDto.getFileExtension();
 
         String url = s3Service.generatePutObjectPresignedUrl(bucket, s3Key);
         return S3PutPresignedUrlResponseDto.builder()
@@ -453,7 +452,8 @@ public class PlaceService {
 
     public S3DeletePresignedUrlResponseDto createS3DeletePresignedUrl(
         CreateS3DeletePresignedUrlRequestDto requestDto) {
-        String url = s3Service.generateDeleteObjectPresignedUrl(bucket, requestDto.getS3Key());
+        String s3Key = S3_MENU_IMAGE_PREFIX + requestDto.getFullFilename();
+        String url = s3Service.generateDeleteObjectPresignedUrl(bucket, s3Key);
         return S3DeletePresignedUrlResponseDto.builder().url(url).build();
     }
 }

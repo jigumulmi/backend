@@ -9,7 +9,5 @@ import lombok.NoArgsConstructor;
 public class CreateS3PutPresignedUrlRequestDto {
 
     @NotBlank
-    private Long placeId;
-    @NotBlank
     private String fileExtension;
 }
