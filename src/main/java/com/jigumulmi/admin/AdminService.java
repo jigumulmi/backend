@@ -17,12 +17,14 @@ import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.place.PlaceService;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.PlaceCategoryMapping;
 import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
@@ -40,6 +42,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class AdminService {
+
+    private final PlaceService placeService;
 
     private final CustomAdminRepository customAdminRepository;
     private final MemberRepository memberRepository;
@@ -61,7 +65,8 @@ public class AdminService {
     }
 
     @Transactional(readOnly = true)
-    public AdminPlaceListResponseDto getPlaceList(Pageable pageable, AdminGetPlaceListRequestDto requestDto) {
+    public AdminPlaceListResponseDto getPlaceList(Pageable pageable,
+        AdminGetPlaceListRequestDto requestDto) {
         Page<Place> placePage = customAdminRepository.getPlaceList(pageable,
             requestDto);
 
@@ -130,8 +135,16 @@ public class AdminService {
         }
 
         ArrayList<Menu> menuList = new ArrayList<>();
-        for (String menuName : requestDto.getMenuList()) {
-            Menu menu = Menu.builder().name(menuName).place(place).build();
+        for (MenuDto menuDto : requestDto.getMenuList()) {
+            String imageS3Key = placeService.S3_MENU_IMAGE_PREFIX + menuDto.getFullFilename();
+            Menu menu = Menu.builder()
+                .name(menuDto.getName())
+                .description(menuDto.getDescription())
+                .price(menuDto.getPrice())
+                .imageS3Key(imageS3Key)
+                .isMain(menuDto.getIsMain())
+                .place(place)
+                .build();
             menuList.add(menu);
         }
 
@@ -185,8 +198,15 @@ public class AdminService {
         }
 
         ArrayList<Menu> menuList = new ArrayList<>();
-        for (String menuName : requestDto.getMenuList()) {
-            Menu menu = Menu.builder().name(menuName).place(place).build();
+        for (MenuDto menuDto : requestDto.getMenuList()) {
+            Menu menu = Menu.builder()
+                .name(menuDto.getName())
+                .description(menuDto.getDescription())
+                .price(menuDto.getPrice())
+                .imageS3Key(menuDto.getImageS3Key())
+                .isMain(menuDto.getIsMain())
+                .place(place)
+                .build();
             menuList.add(menu);
         }
 

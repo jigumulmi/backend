@@ -69,7 +69,7 @@ public class AdminController {
         value = {@ApiResponse(responseCode = "200", content = {
             @Content(schema = @Schema(implementation = AdminPlaceDetailResponseDto.class))})}
     )
-    @GetMapping("/place/detail/{placeId}")
+    @GetMapping("/place/{placeId}")
     public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
         AdminPlaceDetailResponseDto placeDetail = adminService.getPlaceDetail(placeId);
         return ResponseEntity.ok().body(placeDetail);

@@ -21,9 +21,23 @@ public class Menu {
     @JsonBackReference
     private Place place;
 
+    private Boolean isMain;
+
+    private String price;
+
+    private String description;
+
+    @Column(name = "image_s3_key", length = 1024)
+    private String imageS3Key;
+
     @Builder
-    public Menu(String name, Place place) {
+    public Menu(String name, Place place, Boolean isMain, String price, String description,
+        String imageS3Key) {
         this.name = name;
         this.place = place;
+        this.isMain = isMain;
+        this.price = price;
+        this.description = description;
+        this.imageS3Key = imageS3Key;
     }
 }
