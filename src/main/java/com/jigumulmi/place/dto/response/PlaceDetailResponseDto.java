@@ -3,6 +3,8 @@ package com.jigumulmi.place.dto.response;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jigumulmi.member.dto.response.MemberBasicResponseDto;
 import com.jigumulmi.place.domain.Menu;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.AccessMode;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,6 +23,7 @@ public class PlaceDetailResponseDto extends PlaceResponseDto {
     @AllArgsConstructor
     public static class MenuDto {
 
+        @Schema(accessMode = AccessMode.READ_ONLY)
         private Long id;
 
         private String name;
@@ -70,7 +73,7 @@ public class PlaceDetailResponseDto extends PlaceResponseDto {
 
     private String contact;
 
-    private List<PlaceDetailResponseDto.MenuDto> menuList;
+    private List<MenuDto> menuList;
 
     private PlaceDetailResponseDto.OpeningHourDto openingHour;
 

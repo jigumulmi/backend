@@ -23,6 +23,7 @@ import com.jigumulmi.place.domain.PlaceCategoryMapping;
 import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
@@ -130,8 +131,15 @@ public class AdminService {
         }
 
         ArrayList<Menu> menuList = new ArrayList<>();
-        for (String menuName : requestDto.getMenuList()) {
-            Menu menu = Menu.builder().name(menuName).place(place).build();
+        for (MenuDto menuDto : requestDto.getMenuList()) {
+            Menu menu = Menu.builder()
+                .name(menuDto.getName())
+                .description(menuDto.getDescription())
+                .price(menuDto.getPrice())
+                .imageS3Key(menuDto.getImageS3Key())
+                .isMain(menuDto.getIsMain())
+                .place(place)
+                .build();
             menuList.add(menu);
         }
 
@@ -185,8 +193,15 @@ public class AdminService {
         }
 
         ArrayList<Menu> menuList = new ArrayList<>();
-        for (String menuName : requestDto.getMenuList()) {
-            Menu menu = Menu.builder().name(menuName).place(place).build();
+        for (MenuDto menuDto : requestDto.getMenuList()) {
+            Menu menu = Menu.builder()
+                .name(menuDto.getName())
+                .description(menuDto.getDescription())
+                .price(menuDto.getPrice())
+                .imageS3Key(menuDto.getImageS3Key())
+                .isMain(menuDto.getIsMain())
+                .place(place)
+                .build();
             menuList.add(menu);
         }
 
