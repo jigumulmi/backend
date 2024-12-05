@@ -74,8 +74,8 @@ public class PlaceService {
 
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
-    private final String S3_REVIEW_IMAGE_PREFIX = "reviewImage/";
-    private final String S3_MENU_IMAGE_PREFIX = "menuImage/";
+    public final String S3_REVIEW_IMAGE_PREFIX = "reviewImage/";
+    public final String S3_MENU_IMAGE_PREFIX = "menuImage/";
 
     private final S3Service s3Service;
 
