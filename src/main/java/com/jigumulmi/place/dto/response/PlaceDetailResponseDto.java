@@ -25,10 +25,22 @@ public class PlaceDetailResponseDto extends PlaceResponseDto {
 
         private String name;
 
+        private Boolean isMain;
+
+        private String price;
+
+        private String description;
+
+        private String imageS3Key;
+
         public static MenuDto from(Menu menu) {
             return MenuDto.builder()
                 .id(menu.getId())
                 .name(menu.getName())
+                .isMain(menu.getIsMain())
+                .price(menu.getPrice())
+                .description(menu.getDescription())
+                .imageS3Key(menu.getImageS3Key())
                 .build();
         }
     }
