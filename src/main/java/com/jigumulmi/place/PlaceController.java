@@ -116,7 +116,7 @@ public class PlaceController {
         value = {@ApiResponse(responseCode = "200", content = {
             @Content(schema = @Schema(implementation = PlaceDetailResponseDto.class))})}
     )
-    @GetMapping("/detail/{placeId}")
+    @GetMapping("/{placeId}")
     public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
         PlaceDetailResponseDto placeDetail = placeService.getPlaceDetail(placeId);
         return ResponseEntity.ok().body(placeDetail);

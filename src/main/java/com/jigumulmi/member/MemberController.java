@@ -81,7 +81,7 @@ public class MemberController {
         value = {@ApiResponse(responseCode = "200", content = {
             @Content(schema = @Schema(implementation = MemberDetailResponseDto.class))})}
     )
-    @GetMapping("/detail")
+    @GetMapping("")
     public ResponseEntity<?> getUserDetail(@RequiredAuthUser Member member) {
         MemberDetailResponseDto userDetail = memberService.getUserDetail(member);
         return ResponseEntity.ok().body(userDetail);
