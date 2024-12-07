@@ -10,10 +10,6 @@ import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.config.common.PageableParams;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
-import com.jigumulmi.place.dto.request.CreateS3DeletePresignedUrlRequestDto;
-import com.jigumulmi.place.dto.request.CreateS3PutPresignedUrlRequestDto;
-import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
-import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +18,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -107,25 +102,5 @@ public class AdminController {
         @RequestBody AdminDeletePlaceRequestDto requestDto) {
         adminService.deletePlace(requestDto);
         return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "S3 Put Presigned Url 요청")
-    @ApiResponse(responseCode = "201", content = {
-        @Content(schema = @Schema(implementation = S3PutPresignedUrlResponseDto.class))})
-    @PostMapping("/s3-put-presigned-url")
-    public ResponseEntity<?> createS3PutPresignedUrl(
-        @RequestBody CreateS3PutPresignedUrlRequestDto requestDto) {
-        S3PutPresignedUrlResponseDto responseDto = adminService.createS3PutPresignedUrl(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
-    }
-
-    @Operation(summary = "S3 Delete Presigned Url 요청")
-    @ApiResponse(responseCode = "201", content = {
-        @Content(schema = @Schema(implementation = S3DeletePresignedUrlResponseDto.class))})
-    @PostMapping("/s3-delete-presigned-url")
-    public ResponseEntity<?> createS3DeletePresignedUrl(
-        @RequestBody CreateS3DeletePresignedUrlRequestDto requestDto) {
-        S3DeletePresignedUrlResponseDto responseDto = adminService.createS3DeletePresignedUrl(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 }
