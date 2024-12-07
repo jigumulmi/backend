@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
@@ -21,6 +22,9 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 @Service
 @RequiredArgsConstructor
 public class S3Service {
+
+    @Value("${cloud.aws.s3.bucket}")
+    public String bucket;
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;

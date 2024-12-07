@@ -13,6 +13,7 @@ import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.dto.response.PageDto;
 import com.jigumulmi.admin.repository.CustomAdminRepository;
+import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.MemberRepository;
@@ -24,14 +25,19 @@ import com.jigumulmi.place.domain.PlaceCategoryMapping;
 import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.dto.request.CreateS3DeletePresignedUrlRequestDto;
+import com.jigumulmi.place.dto.request.CreateS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
+import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -44,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminService {
 
     private final PlaceService placeService;
+    private final S3Service s3Service;
 
     private final CustomAdminRepository customAdminRepository;
     private final MemberRepository memberRepository;
@@ -136,7 +143,7 @@ public class AdminService {
 
         ArrayList<Menu> menuList = new ArrayList<>();
         for (MenuDto menuDto : requestDto.getMenuList()) {
-            String imageS3Key = placeService.S3_MENU_IMAGE_PREFIX + menuDto.getFullFilename();
+            String imageS3Key = placeService.MENU_IMAGE_S3_PREFIX + menuDto.getFullFilename();
             Menu menu = Menu.builder()
                 .name(menuDto.getName())
                 .description(menuDto.getDescription())
@@ -240,5 +247,23 @@ public class AdminService {
 
     public void deletePlace(AdminDeletePlaceRequestDto requestDto) {
         placeRepository.deleteById(requestDto.getPlaceId());
+    }
+
+    public S3PutPresignedUrlResponseDto createS3PutPresignedUrl(
+        CreateS3PutPresignedUrlRequestDto requestDto) {
+        String filename = UUID.randomUUID().toString();
+        String s3Key = placeService.MENU_IMAGE_S3_PREFIX + filename + "." + requestDto.getFileExtension();
+
+        String url = s3Service.generatePutObjectPresignedUrl(s3Service.bucket, s3Key);
+        return S3PutPresignedUrlResponseDto.builder()
+            .url(url)
+            .filename(filename)
+            .build();
+    }
+
+    public S3DeletePresignedUrlResponseDto createS3DeletePresignedUrl(
+        CreateS3DeletePresignedUrlRequestDto requestDto) {
+        String url = s3Service.generateDeleteObjectPresignedUrl(s3Service.bucket, requestDto.getS3Key());
+        return S3DeletePresignedUrlResponseDto.builder().url(url).build();
     }
 }
