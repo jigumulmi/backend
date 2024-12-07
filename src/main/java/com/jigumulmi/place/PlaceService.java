@@ -249,7 +249,7 @@ public class PlaceService {
                     s3Service.putObject(s3Service.bucket, s3Key, image);
                 }
             } catch (SdkException | IOException e) {
-                throw new RuntimeException(e);
+                throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
             }
 
             List<ReviewImage> reviewImageList = new ArrayList<>();
@@ -321,7 +321,7 @@ public class PlaceService {
                 s3Service.putObject(s3Service.bucket, s3Key, image);
             }
         } catch (SdkException | IOException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
 
         List<ReviewImage> newReviewImageList = new ArrayList<>();
@@ -352,7 +352,7 @@ public class PlaceService {
 
             s3Service.deleteObjects(s3Service.bucket, objectIdentifierList);
         } catch (SdkException e) {
-            System.out.println("S3 DeleteObjects Error: " + e.getMessage());
+            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -375,7 +375,7 @@ public class PlaceService {
 
             s3Service.deleteObjects(s3Service.bucket, objectIdentifierList);
         } catch (SdkException e) {
-            System.out.println("S3 DeleteObjects Error: " + e.getMessage());
+            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
 
         List<ReviewReply> reviewReplyList = review.getReviewReplyList();
@@ -410,7 +410,6 @@ public class PlaceService {
 
     public List<PlaceCategory> getPlaceCategoryList(PlaceCategoryGroup placeCategoryGroup) {
         return placeCategoryGroup.getPlaceCategoryList();
-
     }
 
     @Transactional
