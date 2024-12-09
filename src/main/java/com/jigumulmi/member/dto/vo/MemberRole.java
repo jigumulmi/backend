@@ -8,7 +8,8 @@ import lombok.Getter;
 public enum MemberRole {
 
     ADMIN("ROLE_ADMIN"),
-    GENERAL("ROLE_GENERAL");
+    GENERAL("ROLE_GENERAL")
+    ;
 
     private final String value;
 

@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### my ignore ###
-/src/**/*.properties
+/src/main/**/*.properties
 scripts/*.sh
 ### Querydsl
 /src/main/generated

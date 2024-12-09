@@ -76,7 +76,7 @@ public class KakaoService {
      * @return accessToken 인가코드로 얻은 엑세스 토큰
      * @throws JsonProcessingException 카카오 API 응답 본문 파싱 에러
      */
-    private String getAccessToken(KakaoAuthorizationRequestDto requestDto)
+    public String getAccessToken(KakaoAuthorizationRequestDto requestDto)
         throws JsonProcessingException {
         // HTTP Header 생성
         HttpHeaders headers = new HttpHeaders();
@@ -114,7 +114,7 @@ public class KakaoService {
         return accessToken;
     }
 
-    private KakaoMemberInfoDto getKakaoMemberInfo(String accessToken)
+    public KakaoMemberInfoDto getKakaoMemberInfo(String accessToken)
         throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         // 토큰으로 카카오 API 호출
@@ -141,7 +141,7 @@ public class KakaoService {
         return KakaoMemberInfoDto.builder().email(email).build();
     }
 
-    private Long getKakaoUserId(String accessToken) throws JsonProcessingException {
+    public Long getKakaoUserId(String accessToken) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
 
@@ -162,7 +162,7 @@ public class KakaoService {
         return id;
     }
 
-    private Member registerKakaoUserIfNeeded(KakaoMemberInfoDto kakaoMemberInfo, String accessToken)
+    public Member registerKakaoUserIfNeeded(KakaoMemberInfoDto kakaoMemberInfo, String accessToken)
         throws JsonProcessingException {
         String kakaoEmail = kakaoMemberInfo.getEmail();
         Member kakaoMember = memberRepository.findByEmail(kakaoEmail).orElse(null);

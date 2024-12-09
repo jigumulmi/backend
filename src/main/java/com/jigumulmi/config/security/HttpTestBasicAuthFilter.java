@@ -42,7 +42,7 @@ public class HttpTestBasicAuthFilter extends OncePerRequestFilter {
                     Long id = Long.valueOf(username);
 
                     HttpSession session = request.getSession();
-                    Member testMember = new Member(id, "testMember");
+                    Member testMember = Member.testMemberBuilder().id(id).build();
                     UserDetailsServiceImpl.setSecurityContextAndSession(testMember, session);
                 }
             }
