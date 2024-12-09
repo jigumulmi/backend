@@ -25,6 +25,7 @@ public class S3Service {
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
+    private final Duration DEFAULT_DURATION = Duration.ofMinutes(60);
 
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
@@ -60,7 +61,7 @@ public class S3Service {
                     .key(key)
                     .build()
             )
-            .signatureDuration(Duration.ofSeconds(30))
+            .signatureDuration(DEFAULT_DURATION)
             .build();
 
         return s3Presigner.presignPutObject(request).url().toString();
@@ -74,7 +75,7 @@ public class S3Service {
                     .key(key)
                     .build()
             )
-            .signatureDuration(Duration.ofSeconds(30))
+            .signatureDuration(DEFAULT_DURATION)
             .build();
 
         return s3Presigner.presignDeleteObject(request).url().toString();

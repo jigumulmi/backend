@@ -322,18 +322,18 @@ public class CustomPlaceRepository {
                         .when(memberEq(requestMember)).then(true)
                         .otherwise(false).as("isEditable"),
                     Projections.fields(MemberDetailResponseDto.class,
-                        reviewReply.member.createdAt,
-                        reviewReply.member.id,
-                        reviewReply.member.nickname,
-                        reviewReply.member.email).as("member"),
+                        member.createdAt,
+                        member.id,
+                        member.nickname,
+                        member.email).as("member"),
                     new CaseBuilder()
                         .when(reviewReply.createdAt.eq(reviewReply.modifiedAt)).then(false)
                         .otherwise(true).as("isEdited")
                 )
-            ).distinct()
+            )
             .from(reviewReply)
-            .where(reviewReply.review.id.eq(reviewId))
             .join(reviewReply.member, member)
+            .where(reviewReply.review.id.eq(reviewId))
             .orderBy(reviewReply.createdAt.asc())
             .fetch();
     }

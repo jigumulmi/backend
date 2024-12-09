@@ -223,7 +223,8 @@ public class PlaceController {
         @Content(schema = @Schema(implementation = S3PutPresignedUrlResponseDto.class))})
     @PostMapping("/s3-put-presigned-url")
     public ResponseEntity<?> createS3PutPresignedUrl(
-        @RequestBody CreateS3PutPresignedUrlRequestDto requestDto) {
+        @RequestBody CreateS3PutPresignedUrlRequestDto requestDto,
+        @RequiredAuthUser Member Member) {
         S3PutPresignedUrlResponseDto responseDto = placeService.createS3PutPresignedUrl(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
@@ -233,7 +234,8 @@ public class PlaceController {
         @Content(schema = @Schema(implementation = S3DeletePresignedUrlResponseDto.class))})
     @PostMapping("/s3-delete-presigned-url")
     public ResponseEntity<?> createS3DeletePresignedUrl(
-        @RequestBody CreateS3DeletePresignedUrlRequestDto requestDto) {
+        @RequestBody CreateS3DeletePresignedUrlRequestDto requestDto,
+        @RequiredAuthUser Member Member) {
         S3DeletePresignedUrlResponseDto responseDto = placeService.createS3DeletePresignedUrl(
             requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
