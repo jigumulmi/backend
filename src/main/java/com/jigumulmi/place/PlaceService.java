@@ -59,7 +59,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -71,11 +70,8 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 @RequiredArgsConstructor
 public class PlaceService {
 
-
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
-    public final String S3_REVIEW_IMAGE_PREFIX = "reviewImage/";
-    public final String S3_MENU_IMAGE_PREFIX = "menuImage/";
+    public final String REVIEW_IMAGE_S3_PREFIX = "reviewImage/";
+    public final String MENU_IMAGE_S3_PREFIX = "menuImage/";
 
     private final S3Service s3Service;
 
@@ -249,15 +245,15 @@ public class PlaceService {
                     String fileExtension = StringUtils.getFilenameExtension(
                         image.getOriginalFilename());
                     String s3Key =
-                        S3_REVIEW_IMAGE_PREFIX + requestDto.getPlaceId() + "/" + UUID.randomUUID()
+                        REVIEW_IMAGE_S3_PREFIX + requestDto.getPlaceId() + "/" + UUID.randomUUID()
                             + "." + fileExtension;
 
                     s3KeyList.add(s3Key);
 
-                    s3Service.putObject(bucket, s3Key, image);
+                    s3Service.putObject(s3Service.bucket, s3Key, image);
                 }
             } catch (SdkException | IOException e) {
-                throw new RuntimeException(e);
+                throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
             }
 
             List<ReviewImage> reviewImageList = new ArrayList<>();
@@ -321,15 +317,15 @@ public class PlaceService {
                 String fileExtension = StringUtils.getFilenameExtension(
                     image.getOriginalFilename());
                 String s3Key =
-                    S3_REVIEW_IMAGE_PREFIX + placeId + "/" + UUID.randomUUID() + "."
+                    REVIEW_IMAGE_S3_PREFIX + placeId + "/" + UUID.randomUUID() + "."
                         + fileExtension;
 
                 s3KeyList.add(s3Key);
 
-                s3Service.putObject(bucket, s3Key, image);
+                s3Service.putObject(s3Service.bucket, s3Key, image);
             }
         } catch (SdkException | IOException e) {
-            throw new RuntimeException(e);
+            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
 
         List<ReviewImage> newReviewImageList = new ArrayList<>();
@@ -358,9 +354,9 @@ public class PlaceService {
                 i -> ObjectIdentifier.builder().key(i.getS3Key()).build()
             ).toList();
 
-            s3Service.deleteObjects(bucket, objectIdentifierList);
+            s3Service.deleteObjects(s3Service.bucket, objectIdentifierList);
         } catch (SdkException e) {
-            System.out.println("S3 DeleteObjects Error: " + e.getMessage());
+            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -381,9 +377,9 @@ public class PlaceService {
                 i -> ObjectIdentifier.builder().key(i.getS3Key()).build()
             ).toList();
 
-            s3Service.deleteObjects(bucket, objectIdentifierList);
+            s3Service.deleteObjects(s3Service.bucket, objectIdentifierList);
         } catch (SdkException e) {
-            System.out.println("S3 DeleteObjects Error: " + e.getMessage());
+            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
 
         List<ReviewReply> reviewReplyList = review.getReviewReplyList();
@@ -418,7 +414,6 @@ public class PlaceService {
 
     public List<PlaceCategory> getPlaceCategoryList(PlaceCategoryGroup placeCategoryGroup) {
         return placeCategoryGroup.getPlaceCategoryList();
-
     }
 
     @Transactional
@@ -441,9 +436,9 @@ public class PlaceService {
     public S3PutPresignedUrlResponseDto createS3PutPresignedUrl(
         CreateS3PutPresignedUrlRequestDto requestDto) {
         String filename = UUID.randomUUID().toString();
-        String s3Key = S3_MENU_IMAGE_PREFIX + filename + "." + requestDto.getFileExtension();
+        String s3Key = MENU_IMAGE_S3_PREFIX + filename + "." + requestDto.getFileExtension();
 
-        String url = s3Service.generatePutObjectPresignedUrl(bucket, s3Key);
+        String url = s3Service.generatePutObjectPresignedUrl(s3Service.bucket, s3Key);
         return S3PutPresignedUrlResponseDto.builder()
             .url(url)
             .filename(filename)
@@ -452,7 +447,8 @@ public class PlaceService {
 
     public S3DeletePresignedUrlResponseDto createS3DeletePresignedUrl(
         CreateS3DeletePresignedUrlRequestDto requestDto) {
-        String url = s3Service.generateDeleteObjectPresignedUrl(bucket, requestDto.getS3Key());
+        String url = s3Service.generateDeleteObjectPresignedUrl(s3Service.bucket,
+            requestDto.getS3Key());
         return S3DeletePresignedUrlResponseDto.builder().url(url).build();
     }
 }
