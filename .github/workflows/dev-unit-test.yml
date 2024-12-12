@@ -58,7 +58,7 @@ jobs:
 
       # Gradle test 실행
       - name: Test with Gradle
-        run: ./gradlew --info test
+        run: ./gradlew --quiet test
 
       # 테스트 후 Result 출력
       - name: Publish Unit Test Results
