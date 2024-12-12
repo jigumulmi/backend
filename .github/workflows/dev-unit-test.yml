@@ -17,9 +17,9 @@ jobs:
       ## properties 파일 세팅
       - name: Setup application.properties
         env:
-          MAIN_PROPERTY_DIR: src/main/resources
+          MAIN_PROPERTY_DIR: ./src/main/resources
           MAIN_PROPERTY_FILE: application.properties
-          TEST_PROPERTY_DIR: src/test/resources
+          TEST_PROPERTY_DIR: ./src/test/resources
           TEST_PROPERTY_FILE: application-default.properties
         run:
           mkdir $MAIN_PROPERTY_DIR $TEST_PROPERTY_DIR |
