@@ -5,7 +5,7 @@ on:
     branches: [ dev ]
 
 permissions:
-  contents: write
+  checks: write
 
 jobs:
   unit-test:
