@@ -14,18 +14,14 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@ToString
 public class Member extends Timestamped {
 
     @Id
@@ -60,9 +56,10 @@ public class Member extends Timestamped {
     /**
      * 스웨거 또는 포스트맨으로 인증된 테스트 사용자
      */
-    public Member(Long id, String nickname) {
+    @Builder(builderMethodName = "testMemberBuilder", builderClassName="TestMemberBuilder")
+    public Member(Long id) {
         this.id = id;
-        this.nickname = nickname;
+        this.nickname = "testMember";
         this.isAdmin = true;
     }
 
