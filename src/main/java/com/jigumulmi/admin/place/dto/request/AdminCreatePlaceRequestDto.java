@@ -1,4 +1,4 @@
-package com.jigumulmi.admin.dto.request;
+package com.jigumulmi.admin.place.dto.request;
 
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;

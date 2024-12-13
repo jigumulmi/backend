@@ -1,4 +1,4 @@
-package com.jigumulmi.admin.dto.request;
+package com.jigumulmi.admin.place.dto.request;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

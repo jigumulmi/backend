@@ -1,4 +1,4 @@
-package com.jigumulmi.admin.dto.response;
+package com.jigumulmi.admin.place.dto.response;
 
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.SubwayStation;

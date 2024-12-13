@@ -1,12 +1,11 @@
-package com.jigumulmi.admin;
+package com.jigumulmi.admin.place;
 
-import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
-import com.jigumulmi.admin.dto.request.AdminDeletePlaceRequestDto;
-import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
-import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
-import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
-import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
+import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminDeletePlaceRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminUpdatePlaceRequestDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceDetailResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.config.common.PageableParams;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
@@ -31,23 +30,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin")
-public class AdminController {
+@RequestMapping("/admin/place")
+public class AdminPlaceController {
 
-    private final AdminService adminService;
-
-    @Operation(summary = "멤버 리스트 조회")
-    @ApiResponses(
-        value = {@ApiResponse(responseCode = "200", content = {
-            @Content(schema = @Schema(implementation = AdminMemberListResponseDto.class))})}
-    )
-    @PageableParams
-    @GetMapping("/member")
-    public ResponseEntity<?> getMemberList(
-        @ParameterObject Pageable pageable) {
-        AdminMemberListResponseDto memberList = adminService.getMemberList(pageable);
-        return ResponseEntity.ok().body(memberList);
-    }
+    private final AdminPlaceService adminPlaceService;
 
 
     @Operation(summary = "장소 리스트 조회")
@@ -56,11 +42,11 @@ public class AdminController {
             @Content(schema = @Schema(implementation = AdminPlaceListResponseDto.class))})}
     )
     @PageableParams
-    @GetMapping("/place")
+    @GetMapping("")
     public ResponseEntity<?> getPlaceList(
         @ParameterObject Pageable pageable,
         @ModelAttribute AdminGetPlaceListRequestDto requestDto) {
-        AdminPlaceListResponseDto placeList = adminService.getPlaceList(pageable, requestDto);
+        AdminPlaceListResponseDto placeList = adminPlaceService.getPlaceList(pageable, requestDto);
         return ResponseEntity.ok().body(placeList);
     }
 
@@ -69,38 +55,38 @@ public class AdminController {
         value = {@ApiResponse(responseCode = "200", content = {
             @Content(schema = @Schema(implementation = AdminPlaceDetailResponseDto.class))})}
     )
-    @GetMapping("/place/{placeId}")
+    @GetMapping("/{placeId}")
     public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
-        AdminPlaceDetailResponseDto placeDetail = adminService.getPlaceDetail(placeId);
+        AdminPlaceDetailResponseDto placeDetail = adminPlaceService.getPlaceDetail(placeId);
         return ResponseEntity.ok().body(placeDetail);
     }
 
     @Operation(summary = "장소 등록")
     @ApiResponse(responseCode = "204")
-    @PostMapping("/place")
+    @PostMapping("")
     public ResponseEntity<?> createPlace(
         @RequestBody AdminCreatePlaceRequestDto requestDto,
         @RequiredAuthUser Member member
     ) {
-        adminService.createPlace(requestDto, member);
+        adminPlaceService.createPlace(requestDto, member);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "장소 수정", description = "덮어쓰는 로직이므로 수정하지 않은 항목도 기존 조회된 데이터를 꼭 담아주세요")
     @ApiResponse(responseCode = "204")
-    @PutMapping("/place")
+    @PutMapping("")
     public ResponseEntity<?> updatePlaceDetail(
         @RequestBody AdminUpdatePlaceRequestDto requestDto) {
-        adminService.updatePlaceDetail(requestDto);
+        adminPlaceService.updatePlaceDetail(requestDto);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "장소 삭제")
     @ApiResponse(responseCode = "204")
-    @DeleteMapping("/place")
+    @DeleteMapping("")
     public ResponseEntity<?> deletePlace(
         @RequestBody AdminDeletePlaceRequestDto requestDto) {
-        adminService.deletePlace(requestDto);
+        adminPlaceService.deletePlace(requestDto);
         return ResponseEntity.noContent().build();
     }
 }
