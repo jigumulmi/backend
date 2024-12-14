@@ -1,5 +1,6 @@
 package com.jigumulmi.admin.banner;
 
+import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
 import com.jigumulmi.aws.S3Service;
@@ -23,6 +24,7 @@ public class AdminBannerService {
     private final S3Service s3Service;
 
     private final BannerRepository bannerRepository;
+    private final AdminCustomBannerRepository adminCustomBannerRepository;
 
     public void createBanner(CreateBannerRequestDto requestDto) {
         String outerImageS3Key = null;
@@ -59,5 +61,9 @@ public class AdminBannerService {
 
     public List<AdminBannerResponseDto> getBannerList() {
         return bannerRepository.findAll().stream().map(AdminBannerResponseDto::from).toList();
+    }
+
+    public void addBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
+        adminCustomBannerRepository.insertBannerPlace(bannerId, requestDto);
     }
 }

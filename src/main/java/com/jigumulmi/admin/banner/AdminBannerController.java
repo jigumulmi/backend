@@ -1,5 +1,6 @@
 package com.jigumulmi.admin.banner;
 
+import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,7 +16,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,5 +46,14 @@ public class AdminBannerController {
     public ResponseEntity<?> getBannerList() {
         List<AdminBannerResponseDto> bannerList = adminBannerService.getBannerList();
         return ResponseEntity.ok(bannerList);
+    }
+
+    @Operation(summary = "장소 할당")
+    @ApiResponse(responseCode = "204")
+    @PostMapping(path = "/{bannerId}/place")
+    public ResponseEntity<?> createBanner(@PathVariable Long bannerId,
+        @RequestBody BannerPlaceMappingRequestDto requestDto) {
+        adminBannerService.addBannerPlace(bannerId, requestDto);
+        return ResponseEntity.noContent().build();
     }
 }
