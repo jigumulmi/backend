@@ -2,7 +2,10 @@ package com.jigumulmi.admin.banner;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
+import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
+import com.jigumulmi.config.common.PageableParams;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,6 +15,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -65,5 +70,25 @@ public class AdminBannerController {
         @RequestBody BannerPlaceMappingRequestDto requestDto) {
         adminBannerService.removeBannerPlace(bannerId, requestDto);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "배너 상세 조회")
+    @ApiResponse(responseCode = "200", content = {
+        @Content(schema = @Schema(implementation = AdminBannerDetailResponseDto.class))})
+    @GetMapping("/{bannerId}")
+    public ResponseEntity<?> getBannerDetail(@PathVariable Long bannerId) {
+        AdminBannerDetailResponseDto responseDto = adminBannerService.getBannerDetail(bannerId);
+        return ResponseEntity.ok(responseDto);
+    }
+
+    @Operation(summary = "배너와 연관된 장소 목록 조회")
+    @ApiResponse(responseCode = "200", content = {
+        @Content(schema = @Schema(implementation = AdminBannerPlaceListResponseDto.class))})
+    @PageableParams
+    @GetMapping("/{bannerId}/place")
+    public ResponseEntity<?> getBannerPlaceList(@ParameterObject Pageable pageable, @PathVariable Long bannerId) {
+        AdminBannerPlaceListResponseDto responseDto = adminBannerService.getBannerPlaceList(
+            pageable, bannerId);
+        return ResponseEntity.ok(responseDto);
     }
 }

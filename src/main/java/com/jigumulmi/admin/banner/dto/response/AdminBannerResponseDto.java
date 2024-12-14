@@ -2,11 +2,11 @@ package com.jigumulmi.admin.banner.dto.response;
 
 import com.jigumulmi.banner.domain.Banner;
 import java.time.LocalDateTime;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
+@SuperBuilder
 public class AdminBannerResponseDto {
 
     private LocalDateTime modifiedAt;

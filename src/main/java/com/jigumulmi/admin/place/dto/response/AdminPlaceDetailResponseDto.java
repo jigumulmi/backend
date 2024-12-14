@@ -3,6 +3,7 @@ package com.jigumulmi.admin.place.dto.response;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import java.time.LocalDateTime;
@@ -41,8 +42,8 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
 
         List<ImageDto> imageList = place.getPlaceImageList().stream().map(ImageDto::from).toList();
 
-        List<CategoryDto> categoryList = place.getCategoryMappingList().stream()
-            .map(CategoryDto::fromPlaceCategoryMapping).toList();
+        List<PlaceCategoryDto> categoryList = place.getCategoryMappingList().stream()
+            .map(PlaceCategoryDto::fromPlaceCategoryMapping).toList();
 
         return AdminPlaceDetailResponseDto.builder()
             .createdAt(place.getCreatedAt())

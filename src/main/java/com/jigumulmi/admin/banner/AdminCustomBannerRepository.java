@@ -2,10 +2,19 @@ package com.jigumulmi.admin.banner;
 
 
 import static com.jigumulmi.banner.domain.QBannerPlaceMapping.bannerPlaceMapping;
+import static com.jigumulmi.config.querydsl.Utils.getOrderSpecifier;
+import static com.jigumulmi.place.domain.QPlace.place;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
+import com.jigumulmi.place.domain.Place;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -41,5 +50,24 @@ public class AdminCustomBannerRepository {
                     .and(bannerPlaceMapping.place.id.in(requestDto.getPlaceIdList()))
             )
             .execute();
+    }
+
+    public Page<Place> getBannerPlaceList(Pageable pageable, Long bannerId) {
+        List<Place> content = queryFactory
+            .selectFrom(place)
+            .join(place.bannerPlaceMappingList, bannerPlaceMapping)
+            .where(bannerPlaceMapping.banner.id.eq(bannerId))
+            .orderBy(getOrderSpecifier(pageable.getSort(), Expressions.path(Place.class, "place")))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        JPAQuery<Long> totalCountQuery = queryFactory
+            .select(place.count())
+            .from(place)
+            .join(place.bannerPlaceMappingList, bannerPlaceMapping)
+            .where(bannerPlaceMapping.banner.id.eq(bannerId));
+
+        return PageableExecutionUtils.getPage(content, pageable, totalCountQuery::fetchOne);
     }
 }

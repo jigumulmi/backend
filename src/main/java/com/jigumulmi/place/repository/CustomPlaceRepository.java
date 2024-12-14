@@ -30,7 +30,7 @@ import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
+import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
@@ -88,7 +88,7 @@ public class CustomPlaceRepository {
                     Projections.fields(PlaceResponseDto.class,
                         place.id,
                         place.name,
-                        list(Projections.fields(CategoryDto.class,
+                        list(Projections.fields(PlaceCategoryDto.class,
                             placeCategoryMapping.categoryGroup,
                             placeCategoryMapping.category
                         )).as("categoryList"),
@@ -187,7 +187,7 @@ public class CustomPlaceRepository {
                                 )
                             ).as("subwayStationLineList")
                         ).as("subwayStation"),
-                        list(Projections.fields(CategoryDto.class,
+                        list(Projections.fields(PlaceCategoryDto.class,
                             placeCategoryMapping.categoryGroup,
                             placeCategoryMapping.category
                         )).as("categoryList"),

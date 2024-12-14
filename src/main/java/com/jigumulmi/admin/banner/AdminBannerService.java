@@ -2,17 +2,26 @@ package com.jigumulmi.admin.banner;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
+import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
+import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.repository.BannerRepository;
+import com.jigumulmi.config.common.PageDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
+import com.jigumulmi.place.domain.Place;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -69,5 +78,31 @@ public class AdminBannerService {
 
     public void removeBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
         adminCustomBannerRepository.deleteBannerPlace(bannerId, requestDto);
+    }
+
+    public AdminBannerDetailResponseDto getBannerDetail(Long bannerId) {
+        Banner banner = bannerRepository.findById(bannerId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        return AdminBannerDetailResponseDto.from(banner);
+    }
+
+    @Transactional(readOnly = true)
+    public AdminBannerPlaceListResponseDto getBannerPlaceList(Pageable pageable, Long bannerId) {
+        Page<Place> placePage = adminCustomBannerRepository.getBannerPlaceList(pageable,
+            bannerId);
+
+        List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
+            .map(BannerPlaceDto::from).collect(Collectors.toList());
+
+        return AdminBannerPlaceListResponseDto.builder()
+            .data(placeDtoList)
+            .page(PageDto.builder()
+                .totalCount(placePage.getTotalElements())
+                .currentPage(pageable.getPageNumber() + 1)
+                .totalPage(placePage.getTotalPages())
+                .build()
+            )
+            .build();
     }
 }

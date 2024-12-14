@@ -27,7 +27,7 @@ import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
+import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
@@ -87,7 +87,7 @@ public class PlaceService {
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         return subwayStationRepository.findAllByStationNameStartsWith(stationName)
-            .stream().map(SubwayStationResponseDto::from).toList();
+            .stream().map(SubwayStationResponseDto::fromMainStation).toList();
     }
 
     @Transactional
@@ -127,7 +127,7 @@ public class PlaceService {
             List<ImageDto> imageList = responseDto.getImageList();
             responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
 
-            List<CategoryDto> distinctCategoryList = responseDto.getCategoryList().stream()
+            List<PlaceCategoryDto> distinctCategoryList = responseDto.getCategoryList().stream()
                 .distinct().toList();
             responseDto.setCategoryList(distinctCategoryList);
 
@@ -151,7 +151,7 @@ public class PlaceService {
     public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
         PlaceDetailResponseDto place = customPlaceRepository.getPlaceDetail(placeId);
 
-        List<CategoryDto> distinctCategoryList = place.getCategoryList().stream().distinct()
+        List<PlaceCategoryDto> distinctCategoryList = place.getCategoryList().stream().distinct()
             .toList();
 
         SubwayStationResponseDto subwayStation = place.getSubwayStation();

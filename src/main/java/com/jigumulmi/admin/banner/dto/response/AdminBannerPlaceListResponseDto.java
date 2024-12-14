@@ -1,28 +1,28 @@
-package com.jigumulmi.admin.place.dto.response;
+package com.jigumulmi.admin.banner.dto.response;
 
 import com.jigumulmi.config.common.PageDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Getter
 @Builder
-public class AdminPlaceListResponseDto {
+public class AdminBannerPlaceListResponseDto {
 
     @Getter
-    @SuperBuilder
-    @NoArgsConstructor
-    public static class PlaceDto extends PlaceResponseDto {
+    @Builder
+    public static class BannerPlaceDto {
 
-        private Boolean isApproved;
+        private Long id;
+        private String name;
+        private String district;
+        private SubwayStationResponseDto subwayStation;
+        private List<PlaceCategoryDto> categoryList;
 
-        public static PlaceDto from(Place place) {
+        public static BannerPlaceDto from(Place place) {
             SubwayStationResponseDto subwayStationResponseDto;
             if (place.getSubwayStationPlaceList().isEmpty()) {
                 subwayStationResponseDto = null;
@@ -32,22 +32,16 @@ public class AdminPlaceListResponseDto {
                 );
             }
 
-            return PlaceDto.builder()
+            return BannerPlaceDto.builder()
                 .id(place.getId())
                 .name(place.getName())
-                .position(
-                    PositionDto.builder().latitude(place.getLatitude())
-                        .longitude(place.getLongitude())
-                        .build()
-                )
                 .subwayStation(subwayStationResponseDto)
                 .categoryList(place.getCategoryMappingList().stream()
                     .map(PlaceCategoryDto::fromPlaceCategoryMapping).toList())
-                .isApproved(place.getIsApproved())
                 .build();
         }
     }
 
     private PageDto page;
-    private List<PlaceDto> data;
+    private List<BannerPlaceDto> data;
 }

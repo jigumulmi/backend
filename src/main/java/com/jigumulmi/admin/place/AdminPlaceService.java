@@ -23,7 +23,7 @@ import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
+import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
@@ -149,7 +149,7 @@ public class AdminPlaceService {
         }
 
         ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
-        for (CategoryDto categoryRequestDto : requestDto.getCategoryList()) {
+        for (PlaceCategoryDto categoryRequestDto : requestDto.getCategoryList()) {
             categoryMappingList.add(
                 PlaceCategoryMapping.builder()
                     .category(categoryRequestDto.getCategory())
@@ -211,7 +211,7 @@ public class AdminPlaceService {
         }
 
         ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
-        for (CategoryDto categoryRequestDto : requestDto.getCategoryList()) {
+        for (PlaceCategoryDto categoryRequestDto : requestDto.getCategoryList()) {
             categoryMappingList.add(
                 PlaceCategoryMapping.builder()
                     .category(categoryRequestDto.getCategory())
