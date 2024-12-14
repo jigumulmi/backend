@@ -64,6 +64,10 @@ public class AdminBannerService {
     }
 
     public void addBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
-        adminCustomBannerRepository.insertBannerPlace(bannerId, requestDto);
+        adminCustomBannerRepository.batchInsertBannerPlace(bannerId, requestDto);
+    }
+
+    public void removeBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
+        adminCustomBannerRepository.deleteBannerPlace(bannerId, requestDto);
     }
 }

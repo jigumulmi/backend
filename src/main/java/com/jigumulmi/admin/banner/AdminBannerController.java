@@ -14,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,9 +52,18 @@ public class AdminBannerController {
     @Operation(summary = "장소 할당")
     @ApiResponse(responseCode = "204")
     @PostMapping(path = "/{bannerId}/place")
-    public ResponseEntity<?> createBanner(@PathVariable Long bannerId,
+    public ResponseEntity<?> createBannerPlace(@PathVariable Long bannerId,
         @RequestBody BannerPlaceMappingRequestDto requestDto) {
         adminBannerService.addBannerPlace(bannerId, requestDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "장소 할당 해제")
+    @ApiResponse(responseCode = "204")
+    @DeleteMapping(path = "/{bannerId}/place")
+    public ResponseEntity<?> deleteBannerPlace(@PathVariable Long bannerId,
+        @RequestBody BannerPlaceMappingRequestDto requestDto) {
+        adminBannerService.removeBannerPlace(bannerId, requestDto);
         return ResponseEntity.noContent().build();
     }
 }

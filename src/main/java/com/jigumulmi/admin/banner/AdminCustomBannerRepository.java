@@ -1,6 +1,8 @@
 package com.jigumulmi.admin.banner;
 
 
+import static com.jigumulmi.banner.domain.QBannerPlaceMapping.bannerPlaceMapping;
+
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -16,7 +19,7 @@ public class AdminCustomBannerRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final JPAQueryFactory queryFactory;
 
-    public void insertBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
+    public void batchInsertBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
         String sql = "INSERT INTO banner_place_mapping (banner_id, place_id) " +
             "VALUES (:bannerId, :placeId)";
 
@@ -27,5 +30,16 @@ public class AdminCustomBannerRepository {
             .toArray(SqlParameterSource[]::new);
 
         jdbcTemplate.batchUpdate(sql, batch);
+    }
+
+    @Transactional
+    public void deleteBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
+        queryFactory
+            .delete(bannerPlaceMapping)
+            .where(
+                bannerPlaceMapping.banner.id.eq(bannerId)
+                    .and(bannerPlaceMapping.place.id.in(requestDto.getPlaceIdList()))
+            )
+            .execute();
     }
 }
