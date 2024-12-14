@@ -416,7 +416,6 @@ public class PlaceService {
         return placeCategoryGroup.getPlaceCategoryList();
     }
 
-    @Transactional
     public void togglePlaceLike(Long placeId, Boolean toggleOn, Member member) {
 
         if (toggleOn) {
