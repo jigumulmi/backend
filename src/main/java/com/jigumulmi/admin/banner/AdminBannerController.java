@@ -2,6 +2,7 @@ package com.jigumulmi.admin.banner;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
@@ -100,7 +101,7 @@ public class AdminBannerController {
 
     @Operation(summary = "배너 정보 수정", description = "이미지 제외한 정보 수정")
     @ApiResponse(responseCode = "201")
-    @PutMapping( "/{bannerId}")
+    @PutMapping("/{bannerId}")
     public ResponseEntity<?> updateBanner(@PathVariable Long bannerId,
         @Valid @RequestBody UpdateBannerRequestDto requestDto) {
         adminBannerService.updateBanner(bannerId, requestDto);
@@ -109,7 +110,7 @@ public class AdminBannerController {
 
     @Operation(summary = "배너 외부 이미지 수정")
     @ApiResponse(responseCode = "201")
-    @PutMapping(path = "/{bannerId}/outerImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(path = "/{bannerId}/outerImage", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateBannerOuterImage(@PathVariable Long bannerId,
         @RequestParam MultipartFile outerImage) {
         adminBannerService.updateBannerOuterImage(bannerId, outerImage);
@@ -118,10 +119,19 @@ public class AdminBannerController {
 
     @Operation(summary = "배너 내부 이미지 수정")
     @ApiResponse(responseCode = "201")
-    @PutMapping(path = "/{bannerId}/innerImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(path = "/{bannerId}/innerImage", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateBannerInnerImage(@PathVariable Long bannerId,
         @RequestParam MultipartFile innerImage) {
         adminBannerService.updateBannerInnerImage(bannerId, innerImage);
         return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "배너 삭제")
+    @ApiResponse(responseCode = "204")
+    @DeleteMapping("")
+    public ResponseEntity<?> deleteBannerList(
+        @Valid @RequestBody DeleteBannerRequestDto requestDto) {
+        adminBannerService.deleteBannerList(requestDto);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -34,7 +34,7 @@ public class Banner extends Timestamped {
     @ColumnDefault("false")
     private Boolean isActive;
 
-    @OneToMany(mappedBy = "banner")
+    @OneToMany(mappedBy = "banner", orphanRemoval = true)
     @JsonManagedReference
     private List<BannerPlaceMapping> bannerPlaceMappingList = new ArrayList<>();
 
@@ -45,7 +45,8 @@ public class Banner extends Timestamped {
         this.outerImageS3Key = outerImageS3Key;
         this.innerImageS3Key = innerImageS3Key;
         this.isActive = isActive;
-        this.bannerPlaceMappingList = bannerPlaceMappingList == null ? new ArrayList<>() : bannerPlaceMappingList;
+        this.bannerPlaceMappingList =
+            bannerPlaceMappingList == null ? new ArrayList<>() : bannerPlaceMappingList;
     }
 
     public void updateDetail(String title, Boolean isActive) {

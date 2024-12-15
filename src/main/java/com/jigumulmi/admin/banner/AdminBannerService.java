@@ -2,6 +2,7 @@ package com.jigumulmi.admin.banner;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
@@ -15,6 +16,7 @@ import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.place.domain.Place;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -26,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
+import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 
 @Service
 @RequiredArgsConstructor
@@ -151,6 +154,35 @@ public class AdminBannerService {
 
             s3Service.deleteObject(s3Service.bucket, oldS3Key);
         } catch (IOException | SdkException e) {
+            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Transactional
+    public void deleteBannerList(DeleteBannerRequestDto requestDto) {
+        List<Banner> bannerList = bannerRepository.findAllById(requestDto.getBannerIdList());
+
+        adminCustomBannerRepository.deleteBannerPlace(requestDto);
+        bannerRepository.deleteAllInBatch(bannerList);
+
+        try {
+            List<ObjectIdentifier> objectIdentifierList = new ArrayList<>();
+            for (Banner banner : bannerList) {
+                String outerImageS3Key = banner.getOuterImageS3Key();
+                String innerImageS3Key = banner.getInnerImageS3Key();
+
+                if (outerImageS3Key != null) {
+                    objectIdentifierList.add(
+                        ObjectIdentifier.builder().key(outerImageS3Key).build());
+                }
+                if (innerImageS3Key != null) {
+                    objectIdentifierList.add(
+                        ObjectIdentifier.builder().key(innerImageS3Key).build());
+                }
+            }
+
+            s3Service.deleteObjects(s3Service.bucket, objectIdentifierList);
+        } catch (SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
     }

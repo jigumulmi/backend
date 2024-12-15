@@ -6,6 +6,7 @@ import static com.jigumulmi.config.querydsl.Utils.getOrderSpecifier;
 import static com.jigumulmi.place.domain.QPlace.place;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
+import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.place.domain.Place;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -69,5 +70,14 @@ public class AdminCustomBannerRepository {
             .where(bannerPlaceMapping.banner.id.eq(bannerId));
 
         return PageableExecutionUtils.getPage(content, pageable, totalCountQuery::fetchOne);
+    }
+
+    @Transactional
+    public void deleteBannerPlace(DeleteBannerRequestDto requestDto) {
+        queryFactory
+            .delete(bannerPlaceMapping)
+            .where(
+                bannerPlaceMapping.banner.id.in(requestDto.getBannerIdList()))
+            .execute();
     }
 }
