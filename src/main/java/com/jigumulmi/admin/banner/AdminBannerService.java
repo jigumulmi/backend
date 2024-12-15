@@ -111,6 +111,7 @@ public class AdminBannerService {
             .build();
     }
 
+    @Transactional
     public void updateBanner(Long bannerId, UpdateBannerRequestDto requestDto) {
         Banner banner = bannerRepository.findById(bannerId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
@@ -120,6 +121,7 @@ public class AdminBannerService {
         bannerRepository.save(banner);
     }
 
+    @Transactional
     public void updateBannerOuterImage(Long bannerId, MultipartFile image) {
         Banner banner = bannerRepository.findById(bannerId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
@@ -139,6 +141,7 @@ public class AdminBannerService {
         }
     }
 
+    @Transactional
     public void updateBannerInnerImage(Long bannerId, MultipartFile image) {
         Banner banner = bannerRepository.findById(bannerId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
