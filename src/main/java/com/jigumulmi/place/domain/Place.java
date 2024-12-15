@@ -1,7 +1,8 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminUpdatePlaceRequestDto;
+import com.jigumulmi.banner.domain.BannerPlaceMapping;
 import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
@@ -108,6 +109,9 @@ public class Place extends Timestamped {
     @JsonManagedReference
     private List<PlaceLike> placeLikeList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "place", orphanRemoval = true)
+    private List<BannerPlaceMapping> bannerPlaceMappingList = new ArrayList<>();
+
     @Builder
     public Place(String name, List<PlaceCategoryMapping> categoryMappingList, String address,
         String contact, List<Menu> menuList,
@@ -117,7 +121,8 @@ public class Place extends Timestamped {
         Boolean isApproved, List<Review> reviewList,
         List<SubwayStationPlace> subwayStationPlaceList,
         List<PlaceImage> placeImageList, String kakaoPlaceId,
-        Boolean isFromAdmin, Member member, List<PlaceLike> placeLikeList
+        Boolean isFromAdmin, Member member, List<PlaceLike> placeLikeList,
+        List<BannerPlaceMapping> bannerPlaceMappingList
     ) {
         this.name = name;
         this.categoryMappingList =
@@ -146,6 +151,8 @@ public class Place extends Timestamped {
         this.isFromAdmin = (isFromAdmin != null) ? isFromAdmin : false;
         this.member = member;
         this.placeLikeList = placeLikeList != null ? placeLikeList : new ArrayList<>();
+        this.bannerPlaceMappingList =
+            bannerPlaceMappingList != null ? bannerPlaceMappingList : new ArrayList<>();
     }
 
     public void addChildren(List<PlaceCategoryMapping> categoryMappingList,

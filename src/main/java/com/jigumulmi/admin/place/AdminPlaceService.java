@@ -1,24 +1,19 @@
-package com.jigumulmi.admin;
+package com.jigumulmi.admin.place;
 
 
-import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto;
-import com.jigumulmi.admin.dto.request.AdminCreatePlaceRequestDto.ImageRequestDto;
-import com.jigumulmi.admin.dto.request.AdminDeletePlaceRequestDto;
-import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
-import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto;
-import com.jigumulmi.admin.dto.response.AdminMemberListResponseDto.MemberDto;
-import com.jigumulmi.admin.dto.response.AdminPlaceDetailResponseDto;
-import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto;
-import com.jigumulmi.admin.dto.response.AdminPlaceListResponseDto.PlaceDto;
-import com.jigumulmi.admin.dto.response.PageDto;
-import com.jigumulmi.admin.repository.CustomAdminRepository;
+import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto.ImageRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminDeletePlaceRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminUpdatePlaceRequestDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceDetailResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.aws.S3Service;
+import com.jigumulmi.config.common.PageDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
-import com.jigumulmi.member.MemberRepository;
 import com.jigumulmi.member.domain.Member;
-import com.jigumulmi.place.PlaceService;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.PlaceCategoryMapping;
@@ -28,7 +23,7 @@ import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.CategoryDto;
+import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
@@ -41,43 +36,27 @@ import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 
-@Service
+@org.springframework.stereotype.Service
 @RequiredArgsConstructor
-public class AdminService {
+public class AdminPlaceService {
 
-    private final PlaceService placeService;
+    private final com.jigumulmi.place.PlaceService placeService;
     private final S3Service s3Service;
 
-    private final CustomAdminRepository customAdminRepository;
-    private final MemberRepository memberRepository;
+    private final AdminCustomPlaceRepository adminCustomPlaceRepository;
     private final PlaceRepository placeRepository;
     private final SubwayStationRepository subwayStationRepository;
     private final MenuRepository menuRepository;
     private final ReviewImageRepository reviewImageRepository;
 
-    public AdminMemberListResponseDto getMemberList(Pageable pageable) {
-        Page<MemberDto> memberPage = memberRepository.findAll(pageable).map(MemberDto::from);
-
-        return AdminMemberListResponseDto.builder()
-            .data(memberPage.getContent())
-            .page(PageDto.builder()
-                .totalCount(memberPage.getTotalElements())
-                .currentPage(pageable.getPageNumber() + 1)
-                .totalPage(memberPage.getTotalPages())
-                .build()
-            )
-            .build();
-    }
-
     @Transactional(readOnly = true)
     public AdminPlaceListResponseDto getPlaceList(Pageable pageable,
         AdminGetPlaceListRequestDto requestDto) {
-        Page<Place> placePage = customAdminRepository.getPlaceList(pageable,
+        Page<Place> placePage = adminCustomPlaceRepository.getPlaceList(pageable,
             requestDto);
 
         List<PlaceDto> placeDtoList = placePage.getContent().stream()
@@ -170,7 +149,7 @@ public class AdminService {
         }
 
         ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
-        for (CategoryDto categoryRequestDto : requestDto.getCategoryList()) {
+        for (PlaceCategoryDto categoryRequestDto : requestDto.getCategoryList()) {
             categoryMappingList.add(
                 PlaceCategoryMapping.builder()
                     .category(categoryRequestDto.getCategory())
@@ -232,7 +211,7 @@ public class AdminService {
         }
 
         ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
-        for (CategoryDto categoryRequestDto : requestDto.getCategoryList()) {
+        for (PlaceCategoryDto categoryRequestDto : requestDto.getCategoryList()) {
             categoryMappingList.add(
                 PlaceCategoryMapping.builder()
                     .category(categoryRequestDto.getCategory())

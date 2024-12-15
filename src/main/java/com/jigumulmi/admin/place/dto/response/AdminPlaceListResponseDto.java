@@ -1,6 +1,8 @@
-package com.jigumulmi.admin.dto.response;
+package com.jigumulmi.admin.place.dto.response;
 
+import com.jigumulmi.config.common.PageDto;
 import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import java.util.List;
@@ -25,7 +27,7 @@ public class AdminPlaceListResponseDto {
             if (place.getSubwayStationPlaceList().isEmpty()) {
                 subwayStationResponseDto = null;
             } else {
-                subwayStationResponseDto = SubwayStationResponseDto.from(
+                subwayStationResponseDto = SubwayStationResponseDto.fromMainStation(
                     place.getSubwayStationPlaceList().getFirst().getSubwayStation()
                 );
             }
@@ -40,7 +42,7 @@ public class AdminPlaceListResponseDto {
                 )
                 .subwayStation(subwayStationResponseDto)
                 .categoryList(place.getCategoryMappingList().stream()
-                    .map(CategoryDto::fromPlaceCategoryMapping).toList())
+                    .map(PlaceCategoryDto::fromPlaceCategoryMapping).toList())
                 .isApproved(place.getIsApproved())
                 .build();
         }

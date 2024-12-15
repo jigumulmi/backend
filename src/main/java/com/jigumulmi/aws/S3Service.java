@@ -30,7 +30,8 @@ public class S3Service {
     private final S3Client s3Client;
     private final S3Presigner s3Presigner;
 
-    public void putObject(String bucketName, String key, MultipartFile file) throws IOException {
+    public void putObject(String bucketName, String key, MultipartFile file)
+        throws IOException, SdkException {
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
             .key(key)
@@ -43,8 +44,25 @@ public class S3Service {
         );
     }
 
+    public void deleteObject(String bucketName, String key) throws SdkException {
+        if (key == null) {
+            return;
+        }
+
+        DeleteObjectRequest request = DeleteObjectRequest.builder()
+            .bucket(bucketName)
+            .key(key)
+            .build();
+
+        s3Client.deleteObject(request);
+    }
+
     public void deleteObjects(String bucketName, List<ObjectIdentifier> objectIdentifierList)
         throws SdkException {
+        if (objectIdentifierList.isEmpty()) {
+            return;
+        }
+
         DeleteObjectsRequest deleteObjectsRequest = DeleteObjectsRequest.builder()
             .bucket(bucketName)
             .delete(Delete.builder().objects(objectIdentifierList).build())

@@ -1,4 +1,4 @@
-package com.jigumulmi.admin.dto.request;
+package com.jigumulmi.admin.place.dto.request;
 
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import io.swagger.v3.oas.annotations.Parameter;

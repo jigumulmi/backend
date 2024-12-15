@@ -1,4 +1,4 @@
-package com.jigumulmi.admin.dto.response;
+package com.jigumulmi.config.common;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -32,7 +32,7 @@ public class SubwayStationResponseDto {
     @Setter
     private List<SubwayStationLineDto> subwayStationLineList;
 
-    public static SubwayStationResponseDto from(SubwayStation subwayStation) {
+    public static SubwayStationResponseDto fromMainStation(SubwayStation subwayStation) {
         return SubwayStationResponseDto.builder()
             .id(subwayStation.getId())
             .stationName(subwayStation.getStationName())

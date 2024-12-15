@@ -1,10 +1,10 @@
-package com.jigumulmi.admin.repository;
+package com.jigumulmi.admin.place;
 
 
 import static com.jigumulmi.config.querydsl.Utils.getOrderSpecifier;
 import static com.jigumulmi.place.domain.QPlace.place;
 
-import com.jigumulmi.admin.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
-public class CustomAdminRepository {
+public class AdminCustomPlaceRepository {
 
     private final JPAQueryFactory queryFactory;
 
