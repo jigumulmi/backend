@@ -2,6 +2,7 @@ package com.jigumulmi.admin.banner;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto.BannerPlaceDto;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.exception.SdkException;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +56,7 @@ public class AdminBannerService {
                 innerImageS3Key = BANNER_S3_PREFIX + UUID.randomUUID() + "." + fileExtension;
                 s3Service.putObject(s3Service.bucket, innerImageS3Key, innerImage);
             }
-        } catch (IOException e) {
+        } catch (IOException | SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
 
@@ -104,5 +106,52 @@ public class AdminBannerService {
                 .build()
             )
             .build();
+    }
+
+    public void updateBanner(Long bannerId, UpdateBannerRequestDto requestDto) {
+        Banner banner = bannerRepository.findById(bannerId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        banner.updateDetail(requestDto.getTitle(), requestDto.getIsActive());
+
+        bannerRepository.save(banner);
+    }
+
+    public void updateBannerOuterImage(Long bannerId, MultipartFile image) {
+        Banner banner = bannerRepository.findById(bannerId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+        String oldS3Key = banner.getOuterImageS3Key();
+
+        try {
+            String fileExtension = StringUtils.getFilenameExtension(image.getOriginalFilename());
+            String newS3Key = BANNER_S3_PREFIX + UUID.randomUUID() + "." + fileExtension;
+            s3Service.putObject(s3Service.bucket, newS3Key, image);
+
+            banner.updateOuterS3ImageKey(newS3Key);
+            bannerRepository.save(banner);
+
+            s3Service.deleteObject(s3Service.bucket, oldS3Key);
+        } catch (IOException | SdkException e) {
+            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public void updateBannerInnerImage(Long bannerId, MultipartFile image) {
+        Banner banner = bannerRepository.findById(bannerId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+        String oldS3Key = banner.getInnerImageS3Key();
+
+        try {
+            String fileExtension = StringUtils.getFilenameExtension(image.getOriginalFilename());
+            String newS3Key = BANNER_S3_PREFIX + UUID.randomUUID() + "." + fileExtension;
+            s3Service.putObject(s3Service.bucket, newS3Key, image);
+
+            banner.updateInnerS3ImageKey(newS3Key);
+            bannerRepository.save(banner);
+
+            s3Service.deleteObject(s3Service.bucket, oldS3Key);
+        } catch (IOException | SdkException e) {
+            throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
+        }
     }
 }

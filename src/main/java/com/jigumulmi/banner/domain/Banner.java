@@ -47,4 +47,18 @@ public class Banner extends Timestamped {
         this.isActive = isActive;
         this.bannerPlaceMappingList = bannerPlaceMappingList == null ? new ArrayList<>() : bannerPlaceMappingList;
     }
+
+    public void updateDetail(String title, Boolean isActive) {
+        this.title = title;
+        this.isActive = isActive;
+    }
+
+    public void updateOuterS3ImageKey(String outerImageS3Key) {
+        this.outerImageS3Key = outerImageS3Key;
+    }
+
+    public void updateInnerS3ImageKey(String innerImageS3Key) {
+        this.innerImageS3Key = innerImageS3Key;
+    }
+
 }
