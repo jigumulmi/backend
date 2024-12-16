@@ -70,12 +70,12 @@ public class AdminBannerController {
     }
 
     @Operation(summary = "장소 할당 해제")
-    @ApiResponse(responseCode = "201")
+    @ApiResponse(responseCode = "204")
     @DeleteMapping(path = "/{bannerId}/place")
     public ResponseEntity<?> deleteBannerPlace(@PathVariable Long bannerId,
         @RequestBody BannerPlaceMappingRequestDto requestDto) {
         adminBannerService.removeBannerPlace(bannerId, requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "배너 상세 조회")

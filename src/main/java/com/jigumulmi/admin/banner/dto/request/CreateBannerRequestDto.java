@@ -3,6 +3,7 @@ package com.jigumulmi.admin.banner.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,5 +21,6 @@ public class CreateBannerRequestDto {
     @Schema(description = "배너 클릭 후 노출되는 이미지")
     private MultipartFile innerImage;
     @Schema(requiredMode = RequiredMode.REQUIRED)
+    @NotNull
     private Boolean isActive;
 }
