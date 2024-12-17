@@ -5,8 +5,7 @@ import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.domain.BannerPlaceMapping;
 import com.jigumulmi.banner.repository.BannerRepository;
-import com.jigumulmi.config.JpaAuditingConfig;
-import com.jigumulmi.config.TestQueryDslConfig;
+import com.jigumulmi.common.RepositoryTest;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.repository.PlaceRepository;
 import java.util.List;
@@ -14,14 +13,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@DataJpaTest(showSql = false)
-@Import({TestQueryDslConfig.class, JpaAuditingConfig.class})
+@RepositoryTest
 class AdminCustomBannerRepositoryTest {
 
     @Autowired
