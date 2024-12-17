@@ -11,6 +11,7 @@ import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.repository.BannerRepository;
+import com.jigumulmi.config.common.FileUtils;
 import com.jigumulmi.config.common.PageDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
@@ -18,14 +19,12 @@ import com.jigumulmi.place.domain.Place;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
@@ -46,17 +45,13 @@ public class AdminBannerService {
         try {
             MultipartFile outerImage = requestDto.getOuterImage();
             if (outerImage != null) {
-                String fileExtension = StringUtils.getFilenameExtension(
-                    outerImage.getOriginalFilename());
-                outerImageS3Key = BANNER_S3_PREFIX + UUID.randomUUID() + "." + fileExtension;
+                outerImageS3Key = BANNER_S3_PREFIX + FileUtils.generateUniqueFilename(outerImage);
                 s3Service.putObject(s3Service.bucket, outerImageS3Key, outerImage);
             }
 
             MultipartFile innerImage = requestDto.getInnerImage();
             if (innerImage != null) {
-                String fileExtension = StringUtils.getFilenameExtension(
-                    innerImage.getOriginalFilename());
-                innerImageS3Key = BANNER_S3_PREFIX + UUID.randomUUID() + "." + fileExtension;
+                innerImageS3Key = BANNER_S3_PREFIX + FileUtils.generateUniqueFilename(innerImage);
                 s3Service.putObject(s3Service.bucket, innerImageS3Key, innerImage);
             }
         } catch (IOException | SdkException e) {
@@ -93,8 +88,8 @@ public class AdminBannerService {
     }
 
     @Transactional(readOnly = true)
-    public AdminBannerPlaceListResponseDto getBannerPlaceList(Pageable pageable, Long bannerId) {
-        Page<Place> placePage = adminCustomBannerRepository.getBannerPlaceList(pageable,
+    public AdminBannerPlaceListResponseDto getMappedPlaceList(Pageable pageable, Long bannerId) {
+        Page<Place> placePage = adminCustomBannerRepository.getPlaceList(pageable,
             bannerId);
 
         List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
@@ -128,8 +123,7 @@ public class AdminBannerService {
         String oldS3Key = banner.getOuterImageS3Key();
 
         try {
-            String fileExtension = StringUtils.getFilenameExtension(image.getOriginalFilename());
-            String newS3Key = BANNER_S3_PREFIX + UUID.randomUUID() + "." + fileExtension;
+            String newS3Key = BANNER_S3_PREFIX + FileUtils.generateUniqueFilename(image);
             s3Service.putObject(s3Service.bucket, newS3Key, image);
 
             banner.updateOuterS3ImageKey(newS3Key);
@@ -148,8 +142,7 @@ public class AdminBannerService {
         String oldS3Key = banner.getInnerImageS3Key();
 
         try {
-            String fileExtension = StringUtils.getFilenameExtension(image.getOriginalFilename());
-            String newS3Key = BANNER_S3_PREFIX + UUID.randomUUID() + "." + fileExtension;
+            String newS3Key = BANNER_S3_PREFIX + FileUtils.generateUniqueFilename(image);
             s3Service.putObject(s3Service.bucket, newS3Key, image);
 
             banner.updateInnerS3ImageKey(newS3Key);

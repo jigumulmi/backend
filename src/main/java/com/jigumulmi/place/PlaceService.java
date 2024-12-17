@@ -3,6 +3,7 @@ package com.jigumulmi.place;
 import static java.lang.Math.round;
 
 import com.jigumulmi.aws.S3Service;
+import com.jigumulmi.config.common.FileUtils;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;
@@ -242,11 +243,8 @@ public class PlaceService {
             ArrayList<String> s3KeyList = new ArrayList<>();
             try {
                 for (MultipartFile image : requestDto.getImageList()) {
-                    String fileExtension = StringUtils.getFilenameExtension(
-                        image.getOriginalFilename());
-                    String s3Key =
-                        REVIEW_IMAGE_S3_PREFIX + requestDto.getPlaceId() + "/" + UUID.randomUUID()
-                            + "." + fileExtension;
+                    String s3Key = REVIEW_IMAGE_S3_PREFIX + requestDto.getPlaceId() + "/"
+                        + FileUtils.generateUniqueFilename(image);
 
                     s3KeyList.add(s3Key);
 
