@@ -23,6 +23,7 @@ import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
+import com.jigumulmi.common.MultipartTestUtils;
 import com.jigumulmi.config.common.PageDto;
 import com.jigumulmi.config.security.MockMember;
 import com.jigumulmi.config.security.SecurityConfig;
@@ -74,12 +75,8 @@ class AdminBannerControllerTest {
         // given
         CreateBannerRequestDto createBannerRequestDto = new CreateBannerRequestDto(
             "testTitle",
-            new MockMultipartFile(
-                "outerImage", "content".getBytes()
-            ),
-            new MockMultipartFile(
-                "innerImage", "content".getBytes()
-            ),
+            MultipartTestUtils.createMockFile("outerImage"),
+            MultipartTestUtils.createMockFile("innerImage"),
             false
         );
 
@@ -119,12 +116,8 @@ class AdminBannerControllerTest {
         // given
         CreateBannerRequestDto createBannerRequestDto = new CreateBannerRequestDto(
             title,
-            new MockMultipartFile(
-                "outerImage", "content".getBytes()
-            ),
-            new MockMultipartFile(
-                "innerImage", "content".getBytes()
-            ),
+            MultipartTestUtils.createMockFile("outerImage"),
+            MultipartTestUtils.createMockFile("innerImage"),
             isActive
         );
 
@@ -170,7 +163,6 @@ class AdminBannerControllerTest {
         ResultActions perform = mockMvc.perform(
             get("/admin/banner")
                 .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
         );
 
         // then
@@ -350,9 +342,7 @@ class AdminBannerControllerTest {
         // given
         Long bannerId = 1L;
 
-        MockMultipartFile outerImage = new MockMultipartFile(
-            "outerImage", "content".getBytes()
-        );
+        MockMultipartFile outerImage = MultipartTestUtils.createMockFile("outerImage");
 
         willDoNothing().given(adminBannerService).updateBannerOuterImage(bannerId, outerImage);
 
@@ -377,9 +367,7 @@ class AdminBannerControllerTest {
         // given
         Long bannerId = 1L;
 
-        MockMultipartFile innerImage = new MockMultipartFile(
-            "innerImage", "content".getBytes()
-        );
+        MockMultipartFile innerImage = MultipartTestUtils.createMockFile("innerImage");
 
         willDoNothing().given(adminBannerService).updateBannerInnerImage(bannerId, innerImage);
 
