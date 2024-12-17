@@ -88,8 +88,8 @@ public class AdminBannerService {
     }
 
     @Transactional(readOnly = true)
-    public AdminBannerPlaceListResponseDto getBannerPlaceList(Pageable pageable, Long bannerId) {
-        Page<Place> placePage = adminCustomBannerRepository.getBannerPlaceList(pageable,
+    public AdminBannerPlaceListResponseDto getMappedPlaceList(Pageable pageable, Long bannerId) {
+        Page<Place> placePage = adminCustomBannerRepository.getPlaceList(pageable,
             bannerId);
 
         List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()

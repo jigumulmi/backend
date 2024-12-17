@@ -290,7 +290,7 @@ class AdminBannerControllerTest {
             )
             .build();
 
-        given(adminBannerService.getBannerPlaceList(any(PageRequest.class), eq(bannerId)))
+        given(adminBannerService.getMappedPlaceList(any(PageRequest.class), eq(bannerId)))
             .willReturn(responseDto);
 
         // when

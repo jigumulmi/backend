@@ -53,7 +53,7 @@ public class AdminCustomBannerRepository {
             .execute();
     }
 
-    public Page<Place> getBannerPlaceList(Pageable pageable, Long bannerId) {
+    public Page<Place> getPlaceList(Pageable pageable, Long bannerId) {
         List<Place> content = queryFactory
             .selectFrom(place)
             .join(place.bannerPlaceMappingList, bannerPlaceMapping)

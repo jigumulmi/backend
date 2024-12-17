@@ -92,9 +92,9 @@ public class AdminBannerController {
         @Content(schema = @Schema(implementation = AdminBannerPlaceListResponseDto.class))})
     @PageableParams
     @GetMapping("/{bannerId}/place")
-    public ResponseEntity<?> getBannerPlaceList(@ParameterObject Pageable pageable,
+    public ResponseEntity<?> getMappedPlaceList(@ParameterObject Pageable pageable,
         @PathVariable Long bannerId) {
-        AdminBannerPlaceListResponseDto responseDto = adminBannerService.getBannerPlaceList(
+        AdminBannerPlaceListResponseDto responseDto = adminBannerService.getMappedPlaceList(
             pageable, bannerId);
         return ResponseEntity.ok(responseDto);
     }
