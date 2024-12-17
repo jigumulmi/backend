@@ -20,7 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@DataJpaTest
+@DataJpaTest(showSql = false)
 @Import({TestQueryDslConfig.class, JpaAuditingConfig.class})
 class AdminCustomBannerRepositoryTest {
 
