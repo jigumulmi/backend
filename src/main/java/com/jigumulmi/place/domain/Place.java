@@ -185,6 +185,8 @@ public class Place extends Timestamped {
         PositionDto position = requestDto.getPosition();
 
         this.name = requestDto.getName();
+        this.region = requestDto.getRegion();
+        this.district = requestDto.getDistrict();
         this.address = requestDto.getAddress();
         this.contact = requestDto.getContact();
         this.openingHourSun = openingHour.getOpeningHourSun();
