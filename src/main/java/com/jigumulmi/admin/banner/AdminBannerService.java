@@ -3,6 +3,7 @@ package com.jigumulmi.admin.banner;
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
@@ -89,7 +90,7 @@ public class AdminBannerService {
 
     @Transactional(readOnly = true)
     public AdminBannerPlaceListResponseDto getMappedPlaceList(Pageable pageable, Long bannerId) {
-        Page<Place> placePage = adminCustomBannerRepository.getPlaceList(pageable,
+        Page<Place> placePage = adminCustomBannerRepository.getAllMappedPlaceByBannerId(pageable,
             bannerId);
 
         List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
@@ -181,5 +182,24 @@ public class AdminBannerService {
         } catch (SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public AdminBannerPlaceListResponseDto getCandidatePlaceList(Pageable pageable, GetCandidatePlaceListRequestDto requestDto) {
+        Page<Place> placePage = adminCustomBannerRepository.getAllUnmappedPlaceByBannerIdAndFilters(pageable,
+            requestDto);
+
+        List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
+            .map(BannerPlaceDto::from).collect(Collectors.toList());
+
+        return AdminBannerPlaceListResponseDto.builder()
+            .data(placeDtoList)
+            .page(PageDto.builder()
+                .totalCount(placePage.getTotalElements())
+                .currentPage(pageable.getPageNumber() + 1)
+                .totalPage(placePage.getTotalPages())
+                .build()
+            )
+            .build();
     }
 }

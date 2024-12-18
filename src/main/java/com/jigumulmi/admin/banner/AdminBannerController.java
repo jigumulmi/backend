@@ -3,6 +3,7 @@ package com.jigumulmi.admin.banner;
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
@@ -133,5 +134,17 @@ public class AdminBannerController {
         @Valid @RequestBody DeleteBannerRequestDto requestDto) {
         adminBannerService.deleteBannerList(requestDto);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "할당 가능한 장소 목록 조회")
+    @ApiResponse(responseCode = "200", content = {
+        @Content(schema = @Schema(implementation = AdminBannerPlaceListResponseDto.class))})
+    @PageableParams
+    @GetMapping("/place")
+    public ResponseEntity<?> getCandidatePlaceList(@ParameterObject Pageable pageable,
+        @Valid @ModelAttribute GetCandidatePlaceListRequestDto requestDto) {
+        AdminBannerPlaceListResponseDto responseDto = adminBannerService.getCandidatePlaceList(
+            pageable, requestDto);
+        return ResponseEntity.ok(responseDto);
     }
 }

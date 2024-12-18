@@ -120,7 +120,7 @@ class AdminCustomBannerRepositoryTest {
 
         // when
         PageRequest pageRequest = PageRequest.ofSize(1);
-        Page<Place> placePage = adminCustomBannerRepository.getPlaceList(pageRequest,
+        Page<Place> placePage = adminCustomBannerRepository.getAllMappedPlaceByBannerId(pageRequest,
             savedBannerId);
 
         // then
