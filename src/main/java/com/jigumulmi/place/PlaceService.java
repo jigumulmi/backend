@@ -25,10 +25,10 @@ import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
+import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
-import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
@@ -48,8 +48,10 @@ import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.CurrentOpeningInfo;
+import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
+import com.jigumulmi.place.vo.Region;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -447,5 +449,13 @@ public class PlaceService {
         String url = s3Service.generateDeleteObjectPresignedUrl(s3Service.bucket,
             requestDto.getS3Key());
         return S3DeletePresignedUrlResponseDto.builder().url(url).build();
+    }
+
+    public List<Region> getRegionList() {
+        return Arrays.stream(Region.values()).toList();
+    }
+
+    public List<District> getDistrictList(Region region) {
+        return region.getDistrictList();
     }
 }
