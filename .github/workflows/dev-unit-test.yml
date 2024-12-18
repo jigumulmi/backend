@@ -25,12 +25,15 @@ jobs:
           MAIN_PROPERTY_DIR: ./src/main/resources
           MAIN_PROPERTY_FILE: application.properties
           TEST_PROPERTY_DIR: ./src/test/resources
-          TEST_PROPERTY_FILE: application-default.properties
+          TEST_DEFAULT_PROPERTY_FILE: application-default.properties
+          TEST_PROPERTY_FILE: application-test.properties
         run: |
           mkdir -p $MAIN_PROPERTY_DIR $TEST_PROPERTY_DIR &&
           touch $MAIN_PROPERTY_DIR/$MAIN_PROPERTY_FILE &&
+          touch $TEST_PROPERTY_DIR/TEST_DEFAULT_PROPERTY_FILE &&
           touch $TEST_PROPERTY_DIR/$TEST_PROPERTY_FILE &&
           echo "${{ secrets.DEV_PROPERTIES }}" > $MAIN_PROPERTY_DIR/$MAIN_PROPERTY_FILE &&
+          echo "${{ secrets.TEST_DEFAULT_PROPERTIES }}" > $TEST_PROPERTY_DIR/TEST_DEFAULT_PROPERTY_FILE &&
           echo "${{ secrets.TEST_PROPERTIES }}" > $TEST_PROPERTY_DIR/$TEST_PROPERTY_FILE
         shell: bash
 
