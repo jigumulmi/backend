@@ -23,6 +23,7 @@ import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
+import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
 import com.jigumulmi.common.ControllerTest;
 import com.jigumulmi.common.MultipartTestUtils;
 import com.jigumulmi.config.common.PageDto;
@@ -75,7 +76,11 @@ class AdminBannerControllerTest {
             false
         );
 
-        willDoNothing().given(adminBannerService).createBanner(createBannerRequestDto);
+        CreateBannerResponseDto createBannerResponseDto = CreateBannerResponseDto.builder()
+            .bannerId(1L).build();
+
+        given(adminBannerService.createBanner(any(CreateBannerRequestDto.class))).willReturn(
+            createBannerResponseDto);
 
         // when
         ResultActions perform = mockMvc.perform(
@@ -90,6 +95,7 @@ class AdminBannerControllerTest {
         // then
         perform
             .andExpect(status().isCreated())
+            .andExpect(content().json(objectMapper.writeValueAsString(createBannerResponseDto)))
             .andDo(print());
     }
 
@@ -116,7 +122,11 @@ class AdminBannerControllerTest {
             isActive
         );
 
-        willDoNothing().given(adminBannerService).createBanner(createBannerRequestDto);
+        CreateBannerResponseDto createBannerResponseDto = CreateBannerResponseDto.builder()
+            .bannerId(1L).build();
+
+        given(adminBannerService.createBanner(any(CreateBannerRequestDto.class))).willReturn(
+            createBannerResponseDto);
 
         // when
         MockHttpServletRequestBuilder requestBuilder = multipart("/admin/banner")

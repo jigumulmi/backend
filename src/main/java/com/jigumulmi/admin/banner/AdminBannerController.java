@@ -8,6 +8,7 @@ import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
+import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
 import com.jigumulmi.config.common.PageableParams;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -44,12 +45,13 @@ public class AdminBannerController {
     private final AdminBannerService adminBannerService;
 
     @Operation(summary = "배너 생성")
-    @ApiResponse(responseCode = "201")
+    @ApiResponse(responseCode = "201", content = {
+        @Content(schema = @Schema(implementation = CreateBannerResponseDto.class))})
     @PostMapping(path = "", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> createBanner(
         @Valid @ModelAttribute CreateBannerRequestDto requestDto) {
-        adminBannerService.createBanner(requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        CreateBannerResponseDto responseDto = adminBannerService.createBanner(requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @Operation(summary = "배너 목록 조회")
