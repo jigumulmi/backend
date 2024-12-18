@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.repository.BannerRepository;
@@ -74,10 +75,16 @@ class AdminBannerServiceTest {
             "testTitle", outerImage, innerImage, false
         );
 
+        Banner banner = Banner.builder().build();
+        ReflectionTestUtils.setField(banner, "id", 1L);
+        given(bannerRepository.save(any(Banner.class))).willReturn(banner);
+
         // when
-        adminBannerService.createBanner(createBannerRequestDto);
+        CreateBannerResponseDto responseDto = adminBannerService.createBanner(
+            createBannerRequestDto);
 
         // then
+        Assertions.assertEquals(responseDto.getBannerId(), banner.getId());
         verify(s3Service, times(invokeCount)).putObject(
             eq(s3Service.bucket), any(String.class), any(MultipartFile.class)
         );

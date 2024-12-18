@@ -74,7 +74,7 @@ public class CustomPlaceRepository {
             .where(place.isApproved.eq(true),
                 subwayStationCondition(requestDto.getSubwayStationId()),
                 categoryGroupCondition(requestDto.getCategoryGroup()),
-                nameCondition(requestDto.getPlaceName())
+                placeNameContains(requestDto.getPlaceName())
             );
 
         if (requestDto.getShowLikedOnly() && member != null) {
@@ -134,8 +134,8 @@ public class CustomPlaceRepository {
         }
     }
 
-    public BooleanBuilder nameCondition(String placeName) {
-        return nullSafeBuilder(() -> place.name.startsWith(placeName));
+    public BooleanBuilder placeNameContains(String name) {
+        return nullSafeBuilder(() -> place.name.contains(name));
     }
 
     public BooleanExpression categoryGroupCondition(PlaceCategoryGroup categoryGroup) {

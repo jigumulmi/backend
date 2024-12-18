@@ -18,11 +18,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
+import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
 import com.jigumulmi.common.ControllerTest;
 import com.jigumulmi.common.MultipartTestUtils;
 import com.jigumulmi.config.common.PageDto;
@@ -75,7 +77,11 @@ class AdminBannerControllerTest {
             false
         );
 
-        willDoNothing().given(adminBannerService).createBanner(createBannerRequestDto);
+        CreateBannerResponseDto createBannerResponseDto = CreateBannerResponseDto.builder()
+            .bannerId(1L).build();
+
+        given(adminBannerService.createBanner(any(CreateBannerRequestDto.class))).willReturn(
+            createBannerResponseDto);
 
         // when
         ResultActions perform = mockMvc.perform(
@@ -90,6 +96,7 @@ class AdminBannerControllerTest {
         // then
         perform
             .andExpect(status().isCreated())
+            .andExpect(content().json(objectMapper.writeValueAsString(createBannerResponseDto)))
             .andDo(print());
     }
 
@@ -116,7 +123,11 @@ class AdminBannerControllerTest {
             isActive
         );
 
-        willDoNothing().given(adminBannerService).createBanner(createBannerRequestDto);
+        CreateBannerResponseDto createBannerResponseDto = CreateBannerResponseDto.builder()
+            .bannerId(1L).build();
+
+        given(adminBannerService.createBanner(any(CreateBannerRequestDto.class))).willReturn(
+            createBannerResponseDto);
 
         // when
         MockHttpServletRequestBuilder requestBuilder = multipart("/admin/banner")
@@ -401,6 +412,53 @@ class AdminBannerControllerTest {
         // then
         perform
             .andExpect(status().isNoContent())
+            .andDo(print());
+
+    }
+
+    @Test
+    @DisplayName("할당 가능한 장소 목록 조회")
+    @MockMember(isAdmin = true)
+    public void testGetCandidatePlaceList() throws Exception {
+        // given
+        Long bannerId = 1L;
+
+        BannerPlaceDto bannerPlaceDto = BannerPlaceDto.builder()
+            .id(1L)
+            .name("testTitle")
+            .subwayStation(
+                SubwayStationResponseDto.builder().id(1L).stationName("홍대입구").build()
+            )
+            .categoryList(
+                List.of(PlaceCategoryDto.builder().categoryGroup(PlaceCategoryGroup.CAFE)
+                    .category(PlaceCategory.BEVERAGE).build())
+            )
+            .build();
+        AdminBannerPlaceListResponseDto responseDto = AdminBannerPlaceListResponseDto.builder()
+            .data(List.of(bannerPlaceDto))
+            .page(
+                PageDto.builder()
+                    .currentPage(1)
+                    .totalPage(1)
+                    .totalCount(1L)
+                    .build()
+            )
+            .build();
+
+        given(adminBannerService.getCandidatePlaceList(any(PageRequest.class), any(GetCandidatePlaceListRequestDto.class)))
+            .willReturn(responseDto);
+
+        // when
+        ResultActions perform = mockMvc.perform(
+            get("/admin/banner/place")
+                .queryParam("bannerId", String.valueOf(1L))
+                .with(csrf())
+        );
+
+        // then
+        perform
+            .andExpect(status().isOk())
+            .andExpect(content().json(objectMapper.writeValueAsString(responseDto)))
             .andDo(print());
 
     }

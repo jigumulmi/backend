@@ -2,6 +2,7 @@ package com.jigumulmi.admin.banner;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.domain.BannerPlaceMapping;
 import com.jigumulmi.banner.repository.BannerRepository;
@@ -96,8 +97,8 @@ class AdminCustomBannerRepositoryTest {
     }
 
     @Test
-    @DisplayName("장소 목록 조회")
-    public void testGetBannerList() {
+    @DisplayName("연관 장소 목록 조회 (페이지네이션 적용)")
+    public void testGetAllMappedPlaceByBannerId() {
         // given
         Banner banner = Banner.builder().build();
         Banner savedBanner = bannerRepository.save(banner);
@@ -120,7 +121,7 @@ class AdminCustomBannerRepositoryTest {
 
         // when
         PageRequest pageRequest = PageRequest.ofSize(1);
-        Page<Place> placePage = adminCustomBannerRepository.getPlaceList(pageRequest,
+        Page<Place> placePage = adminCustomBannerRepository.getAllMappedPlaceByBannerId(pageRequest,
             savedBannerId);
 
         // then
@@ -161,6 +162,46 @@ class AdminCustomBannerRepositoryTest {
         List<BannerPlaceMapping> bannerPlaceMappingList = bannerPlaceMappingRepository.findAllByBannerIdIn(
             savedBannerIdList);
         Assertions.assertEquals(bannerPlaceMappingList.size(), 0);
+
+    }
+
+    @Test
+    @DisplayName("할당 가능 장소 목록 조회 (페이지네이션 적용)")
+    public void testGetAllUnmappedPlaceByBannerIdAndFilters() {
+        // given
+        Banner banner = Banner.builder().build();
+        Banner savedBanner = bannerRepository.save(banner);
+        Long savedBannerId = savedBanner.getId();
+
+        Place place1 = Place.builder().isApproved(true).build();
+        Place place2 = Place.builder().isApproved(true).build();
+        List<Place> savedPlaceListForMapping = placeRepository.saveAll(
+            List.of(place1, place2)
+        );
+        Place place3 = Place.builder().isApproved(true).build();
+        Place place4 = Place.builder().isApproved(true).build();
+        placeRepository.saveAll(List.of(place3, place4));
+
+        for (Place savedPlace : savedPlaceListForMapping) {
+            bannerPlaceMappingRepository.save(
+                BannerPlaceMapping.builder()
+                    .banner(banner)
+                    .place(savedPlace)
+                    .build()
+            );
+        }
+
+        GetCandidatePlaceListRequestDto getCandidatePlaceListRequestDto = new GetCandidatePlaceListRequestDto(
+            savedBannerId, null, null, null, null, null);
+
+        // when
+        PageRequest pageRequest = PageRequest.ofSize(1);
+        Page<Place> placePage = adminCustomBannerRepository.getAllUnmappedPlaceByBannerIdAndFilters(
+            pageRequest, getCandidatePlaceListRequestDto);
+
+        // then
+        Assertions.assertEquals(placePage.getTotalElements(), 2L);
+        Assertions.assertEquals(placePage.getTotalPages(), 2);
 
     }
 

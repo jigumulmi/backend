@@ -19,9 +19,9 @@ import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
+import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
-import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
@@ -48,10 +48,8 @@ import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.CurrentOpeningInfo;
-import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
-import com.jigumulmi.place.vo.Region;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -449,13 +447,5 @@ public class PlaceService {
         String url = s3Service.generateDeleteObjectPresignedUrl(s3Service.bucket,
             requestDto.getS3Key());
         return S3DeletePresignedUrlResponseDto.builder().url(url).build();
-    }
-
-    public List<Region> getRegionList() {
-        return Arrays.stream(Region.values()).toList();
-    }
-
-    public List<District> getDistrictList(Region region) {
-        return region.getDistrictList();
     }
 }

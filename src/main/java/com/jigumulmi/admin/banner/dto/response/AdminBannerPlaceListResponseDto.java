@@ -4,6 +4,8 @@ import com.jigumulmi.config.common.PageDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import com.jigumulmi.place.vo.District;
+import com.jigumulmi.place.vo.Region;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +20,7 @@ public class AdminBannerPlaceListResponseDto {
 
         private Long id;
         private String name;
-        private String district;
+        private District district;
         private SubwayStationResponseDto subwayStation;
         private List<PlaceCategoryDto> categoryList;
 
@@ -35,6 +37,7 @@ public class AdminBannerPlaceListResponseDto {
             return BannerPlaceDto.builder()
                 .id(place.getId())
                 .name(place.getName())
+                .district(place.getDistrict())
                 .subwayStation(subwayStationResponseDto)
                 .categoryList(place.getCategoryMappingList().stream()
                     .map(PlaceCategoryDto::fromPlaceCategoryMapping).toList())

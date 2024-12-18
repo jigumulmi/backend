@@ -3,11 +3,13 @@ package com.jigumulmi.admin.banner;
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
+import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
+import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.repository.BannerRepository;
@@ -39,7 +41,7 @@ public class AdminBannerService {
     private final BannerRepository bannerRepository;
     private final AdminCustomBannerRepository adminCustomBannerRepository;
 
-    public void createBanner(CreateBannerRequestDto requestDto) {
+    public CreateBannerResponseDto createBanner(CreateBannerRequestDto requestDto) {
         String outerImageS3Key = null;
         String innerImageS3Key = null;
         try {
@@ -65,7 +67,9 @@ public class AdminBannerService {
             .isActive(requestDto.getIsActive())
             .build();
 
-        bannerRepository.save(banner);
+        Banner savedBanner = bannerRepository.save(banner);
+
+        return CreateBannerResponseDto.builder().bannerId(savedBanner.getId()).build();
     }
 
     public List<AdminBannerResponseDto> getBannerList() {
@@ -89,7 +93,7 @@ public class AdminBannerService {
 
     @Transactional(readOnly = true)
     public AdminBannerPlaceListResponseDto getMappedPlaceList(Pageable pageable, Long bannerId) {
-        Page<Place> placePage = adminCustomBannerRepository.getPlaceList(pageable,
+        Page<Place> placePage = adminCustomBannerRepository.getAllMappedPlaceByBannerId(pageable,
             bannerId);
 
         List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
@@ -181,5 +185,25 @@ public class AdminBannerService {
         } catch (SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Transactional(readOnly = true)
+    public AdminBannerPlaceListResponseDto getCandidatePlaceList(Pageable pageable,
+        GetCandidatePlaceListRequestDto requestDto) {
+        Page<Place> placePage = adminCustomBannerRepository.getAllUnmappedPlaceByBannerIdAndFilters(
+            pageable, requestDto);
+
+        List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
+            .map(BannerPlaceDto::from).collect(Collectors.toList());
+
+        return AdminBannerPlaceListResponseDto.builder()
+            .data(placeDtoList)
+            .page(PageDto.builder()
+                .totalCount(placePage.getTotalElements())
+                .currentPage(pageable.getPageNumber() + 1)
+                .totalPage(placePage.getTotalPages())
+                .build()
+            )
+            .build();
     }
 }

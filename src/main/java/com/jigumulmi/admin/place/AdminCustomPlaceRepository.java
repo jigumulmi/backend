@@ -49,7 +49,7 @@ public class AdminCustomPlaceRepository {
             place.isFromAdmin.eq(requestDto.getIsFromAdmin())
                 .and(customPlaceRepository.subwayStationCondition(requestDto.getSubwayStationId()))
                 .and(customPlaceRepository.categoryGroupCondition(requestDto.getCategoryGroup()))
-                .and(customPlaceRepository.nameCondition(requestDto.getPlaceName()))
+                .and(customPlaceRepository.placeNameContains(requestDto.getPlaceName()))
         );
     }
 }

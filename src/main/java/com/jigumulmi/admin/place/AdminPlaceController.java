@@ -9,12 +9,16 @@ import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.config.common.PageableParams;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.place.vo.District;
+import com.jigumulmi.place.vo.Region;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +31,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "장소 관리")
@@ -90,5 +95,28 @@ public class AdminPlaceController {
         @RequestBody AdminDeletePlaceRequestDto requestDto) {
         adminPlaceService.deletePlace(requestDto);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "광역시도 조회")
+    @ApiResponses(
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = Region.class)))})}
+    )
+    @GetMapping("/region")
+    public ResponseEntity<?> getRegionList() {
+        List<Region> regionList = adminPlaceService.getRegionList();
+        return ResponseEntity.ok().body(regionList);
+    }
+
+    @Operation(summary = "시군구 조회")
+    @ApiResponses(
+        value = {@ApiResponse(responseCode = "200", content = {
+            @Content(array = @ArraySchema(schema = @Schema(implementation = District.class)))})}
+    )
+    @GetMapping("/district")
+    public ResponseEntity<?> getDistrictList(
+        @RequestParam(name = "placeCategoryGroup") Region region) {
+        List<District> districtList = adminPlaceService.getDistrictList(region);
+        return ResponseEntity.ok().body(districtList);
     }
 }
