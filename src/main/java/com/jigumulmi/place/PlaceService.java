@@ -19,16 +19,16 @@ import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
-import com.jigumulmi.place.dto.request.CreateS3DeletePresignedUrlRequestDto;
-import com.jigumulmi.place.dto.request.CreateS3PutPresignedUrlRequestDto;
+import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
+import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
+import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;
-import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
@@ -48,8 +48,10 @@ import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.CurrentOpeningInfo;
+import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
+import com.jigumulmi.place.vo.Region;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -430,8 +432,8 @@ public class PlaceService {
         }
     }
 
-    public S3PutPresignedUrlResponseDto createS3PutPresignedUrl(
-        CreateS3PutPresignedUrlRequestDto requestDto) {
+    public S3PutPresignedUrlResponseDto createMenuImageS3PutPresignedUrl(
+        MenuImageS3PutPresignedUrlRequestDto requestDto) {
         String filename = UUID.randomUUID().toString();
         String s3Key = MENU_IMAGE_S3_PREFIX + filename + "." + requestDto.getFileExtension();
 
@@ -442,10 +444,18 @@ public class PlaceService {
             .build();
     }
 
-    public S3DeletePresignedUrlResponseDto createS3DeletePresignedUrl(
-        CreateS3DeletePresignedUrlRequestDto requestDto) {
+    public S3DeletePresignedUrlResponseDto createMenuImageS3DeletePresignedUrl(
+        MenuImageS3DeletePresignedUrlRequestDto requestDto) {
         String url = s3Service.generateDeleteObjectPresignedUrl(s3Service.bucket,
             requestDto.getS3Key());
         return S3DeletePresignedUrlResponseDto.builder().url(url).build();
+    }
+
+    public List<Region> getRegionList() {
+        return Arrays.stream(Region.values()).toList();
+    }
+
+    public List<District> getDistrictList(Region region) {
+        return region.getDistrictList();
     }
 }

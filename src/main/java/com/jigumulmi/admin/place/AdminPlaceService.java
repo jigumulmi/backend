@@ -21,9 +21,9 @@ import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
-import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
@@ -88,6 +88,8 @@ public class AdminPlaceService {
 
         Place place = Place.builder()
             .name(requestDto.getName())
+            .region(requestDto.getRegion())
+            .district(requestDto.getDistrict())
             .address(requestDto.getAddress())
             .contact(requestDto.getContact())
             .openingHourSun(openingHour.getOpeningHourSun())

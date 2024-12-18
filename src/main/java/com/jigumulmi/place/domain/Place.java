@@ -7,6 +7,8 @@ import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.vo.District;
+import com.jigumulmi.place.vo.Region;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +29,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Comment;
 
 @Entity
 @Getter
@@ -40,7 +43,14 @@ public class Place extends Timestamped {
 
     private String name;
 
-    private String address; // 도로명 주소
+    @Comment("광역시도")
+    @Column(length = 20)
+    private Region region;
+    @Comment("시군구")
+    @Column(length = 20)
+    private District district;
+    @Comment("도로명 주소")
+    private String address;
 
     private String contact;
 
@@ -113,7 +123,8 @@ public class Place extends Timestamped {
     private List<BannerPlaceMapping> bannerPlaceMappingList = new ArrayList<>();
 
     @Builder
-    public Place(String name, List<PlaceCategoryMapping> categoryMappingList, String address,
+    public Place(String name, List<PlaceCategoryMapping> categoryMappingList, Region region,
+        District district, String address,
         String contact, List<Menu> menuList,
         String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed,
         String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo,
@@ -127,6 +138,8 @@ public class Place extends Timestamped {
         this.name = name;
         this.categoryMappingList =
             categoryMappingList != null ? categoryMappingList : new ArrayList<>();
+        this.region = region;
+        this.district = district;
         this.address = address;
         this.contact = contact;
         this.menuList = menuList != null ? menuList : new ArrayList<>();
@@ -172,6 +185,8 @@ public class Place extends Timestamped {
         PositionDto position = requestDto.getPosition();
 
         this.name = requestDto.getName();
+        this.region = requestDto.getRegion();
+        this.district = requestDto.getDistrict();
         this.address = requestDto.getAddress();
         this.contact = requestDto.getContact();
         this.openingHourSun = openingHour.getOpeningHourSun();

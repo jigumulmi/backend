@@ -6,7 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class CreateS3PutPresignedUrlRequestDto {
+public class MenuImageS3PutPresignedUrlRequestDto {
 
     @NotBlank
     private String fileExtension;

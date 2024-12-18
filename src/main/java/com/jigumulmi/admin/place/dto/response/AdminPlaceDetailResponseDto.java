@@ -6,6 +6,8 @@ import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import com.jigumulmi.place.vo.District;
+import com.jigumulmi.place.vo.Region;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,8 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
     private Boolean isApproved;
     private String kakaoPlaceId;
     private String placeUrl;
+    private Region region;
+    private District district;
 
     public static AdminPlaceDetailResponseDto from(Place place) {
         List<SubwayStationPlace> subwayStationPlaceList = place.getSubwayStationPlaceList();
@@ -51,6 +55,8 @@ public class AdminPlaceDetailResponseDto extends PlaceDetailResponseDto {
             .id(place.getId())
             .name(place.getName())
             .categoryList(categoryList)
+            .region(place.getRegion())
+            .district(place.getDistrict())
             .address(place.getAddress())
             .contact(place.getContact())
             .imageList(imageList)
