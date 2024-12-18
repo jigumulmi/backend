@@ -6,8 +6,8 @@ import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
-import com.jigumulmi.place.dto.request.CreateS3DeletePresignedUrlRequestDto;
-import com.jigumulmi.place.dto.request.CreateS3PutPresignedUrlRequestDto;
+import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
+import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
@@ -220,25 +220,25 @@ public class PlaceController {
     }
 
 
-    @Operation(summary = "S3 Put Presigned Url 요청")
+    @Operation(summary = "메뉴 이미지 S3 Put Presigned Url 요청")
     @ApiResponse(responseCode = "201", content = {
         @Content(schema = @Schema(implementation = S3PutPresignedUrlResponseDto.class))})
-    @PostMapping("/s3-put-presigned-url")
-    public ResponseEntity<?> createS3PutPresignedUrl(
-        @RequestBody CreateS3PutPresignedUrlRequestDto requestDto,
+    @PostMapping("/menu/s3-put-presigned-url")
+    public ResponseEntity<?> createMenuImageS3PutPresignedUrl(
+        @RequestBody MenuImageS3PutPresignedUrlRequestDto requestDto,
         @RequiredAuthUser Member Member) {
-        S3PutPresignedUrlResponseDto responseDto = placeService.createS3PutPresignedUrl(requestDto);
+        S3PutPresignedUrlResponseDto responseDto = placeService.createMenuImageS3PutPresignedUrl(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
-    @Operation(summary = "S3 Delete Presigned Url 요청")
+    @Operation(summary = "메뉴 이미지 S3 Delete Presigned Url 요청")
     @ApiResponse(responseCode = "201", content = {
         @Content(schema = @Schema(implementation = S3DeletePresignedUrlResponseDto.class))})
-    @PostMapping("/s3-delete-presigned-url")
-    public ResponseEntity<?> createS3DeletePresignedUrl(
-        @RequestBody CreateS3DeletePresignedUrlRequestDto requestDto,
+    @PostMapping("/menu/s3-delete-presigned-url")
+    public ResponseEntity<?> createMenuImageS3DeletePresignedUrl(
+        @RequestBody MenuImageS3DeletePresignedUrlRequestDto requestDto,
         @RequiredAuthUser Member Member) {
-        S3DeletePresignedUrlResponseDto responseDto = placeService.createS3DeletePresignedUrl(
+        S3DeletePresignedUrlResponseDto responseDto = placeService.createMenuImageS3DeletePresignedUrl(
             requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
