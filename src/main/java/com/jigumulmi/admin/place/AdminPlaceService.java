@@ -29,7 +29,11 @@ import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
+import com.jigumulmi.place.vo.District;
+import com.jigumulmi.place.vo.Region;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -251,5 +255,14 @@ public class AdminPlaceService {
         }
 
         placeRepository.deleteById(placeId);
+    }
+
+    public List<Region> getRegionList() {
+        return Arrays.stream(Region.values()).toList();
+    }
+
+    public List<District> getDistrictList(Region region) {
+        return region.getDistrictList().stream().sorted(Comparator.comparing(District::getTitle))
+            .toList();
     }
 }

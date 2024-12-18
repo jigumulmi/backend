@@ -6,9 +6,9 @@ import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
+import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
-import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
@@ -18,10 +18,8 @@ import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
-import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
-import com.jigumulmi.place.vo.Region;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -241,28 +239,5 @@ public class PlaceController {
         S3DeletePresignedUrlResponseDto responseDto = placeService.createMenuImageS3DeletePresignedUrl(
             requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
-    }
-
-    @Operation(summary = "광역시도 조회")
-    @ApiResponses(
-        value = {@ApiResponse(responseCode = "200", content = {
-            @Content(array = @ArraySchema(schema = @Schema(implementation = Region.class)))})}
-    )
-    @GetMapping("/region")
-    public ResponseEntity<?> getRegionList() {
-        List<Region> regionList = placeService.getRegionList();
-        return ResponseEntity.ok().body(regionList);
-    }
-
-    @Operation(summary = "시군구 조회")
-    @ApiResponses(
-        value = {@ApiResponse(responseCode = "200", content = {
-            @Content(array = @ArraySchema(schema = @Schema(implementation = District.class)))})}
-    )
-    @GetMapping("/district")
-    public ResponseEntity<?> getDistrictList(
-        @RequestParam(name = "placeCategoryGroup") Region region) {
-        List<District> districtList = placeService.getDistrictList(region);
-        return ResponseEntity.ok().body(districtList);
     }
 }
