@@ -39,5 +39,6 @@ out/
 ### my ignore ###
 /src/**/*.properties
 scripts/*.sh
+/logs
 ### Querydsl
 /src/main/generated

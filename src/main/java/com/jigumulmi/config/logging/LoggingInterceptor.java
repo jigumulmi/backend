@@ -1,10 +1,13 @@
 package com.jigumulmi.config.logging;
 
+import com.jigumulmi.config.security.UserDetailsImpl;
+import com.jigumulmi.member.domain.Member;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -12,10 +15,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+@Slf4j(topic = "ACCESS_LOGGER")
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
-
-    Logger logger = LoggerFactory.getLogger(LoggingInterceptor.class);
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
@@ -44,14 +46,31 @@ public class LoggingInterceptor implements HandlerInterceptor {
         int statusCode = response.getStatus();
         HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
 
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        Authentication authentication = securityContext.getAuthentication();
-        System.out.println("authentication = " + authentication);
+        String url = queryString == null ? request.getRequestURI()
+            : request.getRequestURI() + "?" + queryString;
+        String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
 
-        logger.info("{} {} {} {} {}ms {}", request.getMethod(),
-            queryString == null ? request.getRequestURI()
-                : request.getRequestURI() + "?" + queryString, statusCode,
-            httpStatus.getReasonPhrase(), responseTime, requestId);
+        Member requestMember = getRequestMember();
+        if (requestMember != null) {
+            log.info("[{}] {} {} {} {} {}ms BY member:id:{}:isAdmin:{}", requestId, request.getMethod(),
+                decodedUrl, statusCode, httpStatus.getReasonPhrase(), responseTime,
+                requestMember.getId(), requestMember.getIsAdmin());
+        } else {
+            log.info("[{}] {} {} {} {} {}ms", requestId, request.getMethod(),
+                decodedUrl, statusCode, httpStatus.getReasonPhrase(), responseTime);
+        }
+
+    }
+
+    private static Member getRequestMember() {
+        try {
+            SecurityContext securityContext = SecurityContextHolder.getContext();
+            Authentication authentication = securityContext.getAuthentication();
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            return userDetails.getMember();
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
 
