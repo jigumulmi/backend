@@ -62,7 +62,6 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
@@ -312,11 +311,9 @@ public class PlaceService {
         ArrayList<String> s3KeyList = new ArrayList<>();
         try {
             for (MultipartFile image : requestDto.getNewImageList()) {
-                String fileExtension = StringUtils.getFilenameExtension(
-                    image.getOriginalFilename());
                 String s3Key =
-                    REVIEW_IMAGE_S3_PREFIX + placeId + "/" + UUID.randomUUID() + "."
-                        + fileExtension;
+                    REVIEW_IMAGE_S3_PREFIX + placeId + "/"
+                        + FileUtils.generateUniqueFilename(image);
 
                 s3KeyList.add(s3Key);
 
