@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+  <property name="LOG_PATH" value="./logs"/>
+
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="ACCESS_FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/access-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <maxFileSize>15MB</maxFileSize>
+      <maxHistory>7</maxHistory>
+      <totalSizeCap>15GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <charset>utf8</charset>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="ERROR_FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${LOG_PATH}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <maxFileSize>15MB</maxFileSize>
+      <maxHistory>7</maxHistory>
+      <totalSizeCap>15GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <charset>utf8</charset>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+<!--  로컬 환경-->
+  <springProfile name="local">
+  </springProfile>
+<!--  배포 환경-->
+  <springProfile name="default">
+    <logger name="ERROR_LOGGER" level="ERROR" additivity="true">
+      <appender-ref ref="ERROR_FILE_APPENDER"/>
+    </logger>
+
+    <logger name="ACCESS_LOGGER" level="DEBUG" additivity="true">
+      <appender-ref ref="ACCESS_FILE_APPENDER"/>
+    </logger>
+  </springProfile>
+</configuration>
