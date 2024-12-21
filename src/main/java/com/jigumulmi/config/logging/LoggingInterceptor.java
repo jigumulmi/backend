@@ -1,5 +1,8 @@
 package com.jigumulmi.config.logging;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jigumulmi.config.logging.LoggingVO.LoggingVOBuilder;
 import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.domain.Member;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,7 +11,6 @@ import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,6 +20,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Slf4j(topic = "ACCESS_LOGGER")
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
@@ -33,7 +37,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
-        Object handler, Exception ex) {
+        Object handler, Exception ex) throws JsonProcessingException {
 
         String requestId = (String) request.getAttribute("X-Request-ID");
         response.addHeader("X-Request-ID", requestId);
@@ -43,22 +47,29 @@ public class LoggingInterceptor implements HandlerInterceptor {
         response.setHeader("X-RESPONSE-TIME", responseTime + "ms");
 
         String queryString = request.getQueryString();
-        int statusCode = response.getStatus();
-        HttpStatus httpStatus = HttpStatus.valueOf(statusCode);
+        String decodedQueryString =
+            queryString == null ? null : URLDecoder.decode(queryString, StandardCharsets.UTF_8);
 
-        String url = queryString == null ? request.getRequestURI()
-            : request.getRequestURI() + "?" + queryString;
-        String decodedUrl = URLDecoder.decode(url, StandardCharsets.UTF_8);
+        LoggingVOBuilder loggingVOBuilder = LoggingVO.builder()
+            .requestId(requestId)
+            .requestMethod(request.getMethod())
+            .requestUri(request.getRequestURI())
+            .requestQueryParam(decodedQueryString)
+            .httpStatusCode(response.getStatus())
+            .responseTime(responseTime);
 
+        LoggingVO loggingVO;
         Member requestMember = getRequestMember();
-        if (requestMember != null) {
-            log.info("[{}] {} {} {} {} {}ms BY member:id:{}:isAdmin:{}", requestId, request.getMethod(),
-                decodedUrl, statusCode, httpStatus.getReasonPhrase(), responseTime,
-                requestMember.getId(), requestMember.getIsAdmin());
+        if (requestMember == null) {
+            loggingVO = loggingVOBuilder.build();
         } else {
-            log.info("[{}] {} {} {} {} {}ms", requestId, request.getMethod(),
-                decodedUrl, statusCode, httpStatus.getReasonPhrase(), responseTime);
+            loggingVO = loggingVOBuilder
+                .memberId(requestMember.getId())
+                .memberRole(LoggingVO.getMemberRoleFromIsAdmin(requestMember.getIsAdmin()))
+                .build();
         }
+
+        log.info(objectMapper.writeValueAsString(loggingVO));
 
     }
 
