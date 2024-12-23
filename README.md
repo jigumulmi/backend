@@ -1,5 +1,7 @@
 # [JIGUMULMI(지구멀미)](https://www.jigumulmi.com/)
 [채식 정보 공유 서비스](https://developerjoseph.notion.site/dfea728380654c84b4b898b63e411707)
+## 아키텍처
+![jigumulmi architecture drawio](https://github.com/user-attachments/assets/bb18c5bb-19d7-4be8-b5d1-a0d43226c83a)
 ## 팀원 소개
 - 김학준: 백엔드
 - 정성목: 프론트엔드
