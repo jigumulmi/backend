@@ -36,6 +36,8 @@
 - `Java21`
 - `SpringBoot3, Spring Security, Springdoc`
 - `JPA, QueryDSL`
+- `JUnit5, Mockito`,
+- `OpenSearch, Filebeat`
 - `AWS`
   - `EC2, RDS MySQL`
   - `Route53, Cloudfront, S3`
