@@ -1,9 +1,11 @@
-name: Deploy to Amazon EC2
+name: Deploy to Development Server
 
 on:
   push:
     branches:
       - dev
+    paths-ignore:
+      - "**.md"
 
 permissions:
   contents: read
