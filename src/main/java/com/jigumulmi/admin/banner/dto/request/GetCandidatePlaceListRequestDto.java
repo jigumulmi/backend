@@ -3,6 +3,7 @@ package com.jigumulmi.admin.banner.dto.request;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +20,7 @@ public class GetCandidatePlaceListRequestDto {
 
     @Parameter(description = "장소 이름 검색어")
     private String placeName;
-    @Parameter(description = "시군구")
+    @Parameter(description = "시군구 ID", name = "districtId", schema = @Schema(implementation = Integer.class))
     private District district;
     @Parameter(description = "상위 카테고리")
     private PlaceCategoryGroup placeCategoryGroup;
