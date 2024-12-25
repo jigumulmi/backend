@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -37,7 +39,10 @@ public class PlaceCategoryMapping {
     @JsonBackReference
     private Place place;
 
+    @Enumerated(EnumType.STRING)
     private PlaceCategory category;
+
+    @Enumerated(EnumType.STRING)
     private PlaceCategoryGroup categoryGroup;
 
     @Builder
