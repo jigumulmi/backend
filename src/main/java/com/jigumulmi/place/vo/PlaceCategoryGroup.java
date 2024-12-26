@@ -3,7 +3,9 @@ package com.jigumulmi.place.vo;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -27,11 +29,16 @@ public enum PlaceCategoryGroup {
     private final String title;
     private final List<PlaceCategory> placeCategoryList;
 
+    private static final Map<String, PlaceCategoryGroup> BY_TITLE = new HashMap<>();
+
+    static {
+        for (PlaceCategoryGroup categoryGroup: values()) {
+            BY_TITLE.put(categoryGroup.getTitle(), categoryGroup);
+        }
+    }
+
     @JsonCreator
     public static PlaceCategoryGroup ofTitle(String title) {
-        return Arrays.stream(PlaceCategoryGroup.values())
-            .filter(categoryGroup -> categoryGroup.getTitle().equals(title))
-            .findFirst()
-            .orElseThrow(IllegalArgumentException::new);
+        return BY_TITLE.get(title);
     }
 }

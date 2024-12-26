@@ -2,7 +2,8 @@ package com.jigumulmi.place.vo;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -86,11 +87,16 @@ public enum District {
     private final String title;
     private final Integer id;
 
+    private static final Map<Integer, District> BY_ID = new HashMap<>();
+
+    static {
+        for (District district: values()) {
+            BY_ID.put(district.getId(), district);
+        }
+    }
+
     @JsonCreator
     public static District ofId(Integer id) {
-        return Arrays.stream(District.values())
-            .filter(district -> district.getId().equals(id))
-            .findFirst()
-            .orElseThrow(IllegalArgumentException::new);
+        return BY_ID.get(id);
     }
 }

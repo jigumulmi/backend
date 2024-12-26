@@ -3,7 +3,9 @@ package com.jigumulmi.place.vo;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -88,12 +90,17 @@ public enum Region {
     private final String title;
     private final List<District> districtList;
 
+    private static final Map<String, Region> BY_TITLE = new HashMap<>();
+
+    static {
+        for (Region region: values()) {
+            BY_TITLE.put(region.getTitle(), region);
+        }
+    }
+
     @JsonCreator
     public static Region ofTitle(String title) {
-        return Arrays.stream(Region.values())
-            .filter(region -> region.getTitle().equals(title))
-            .findFirst()
-            .orElseThrow(IllegalArgumentException::new);
+        return BY_TITLE.get(title);
     }
 
 }
