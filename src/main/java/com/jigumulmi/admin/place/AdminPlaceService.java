@@ -21,6 +21,7 @@ import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.MenuDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
@@ -261,8 +262,8 @@ public class AdminPlaceService {
         return Arrays.stream(Region.values()).toList();
     }
 
-    public List<District> getDistrictList(Region region) {
+    public List<DistrictResponseDto> getDistrictList(Region region) {
         return region.getDistrictList().stream().sorted(Comparator.comparing(District::getTitle))
-            .toList();
+            .map(DistrictResponseDto::fromDistrict).toList();
     }
 }

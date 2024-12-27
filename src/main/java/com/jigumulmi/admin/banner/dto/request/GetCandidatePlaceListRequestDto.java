@@ -3,13 +3,12 @@ package com.jigumulmi.admin.banner.dto.request;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springdoc.core.annotations.ParameterObject;
 
 @Getter
-@AllArgsConstructor
 @ParameterObject
 public class GetCandidatePlaceListRequestDto {
 
@@ -19,7 +18,7 @@ public class GetCandidatePlaceListRequestDto {
 
     @Parameter(description = "장소 이름 검색어")
     private String placeName;
-    @Parameter(description = "시군구")
+    @Parameter(description = "시군구 ID", name = "districtId", schema = @Schema(implementation = Integer.class))
     private District district;
     @Parameter(description = "상위 카테고리")
     private PlaceCategoryGroup placeCategoryGroup;
@@ -28,4 +27,13 @@ public class GetCandidatePlaceListRequestDto {
     @Parameter(description = "메뉴 이름 검색어")
     private String menuName;
 
+    public GetCandidatePlaceListRequestDto(Long bannerId, String placeName, District districtId,
+        PlaceCategoryGroup placeCategoryGroup, Long subwayStationId, String menuName) {
+        this.bannerId = bannerId;
+        this.placeName = placeName;
+        this.district = districtId;
+        this.placeCategoryGroup = placeCategoryGroup;
+        this.subwayStationId = subwayStationId;
+        this.menuName = menuName;
+    }
 }

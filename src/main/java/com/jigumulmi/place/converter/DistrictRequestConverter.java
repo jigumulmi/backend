@@ -6,7 +6,7 @@ import org.springframework.core.convert.converter.Converter;
 public class DistrictRequestConverter implements Converter<String, District> {
 
     @Override
-    public District convert(String title) {
-        return District.ofTitle(title);
+    public District convert(String id) {
+        return District.ofId(Integer.valueOf(id));
     }
 }
