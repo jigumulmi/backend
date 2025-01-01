@@ -43,7 +43,9 @@ scripts/*.sh
 ### Logging
 *.env
 /logs
-/monitor/loki/storage
+/monitor/loki/data
+/monitor/prometheus/data
+/monitor/grafana/data
 
 ### Querydsl
 /src/main/generated
