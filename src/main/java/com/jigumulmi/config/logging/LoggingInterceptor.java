@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jigumulmi.config.logging.LoggingVO.LoggingVOBuilder;
 import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.member.dto.vo.MemberRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
@@ -65,7 +66,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
         } else {
             loggingVO = loggingVOBuilder
                 .memberId(requestMember.getId())
-                .memberRole(LoggingVO.getMemberRoleFromIsAdmin(requestMember.getIsAdmin()))
+                .memberRole(MemberRole.getRole(requestMember.getIsAdmin()))
                 .build();
         }
 

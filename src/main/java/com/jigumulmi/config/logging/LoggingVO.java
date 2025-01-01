@@ -21,8 +21,4 @@ public class LoggingVO {
     private Long memberId;
     private MemberRole memberRole;
 
-    public static MemberRole getMemberRoleFromIsAdmin(Boolean isAdmin) {
-        return isAdmin ? MemberRole.ADMIN : MemberRole.GENERAL;
-    }
-
 }
