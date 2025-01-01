@@ -74,7 +74,7 @@ public class SecurityConfig {
                 UsernamePasswordAuthenticationFilter.class
             )
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/admin/*").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
             )
             .exceptionHandling(
