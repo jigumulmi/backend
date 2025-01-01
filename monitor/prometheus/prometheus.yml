@@ -1,0 +1,11 @@
+scrape_configs:
+  - job_name: 'metric'
+    metrics_path: '/dev/manager/prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: [ 'host.docker.internal:8090' ]
+        labels:
+          application: 'Jigumulmi'
+#    basic_auth:
+#      username:
+#      password_file:

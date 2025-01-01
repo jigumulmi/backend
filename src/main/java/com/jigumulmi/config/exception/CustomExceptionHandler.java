@@ -2,7 +2,6 @@ package com.jigumulmi.config.exception;
 
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.config.exception.errorCode.ErrorCode;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -57,7 +56,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgument(IllegalArgumentException e) {
-        log.warn("handleIllegalArgument: " + e.getMessage());
+        log.error("handleIllegalArgument: " + e.getMessage());
         ErrorCode errorCode = CommonErrorCode.INVALID_PARAMETER;
         return handleExceptionInternal(errorCode, e.getMessage());
     }
@@ -65,7 +64,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleDataIntegrityViolationException(
         DataIntegrityViolationException e) {
-        log.warn("handleDataIntegrityViolationException: " + e.getMessage());
+        log.error("handleDataIntegrityViolationException: " + e.getMessage());
         ErrorCode errorCode = CommonErrorCode.RDB_INTEGRITY_VIOLATION;
         return handleExceptionInternal(errorCode, e.getMessage());
     }
@@ -75,22 +74,22 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status,
         WebRequest request
     ) {
-        log.warn("handleMethodArgumentNotValid: " + e.getMessage());
+        log.error("handleMethodArgumentNotValid: " + e.getMessage());
         ErrorCode errorCode = CommonErrorCode.UNPROCESSABLE_ENTITY;
         return handleExceptionInternal(e, errorCode);
     }
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<Object> handleCustomException(CustomException e) {
-        log.warn("handleCustomException: " + e.getErrorCode());
+        log.error("handleCustomException: " + e.getErrorCode());
         ErrorCode errorCode = e.getErrorCode();
         return handleExceptionInternal(errorCode);
     }
 
     @ExceptionHandler({Exception.class})
     public ResponseEntity<Object> handleAllException(Exception e) {
-        e.printStackTrace(System.out);
+        log.error("handleAllException: ", e);
         ErrorCode errorCode = CommonErrorCode.INTERNAL_SERVER_ERROR;
-        return handleExceptionInternal(errorCode, Arrays.toString(e.getStackTrace()));
+        return handleExceptionInternal(errorCode, e.toString());
     }
 }

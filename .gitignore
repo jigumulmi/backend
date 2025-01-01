@@ -39,6 +39,11 @@ out/
 ### my ignore ###
 /src/**/*.properties
 scripts/*.sh
+
+### Logging
+*.env
 /logs
+/monitor/loki/storage
+
 ### Querydsl
 /src/main/generated

@@ -1,5 +1,7 @@
 package com.jigumulmi.config.security;
 
+import static com.fasterxml.jackson.core.JsonEncoding.UTF8;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +35,7 @@ public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding(UTF8.getJavaName());
         response.getWriter().write(responseBody);
     }
 }
