@@ -45,6 +45,7 @@ scripts/*.sh
 /logs
 /monitor/loki/data
 /monitor/prometheus/data
+/monitor/prometheus/password.txt
 /monitor/grafana/data
 
 ### Querydsl

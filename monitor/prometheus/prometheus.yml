@@ -6,6 +6,6 @@ scrape_configs:
       - targets: [ 'host.docker.internal:8090' ]
         labels:
           application: 'Jigumulmi'
-#    basic_auth:
-#      username:
-#      password_file:
+    basic_auth:
+      username: 'admin'
+      password_file: './password.txt'
