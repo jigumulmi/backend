@@ -41,12 +41,9 @@ out/
 scripts/*.sh
 
 ### Logging
-*.env
 /logs
-/monitor/loki/data
-/monitor/prometheus/data
+*.env
 /monitor/prometheus/password.txt
-/monitor/grafana/data
 
 ### Querydsl
 /src/main/generated

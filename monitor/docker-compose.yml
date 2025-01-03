@@ -16,7 +16,7 @@ services:
     container_name: loki
     volumes:
       - ./loki/loki.yml:/etc/loki/local-config.yml
-      - ./loki/data:/loki
+      - loki_data:/loki
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yml -config.expand-env=true
@@ -32,7 +32,7 @@ services:
     volumes:
       - ./prometheus/password.txt:/etc/prometheus/password.txt
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./prometheus/data:/prometheus
+      - prometheus_data:/prometheus
 
   grafana:
     image: grafana/grafana:11.4.0
@@ -42,4 +42,9 @@ services:
     restart: unless-stopped
     volumes:
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - ./grafana/data:/var/lib/grafana
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  loki_data:
+  grafana_data:
+  prometheus_data:
