@@ -6,7 +6,7 @@
 더 자세한 내용은 [지구멀미 소개 페이지](https://developerjoseph.notion.site/dfea728380654c84b4b898b63e411707)에서 확인하실 수 있습니다.
 
 ## 인프라 아키텍처
-![jigumulmi architecture drawio](https://github.com/user-attachments/assets/bb18c5bb-19d7-4be8-b5d1-a0d43226c83a)
+![jigumulmi architecture](https://github.com/user-attachments/assets/0d4ff86a-5c90-46f6-9b5e-c304cd25349b)
 
 ## 브랜치 전략
 ![gitflow drawio](https://github.com/user-attachments/assets/985708a6-f7dd-4d7b-be58-7db9d65e710c)
@@ -30,7 +30,7 @@
 - `SpringBoot3, Spring Security, Springdoc`
 - `JPA, QueryDSL`
 - `JUnit5, Mockito`
-- `OpenSearch, Filebeat`
+- `Docker, FluentBit, Loki, Prometheus, Grafana`
 - `AWS`
   - `EC2, RDS MySQL`
   - `Route53, Cloudfront, S3`
