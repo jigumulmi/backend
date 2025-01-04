@@ -39,6 +39,11 @@ out/
 ### my ignore ###
 /src/**/*.properties
 scripts/*.sh
+
+### Logging
 /logs
+*.env
+/monitor/prometheus/password.txt
+
 ### Querydsl
 /src/main/generated

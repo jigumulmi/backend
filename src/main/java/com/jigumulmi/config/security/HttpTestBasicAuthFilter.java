@@ -7,19 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 import lombok.NonNull;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
 
-@Slf4j
 @Component
-public class HttpTestBasicAuthFilter extends OncePerRequestFilter {
+public class HttpTestBasicAuthFilter extends BasicAuthFilter {
 
     @Value("${swagger.password}")
     private String password;
@@ -47,31 +42,9 @@ public class HttpTestBasicAuthFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            log.info("HttpTestBasicAuthFilter", e);
             SecurityContextHolder.clearContext();
         } finally {
             filterChain.doFilter(request, response);
         }
-
-    }
-
-    private String[] extractAndDecodeHeader(String header) throws IOException {
-        byte[] base64Token = header.substring(6).getBytes(StandardCharsets.UTF_8);
-        byte[] decoded;
-        try {
-            decoded = Base64.getDecoder().decode(base64Token);
-        } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Failed to decode basic authentication token");
-        }
-
-        String token = new String(decoded, StandardCharsets.UTF_8);
-
-        int delim = token.indexOf(":");
-
-        if (delim == -1) {
-            throw new IOException("Invalid basic authentication token");
-        }
-
-        return new String[]{token.substring(0, delim), token.substring(delim + 1)};
     }
 }

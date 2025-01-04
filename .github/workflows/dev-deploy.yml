@@ -63,7 +63,7 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           port: ${{ secrets.EC2_SSH_PORT }}
           source: "build/libs/jigumulmi-0.0.1-SNAPSHOT.jar,deploy.sh"
-          target: /home/ubuntu/dev
+          target: /home/ubuntu/jigumulmi
 
       - name: Run scripts in server
         uses: appleboy/ssh-action@master
