@@ -17,9 +17,9 @@
   <appender name="ACCESS_FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
       <fileNamePattern>${ACCESS_LOG_PATH}/access-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-      <maxFileSize>15MB</maxFileSize>
+      <maxFileSize>20MB</maxFileSize>
       <maxHistory>7</maxHistory>
-      <totalSizeCap>15GB</totalSizeCap>
+      <totalSizeCap>9GB</totalSizeCap>
     </rollingPolicy>
     <encoder>
       <charset>utf8</charset>
@@ -30,9 +30,9 @@
   <appender name="ERROR_FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
     <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
       <fileNamePattern>${ERROR_LOG_PATH}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
-      <maxFileSize>15MB</maxFileSize>
+      <maxFileSize>20MB</maxFileSize>
       <maxHistory>7</maxHistory>
-      <totalSizeCap>15GB</totalSizeCap>
+      <totalSizeCap>9GB</totalSizeCap>
     </rollingPolicy>
     <encoder>
       <charset>utf8</charset>

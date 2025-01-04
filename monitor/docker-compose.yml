@@ -21,7 +21,10 @@ services:
       - loki_data:/loki
     ports:
       - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yml -config.expand-env=true
+    command:
+      - -config.file=/etc/loki/local-config.yml
+      - -config.expand-env=true
+      - -log-config-reverse-order
     restart: always
     env_file:
       - env/.env
@@ -31,6 +34,9 @@ services:
     container_name: prometheus
     ports:
       - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.size=4GB
     volumes:
       - ./prometheus/password.txt:/etc/prometheus/password.txt
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
