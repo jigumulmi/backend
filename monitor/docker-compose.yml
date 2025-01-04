@@ -49,12 +49,15 @@ services:
     ports:
       - "3000:3000"
     volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - grafana_data:/var/lib/grafana
     restart: unless-stopped
     depends_on:
       - prometheus
       - loki
+    env_file:
+      - env/.env
 
 volumes:
   loki_data:
