@@ -1,0 +1,33 @@
+name: Deploy Monitoring System to Development Server
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - "/monitor/**"
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy Monitoring
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run scripts in server
+        uses: appleboy/ssh-action@master
+        with:
+          key: ${{ secrets.EC2_SSH_KEY }}
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          port: ${{ secrets.EC2_SSH_PORT }}
+          script: >
+            cd /home/ubuntu/jigumulmi &&
+            git pull git@github.com:jigumulmi/backend.git dev &&
+            cd /monitor &&
+            docker compose up -d --build
