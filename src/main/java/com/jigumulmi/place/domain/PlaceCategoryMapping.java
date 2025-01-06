@@ -1,9 +1,9 @@
-
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -40,9 +40,11 @@ public class PlaceCategoryMapping {
     private Place place;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(30)")
     private PlaceCategory category;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar(30)")
     private PlaceCategoryGroup categoryGroup;
 
     @Builder

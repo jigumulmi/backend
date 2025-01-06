@@ -46,12 +46,12 @@ public class Place extends Timestamped {
     private String name;
 
     @Comment("광역시도")
-    @Column(length = 40)
+    @Column(columnDefinition = "varchar(40)")
     @Enumerated(EnumType.STRING)
     private Region region;
 
     @Comment("시군구")
-    @Column(length = 40)
+    @Column(columnDefinition = "varchar(40)")
     @Enumerated(EnumType.STRING)
     private District district;
 
