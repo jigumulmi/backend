@@ -10,7 +10,6 @@ import com.jigumulmi.config.common.PageableParams;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
-import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -115,8 +114,7 @@ public class AdminPlaceController {
             @Content(array = @ArraySchema(schema = @Schema(implementation = DistrictResponseDto.class)))})}
     )
     @GetMapping("/district")
-    public ResponseEntity<?> getDistrictList(
-        @RequestParam(name = "placeCategoryGroup") Region region) {
+    public ResponseEntity<?> getDistrictList(@RequestParam Region region) {
         List<DistrictResponseDto> districtList = adminPlaceService.getDistrictList(region);
         return ResponseEntity.ok().body(districtList);
     }
