@@ -23,11 +23,8 @@ services:
       - "3100:3100"
     command:
       - -config.file=/etc/loki/local-config.yml
-      - -config.expand-env=true
       - -log-config-reverse-order
     restart: always
-    env_file:
-      - env/.env
 
   prometheus:
     image: prom/prometheus:v2.50.0
