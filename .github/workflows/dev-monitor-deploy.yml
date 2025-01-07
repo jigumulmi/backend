@@ -5,6 +5,7 @@ on:
     branches:
       - dev
     paths:
+      - "!**.md"
       - "monitor/**"
 
 permissions:
@@ -12,7 +13,7 @@ permissions:
 
 jobs:
   deploy:
-    name: Deploy Monitoring
+    name: Deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -29,5 +30,5 @@ jobs:
           script: >
             cd /home/ubuntu/jigumulmi &&
             git pull git@github.com:jigumulmi/backend.git dev &&
-            cd /monitor &&
+            cd monitor &&
             docker compose up -d --build
