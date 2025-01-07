@@ -32,4 +32,4 @@ jobs:
             cd /home/ubuntu/jigumulmi &&
             git pull git@github.com:jigumulmi/backend.git dev &&
             cd monitor &&
-            docker compose up -d --build
+            docker compose up -d --build --remove-orphans
