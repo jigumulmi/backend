@@ -192,7 +192,7 @@ class AdminCustomBannerRepositoryTest {
         }
 
         GetCandidatePlaceListRequestDto getCandidatePlaceListRequestDto = new GetCandidatePlaceListRequestDto(
-            savedBannerId, null, null, null, null, null);
+            savedBannerId, null, null, null, null, null, null);
 
         // when
         PageRequest pageRequest = PageRequest.ofSize(1);

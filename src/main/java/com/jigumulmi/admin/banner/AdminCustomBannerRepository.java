@@ -13,6 +13,7 @@ import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.vo.District;
+import com.jigumulmi.place.vo.Region;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
@@ -113,6 +114,10 @@ public class AdminCustomBannerRepository {
         return PageableExecutionUtils.getPage(content, pageable, totalCountQuery::fetchOne);
     }
 
+    public BooleanBuilder regionEq(Region region) {
+        return nullSafeBuilder(() -> place.region.eq(region));
+    }
+
     public BooleanBuilder districtEq(District district) {
         return nullSafeBuilder(() -> place.district.eq(district));
     }
@@ -137,6 +142,7 @@ public class AdminCustomBannerRepository {
                 .and(customPlaceRepository.categoryGroupCondition(
                     requestDto.getPlaceCategoryGroup()))
                 .and(customPlaceRepository.placeNameContains(requestDto.getPlaceName()))
+                .and(regionEq(requestDto.getRegion()))
                 .and(districtEq(requestDto.getDistrict()))
                 .and(menuNameContains(requestDto.getMenuName()))
         );
