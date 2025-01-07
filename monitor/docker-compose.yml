@@ -33,30 +33,30 @@ services:
       - "9090:9090"
     command:
       - --config.file=/etc/prometheus/prometheus.yml
-      - --storage.tsdb.retention.size=4GB
+      - --storage.tsdb.retention.size=2GB
     volumes:
       - ./prometheus/password.txt:/etc/prometheus/password.txt
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     restart: always
 
-  grafana:
-    image: grafana/grafana:11.4.0
-    container_name: grafana
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - grafana_data:/var/lib/grafana
-    restart: unless-stopped
-    depends_on:
-      - prometheus
-      - loki
-    env_file:
-      - env/.env
+#  grafana:
+#    image: grafana/grafana:11.4.0
+#    container_name: grafana
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+#      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+#      - grafana_data:/var/lib/grafana
+#    restart: unless-stopped
+#    depends_on:
+#      - prometheus
+#      - loki
+#    env_file:
+#      - env/.env
 
 volumes:
   loki_data:
-  grafana_data:
+#  grafana_data:
   prometheus_data:
