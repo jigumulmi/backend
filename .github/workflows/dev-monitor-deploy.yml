@@ -6,6 +6,7 @@ on:
       - dev
     paths:
       - "!**.md"
+      - "**/dev-monitor-deploy.yml"
       - "monitor/**"
 
 permissions:
