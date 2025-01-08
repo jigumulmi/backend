@@ -2,7 +2,6 @@ package com.jigumulmi.admin.banner;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
-import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
@@ -131,10 +130,9 @@ public class AdminBannerController {
 
     @Operation(summary = "배너 삭제")
     @ApiResponse(responseCode = "204")
-    @DeleteMapping("")
-    public ResponseEntity<?> deleteBannerList(
-        @Valid @RequestBody DeleteBannerRequestDto requestDto) {
-        adminBannerService.deleteBannerList(requestDto);
+    @DeleteMapping("/{bannerId}")
+    public ResponseEntity<?> deleteBanner(@PathVariable Long bannerId) {
+        adminBannerService.deleteBanner(bannerId);
         return ResponseEntity.noContent().build();
     }
 

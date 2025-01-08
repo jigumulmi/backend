@@ -11,7 +11,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
-import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
 import com.jigumulmi.aws.S3Service;
@@ -21,7 +20,6 @@ import com.jigumulmi.common.MultipartTestUtils;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.security.MockMember;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
@@ -215,29 +213,24 @@ class AdminBannerServiceTest {
 
     @ParameterizedTest
     @MethodSource("getImageS3KeyParams")
-    @DisplayName("배너 목록 삭제")
-    public void testDeleteBannerList(String outerImageKey, String innerImageKey, int deleteCount) {
+    @DisplayName("배너 삭제")
+    public void testDeleteBanner(String outerImageKey, String innerImageKey, int deleteCount) {
         // given
-        DeleteBannerRequestDto deleteBannerRequestDto = new DeleteBannerRequestDto();
-        ReflectionTestUtils.setField(deleteBannerRequestDto, "bannerIdList", List.of(1L));
-
+        long bannerId = 1L;
         Banner banner = Banner.builder()
             .title("title")
             .outerImageS3Key(outerImageKey)
             .innerImageS3Key(innerImageKey)
             .isActive(false)
             .build();
-        ReflectionTestUtils.setField(banner, "id", 1L);
+        ReflectionTestUtils.setField(banner, "id", bannerId);
 
-        List<Banner> bannerList = List.of(banner);
-        given(bannerRepository.findAllById(deleteBannerRequestDto.getBannerIdList())).willReturn(
-            bannerList);
-        willDoNothing().given(adminCustomBannerRepository)
-            .deleteBannerPlace(deleteBannerRequestDto);
-        willDoNothing().given(bannerRepository).deleteAllInBatch(bannerList);
+        given(bannerRepository.findById(bannerId)).willReturn(Optional.of(banner));
+        willDoNothing().given(adminCustomBannerRepository).deleteBannerPlaceByBannerId(bannerId);
+        willDoNothing().given(bannerRepository).delete(banner);
 
         // when
-        adminBannerService.deleteBannerList(deleteBannerRequestDto);
+        adminBannerService.deleteBanner(bannerId);
 
         // then
         verify(s3Service, times(1)).deleteObjects(eq(s3Service.bucket),

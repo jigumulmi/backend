@@ -2,7 +2,6 @@ package com.jigumulmi.admin.banner;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
-import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
@@ -77,11 +76,12 @@ public class AdminBannerService {
     }
 
     public void addBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
-        adminCustomBannerRepository.batchInsertBannerPlace(bannerId, requestDto);
+        adminCustomBannerRepository.batchInsertBannerPlace(bannerId, requestDto.getPlaceIdList());
     }
 
     public void removeBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
-        adminCustomBannerRepository.deleteBannerPlace(bannerId, requestDto);
+        adminCustomBannerRepository.deleteBannerPlaceByBannerIdAndPlaceIdList(bannerId,
+            requestDto.getPlaceIdList());
     }
 
     public AdminBannerDetailResponseDto getBannerDetail(Long bannerId) {
@@ -159,26 +159,24 @@ public class AdminBannerService {
     }
 
     @Transactional
-    public void deleteBannerList(DeleteBannerRequestDto requestDto) {
-        List<Banner> bannerList = bannerRepository.findAllById(requestDto.getBannerIdList());
+    public void deleteBanner(Long bannerId) {
+        Banner banner = bannerRepository.findById(bannerId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+        String outerImageS3Key = banner.getOuterImageS3Key();
+        String innerImageS3Key = banner.getInnerImageS3Key();
 
-        adminCustomBannerRepository.deleteBannerPlace(requestDto);
-        bannerRepository.deleteAllInBatch(bannerList);
+        adminCustomBannerRepository.deleteBannerPlaceByBannerId(bannerId);
+        bannerRepository.delete(banner);
 
         try {
             List<ObjectIdentifier> objectIdentifierList = new ArrayList<>();
-            for (Banner banner : bannerList) {
-                String outerImageS3Key = banner.getOuterImageS3Key();
-                String innerImageS3Key = banner.getInnerImageS3Key();
-
-                if (outerImageS3Key != null) {
-                    objectIdentifierList.add(
-                        ObjectIdentifier.builder().key(outerImageS3Key).build());
-                }
-                if (innerImageS3Key != null) {
-                    objectIdentifierList.add(
-                        ObjectIdentifier.builder().key(innerImageS3Key).build());
-                }
+            if (outerImageS3Key != null) {
+                objectIdentifierList.add(
+                    ObjectIdentifier.builder().key(outerImageS3Key).build());
+            }
+            if (innerImageS3Key != null) {
+                objectIdentifierList.add(
+                    ObjectIdentifier.builder().key(innerImageS3Key).build());
             }
 
             s3Service.deleteObjects(s3Service.bucket, objectIdentifierList);

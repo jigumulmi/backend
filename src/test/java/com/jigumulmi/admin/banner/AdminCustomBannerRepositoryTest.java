@@ -1,7 +1,6 @@
 package com.jigumulmi.admin.banner;
 
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
-import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.domain.BannerPlaceMapping;
@@ -49,8 +48,7 @@ class AdminCustomBannerRepositoryTest {
         ReflectionTestUtils.setField(bannerPlaceMappingRequestDto, "placeIdList", savedPlaceIdList);
 
         // when
-        adminCustomBannerRepository.batchInsertBannerPlace(savedBannerId,
-            bannerPlaceMappingRequestDto);
+        adminCustomBannerRepository.batchInsertBannerPlace(savedBannerId, savedPlaceIdList);
 
         // then
         List<BannerPlaceMapping> bannerPlaceMappingList = bannerPlaceMappingRepository.findAllByBannerId(
@@ -61,7 +59,7 @@ class AdminCustomBannerRepositoryTest {
 
     @Test
     @DisplayName("장소 할당 해제")
-    public void testDeleteBannerPlace() {
+    public void testDeleteBannerPlaceByBannerIdAndPlaceIdList() {
         // given
         Banner banner = Banner.builder().build();
         Banner savedBanner = bannerRepository.save(banner);
@@ -87,7 +85,8 @@ class AdminCustomBannerRepositoryTest {
         ReflectionTestUtils.setField(bannerPlaceMappingRequestDto, "placeIdList", savedPlaceIdList);
 
         // when
-        adminCustomBannerRepository.deleteBannerPlace(savedBannerId, bannerPlaceMappingRequestDto);
+        adminCustomBannerRepository.deleteBannerPlaceByBannerIdAndPlaceIdList(savedBannerId,
+            savedPlaceIdList);
 
         // then
         List<BannerPlaceMapping> bannerPlaceMappingList = bannerPlaceMappingRepository.findAllByBannerId(
@@ -131,36 +130,29 @@ class AdminCustomBannerRepositoryTest {
     }
 
     @Test
-    @DisplayName("장소 할당 해제 - 배너 목록 삭제")
-    public void testDeleteBannerPlaceFromBannerRemoval() {
+    @DisplayName("장소 할당 해제 - 배너 삭제")
+    public void testDeleteBannerPlaceByBannerId() {
         // given
-        Banner banner1 = Banner.builder().build();
-        Banner banner2 = Banner.builder().build();
-        List<Banner> savedBannerList = bannerRepository.saveAll(List.of(banner1, banner2));
-        List<Long> savedBannerIdList = savedBannerList.stream().map(Banner::getId).toList();
+        Banner banner = Banner.builder().build();
+        Banner savedBanner = bannerRepository.save(banner);
+        Long bannerId = savedBanner.getId();
 
         Place place = Place.builder().build();
         Place savedPlace = placeRepository.save(place);
 
-        for (Banner savedBanner : savedBannerList) {
-            bannerPlaceMappingRepository.save(
-                BannerPlaceMapping.builder()
-                    .banner(savedBanner)
-                    .place(savedPlace)
-                    .build()
-            );
-        }
-
-        DeleteBannerRequestDto deleteBannerRequestDto = new DeleteBannerRequestDto();
-        ReflectionTestUtils.setField(deleteBannerRequestDto, "bannerIdList",
-            savedBannerIdList);
+        bannerPlaceMappingRepository.save(
+            BannerPlaceMapping.builder()
+                .banner(savedBanner)
+                .place(savedPlace)
+                .build()
+        );
 
         // when
-        adminCustomBannerRepository.deleteBannerPlace(deleteBannerRequestDto);
+        adminCustomBannerRepository.deleteBannerPlaceByBannerId(bannerId);
 
         // then
-        List<BannerPlaceMapping> bannerPlaceMappingList = bannerPlaceMappingRepository.findAllByBannerIdIn(
-            savedBannerIdList);
+        List<BannerPlaceMapping> bannerPlaceMappingList = bannerPlaceMappingRepository.findAllByBannerId(
+            bannerId);
         Assertions.assertEquals(bannerPlaceMappingList.size(), 0);
 
     }

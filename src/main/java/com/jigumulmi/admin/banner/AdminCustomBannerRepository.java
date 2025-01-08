@@ -7,8 +7,6 @@ import static com.jigumulmi.config.querydsl.Utils.nullSafeBuilder;
 import static com.jigumulmi.place.domain.QMenu.menu;
 import static com.jigumulmi.place.domain.QPlace.place;
 
-import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
-import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
@@ -40,11 +38,11 @@ public class AdminCustomBannerRepository {
 
     private final CustomPlaceRepository customPlaceRepository;
 
-    public void batchInsertBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
+    public void batchInsertBannerPlace(Long bannerId, List<Long> placeIdList) {
         String sql = "INSERT INTO banner_place_mapping (banner_id, place_id) " +
             "VALUES (:bannerId, :placeId)";
 
-        SqlParameterSource[] batch = requestDto.getPlaceIdList().stream()
+        SqlParameterSource[] batch = placeIdList.stream()
             .map(placeId -> new MapSqlParameterSource()
                 .addValue("bannerId", bannerId)
                 .addValue("placeId", placeId))
@@ -54,12 +52,12 @@ public class AdminCustomBannerRepository {
     }
 
     @Transactional
-    public void deleteBannerPlace(Long bannerId, BannerPlaceMappingRequestDto requestDto) {
+    public void deleteBannerPlaceByBannerIdAndPlaceIdList(Long bannerId, List<Long> placeIdList) {
         queryFactory
             .delete(bannerPlaceMapping)
             .where(
                 bannerPlaceMapping.banner.id.eq(bannerId)
-                    .and(bannerPlaceMapping.place.id.in(requestDto.getPlaceIdList()))
+                    .and(bannerPlaceMapping.place.id.in(placeIdList))
             )
             .execute();
     }
@@ -84,11 +82,10 @@ public class AdminCustomBannerRepository {
     }
 
     @Transactional
-    public void deleteBannerPlace(DeleteBannerRequestDto requestDto) {
+    public void deleteBannerPlaceByBannerId(Long bannerId) {
         queryFactory
             .delete(bannerPlaceMapping)
-            .where(
-                bannerPlaceMapping.banner.id.in(requestDto.getBannerIdList()))
+            .where(bannerPlaceMapping.banner.id.eq(bannerId))
             .execute();
     }
 
