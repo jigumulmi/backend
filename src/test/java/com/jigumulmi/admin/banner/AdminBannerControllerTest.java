@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
-import com.jigumulmi.admin.banner.dto.request.DeleteBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
@@ -396,17 +395,13 @@ class AdminBannerControllerTest {
     @MockMember(isAdmin = true)
     public void testDeleteBannerList() throws Exception {
         // given
-        DeleteBannerRequestDto deleteBannerRequestDto = new DeleteBannerRequestDto();
-        ReflectionTestUtils.setField(deleteBannerRequestDto, "bannerIdList", List.of(1L, 2L));
-
-        willDoNothing().given(adminBannerService).deleteBannerList(deleteBannerRequestDto);
+        long bannerId = 1L;
+        willDoNothing().given(adminBannerService).deleteBanner(bannerId);
 
         // when
         ResultActions perform = mockMvc.perform(
-            delete("/admin/banner")
+            delete("/admin/banner/{bannerId}", bannerId)
                 .with(csrf())
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(deleteBannerRequestDto))
         );
 
         // then
@@ -445,13 +440,14 @@ class AdminBannerControllerTest {
             )
             .build();
 
-        given(adminBannerService.getCandidatePlaceList(any(PageRequest.class), any(GetCandidatePlaceListRequestDto.class)))
+        given(adminBannerService.getCandidatePlaceList(any(PageRequest.class),
+            any(GetCandidatePlaceListRequestDto.class)))
             .willReturn(responseDto);
 
         // when
         ResultActions perform = mockMvc.perform(
             get("/admin/banner/place")
-                .queryParam("bannerId", String.valueOf(1L))
+                .queryParam("bannerId", String.valueOf(bannerId))
                 .with(csrf())
         );
 
