@@ -3,9 +3,9 @@ package com.jigumulmi.admin.place;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceDetailResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
+import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
 import com.jigumulmi.config.common.PageableParams;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
@@ -22,13 +22,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -68,24 +68,15 @@ public class AdminPlaceController {
         return ResponseEntity.ok().body(placeDetail);
     }
 
-    @Operation(summary = "장소 등록")
-    @ApiResponse(responseCode = "204")
+    @Operation(summary = "장소 생성")
+    @ApiResponse(responseCode = "201")
     @PostMapping("")
-    public ResponseEntity<?> createPlace(
+    public ResponseEntity<CreatePlaceResponseDto> createPlace(
         @RequestBody AdminCreatePlaceRequestDto requestDto,
         @RequiredAuthUser Member member
     ) {
-        adminPlaceService.createPlace(requestDto, member);
-        return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "장소 수정", description = "덮어쓰는 로직이므로 수정하지 않은 항목도 기존 조회된 데이터를 꼭 담아주세요")
-    @ApiResponse(responseCode = "204")
-    @PutMapping("")
-    public ResponseEntity<?> updatePlaceDetail(
-        @RequestBody AdminUpdatePlaceRequestDto requestDto) {
-        adminPlaceService.updatePlaceDetail(requestDto);
-        return ResponseEntity.noContent().build();
+        CreatePlaceResponseDto responseDto = adminPlaceService.createPlace(requestDto, member);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
     @Operation(summary = "장소 삭제")
