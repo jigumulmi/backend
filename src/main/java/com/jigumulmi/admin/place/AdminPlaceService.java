@@ -2,7 +2,6 @@ package com.jigumulmi.admin.place;
 
 
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
@@ -232,8 +231,8 @@ public class AdminPlaceService {
         return CreatePlaceResponseDto.builder().placeId(savedPlace.getId()).build();
     }
 
-    public void deletePlace(AdminDeletePlaceRequestDto requestDto) {
-        Long placeId = requestDto.getPlaceId();
+    @Transactional
+    public void deletePlace(Long placeId) {
         List<Menu> menuList = menuRepository.findAllByPlaceId(placeId);
         List<ReviewImage> reviewImageList = reviewImageRepository.findAllByReview_Place_IdOrderByCreatedAtDesc(
             placeId);
