@@ -10,6 +10,7 @@ import com.jigumulmi.config.common.PageableParams;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.vo.Region;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -71,6 +72,22 @@ public class AdminPlaceController {
     public ResponseEntity<?> updatePlaceBasic(@PathVariable Long placeId,
         @RequestBody AdminCreatePlaceRequestDto requestDto) {
         adminPlaceService.updatePlaceBasic(placeId, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    //@Operation(summary = "장소 이미지 조회")
+    //@GetMapping("/{placeId}/image")
+    //public ResponseEntity<AdminPlaceBasicResponseDto> getPlaceBasic(@PathVariable Long placeId) {
+    //    AdminPlaceBasicResponseDto responseDto = adminPlaceService.getPlaceBasic(placeId);
+    //    return ResponseEntity.ok().body(responseDto);
+    //}
+
+    @Operation(summary = "장소 이미지 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
+    @ApiResponse(responseCode = "201")
+    @PutMapping("/{placeId}/image")
+    public ResponseEntity<?> updatePlaceImage(@PathVariable Long placeId,
+        @RequestBody List<ImageDto> requestDto) {
+        adminPlaceService.updatePlaceImage(placeId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

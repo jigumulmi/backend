@@ -16,13 +16,16 @@ import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.PlaceCategoryMapping;
+import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.MenuRepository;
+import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
@@ -54,6 +57,7 @@ public class AdminPlaceService {
     private final SubwayStationRepository subwayStationRepository;
     private final MenuRepository menuRepository;
     private final ReviewImageRepository reviewImageRepository;
+    private final PlaceImageRepository placeImageRepository;
 
     @Transactional(readOnly = true)
     public AdminPlaceListResponseDto getPlaceList(Pageable pageable,
@@ -117,6 +121,27 @@ public class AdminPlaceService {
         place.adminBasicUpdate(requestDto, categoryMappingList, subwayStationPlaceList);
 
         placeRepository.save(place);
+    }
+
+
+    @Transactional
+    public void updatePlaceImage(Long placeId, List<ImageDto> imageDtoList) {
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+        placeImageRepository.deleteAllByPlace(place);
+
+        List<PlaceImage> placeImageList = new ArrayList<>();
+        for (ImageDto imageDto : imageDtoList) {
+            placeImageList.add(
+                PlaceImage.builder()
+                    .url(imageDto.getUrl())
+                    .isMain(imageDto.getIsMain())
+                    .place(place)
+                    .build()
+            );
+        }
+
+        placeImageRepository.saveAll(placeImageList);
     }
 
     @Transactional
