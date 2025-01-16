@@ -1,9 +1,11 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.banner.domain.BannerPlaceMapping;
 import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
 import jakarta.persistence.CascadeType;
@@ -182,12 +184,40 @@ public class Place extends Timestamped {
             bannerPlaceMappingList != null ? bannerPlaceMappingList : new ArrayList<>();
     }
 
-    public void addChildren(List<PlaceCategoryMapping> categoryMappingList,
-        List<SubwayStationPlace> subwayStationPlaceList,
-        List<Menu> menuList, List<PlaceImage> placeImageList) {
+    public void addCategoryAndSubwayStation(List<PlaceCategoryMapping> categoryMappingList,
+        List<SubwayStationPlace> subwayStationPlaceList) {
         this.categoryMappingList.addAll(categoryMappingList);
-        this.menuList.addAll(menuList);
         this.subwayStationPlaceList.addAll(subwayStationPlaceList);
-        this.placeImageList.addAll(placeImageList);
+    }
+
+    public void addMenu(List<Menu> menuList) {
+        this.menuList.addAll(menuList);
+    }
+
+    public void adminBasicUpdate(AdminCreatePlaceRequestDto requestDto,
+        List<PlaceCategoryMapping> categoryMappingList,
+        List<SubwayStationPlace> subwayStationPlaceList) {
+        PositionDto position = requestDto.getPosition();
+
+        this.name = requestDto.getName();
+        this.region = requestDto.getRegion();
+        this.district = requestDto.getDistrict();
+        this.address = requestDto.getAddress();
+        this.contact = requestDto.getContact();
+        this.additionalInfo = requestDto.getAdditionalInfo();
+        this.placeUrl = requestDto.getPlaceUrl();
+        this.longitude = position.getLongitude();
+        this.latitude = position.getLatitude();
+        this.registrantComment = requestDto.getRegistrantComment();
+        this.isApproved = requestDto.getIsApproved();
+        this.kakaoPlaceId = requestDto.getKakaoPlaceId();
+
+        List<PlaceCategoryMapping> categoryMappingListToOverwrite = PlaceCategoryMapping.getCategoryMappingListToOverwrite(
+            this.categoryMappingList, categoryMappingList);
+
+        this.categoryMappingList.clear();
+        this.subwayStationPlaceList.clear();
+
+        addCategoryAndSubwayStation(categoryMappingListToOverwrite, subwayStationPlaceList);
     }
 }

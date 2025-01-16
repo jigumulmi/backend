@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,6 +63,15 @@ public class AdminPlaceController {
     public ResponseEntity<AdminPlaceBasicResponseDto> getPlaceBasic(@PathVariable Long placeId) {
         AdminPlaceBasicResponseDto responseDto = adminPlaceService.getPlaceBasic(placeId);
         return ResponseEntity.ok().body(responseDto);
+    }
+
+    @Operation(summary = "장소 기본 정보 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
+    @ApiResponse(responseCode = "201")
+    @PutMapping("/{placeId}/basic")
+    public ResponseEntity<?> updatePlaceBasic(@PathVariable Long placeId,
+        @RequestBody AdminCreatePlaceRequestDto requestDto) {
+        adminPlaceService.updatePlaceBasic(placeId, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(summary = "장소 생성")
