@@ -92,12 +92,12 @@ public class AdminPlaceController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    //@Operation(summary = "장소 이미지 조회")
-    //@GetMapping("/{placeId}/menu")
-    //public ResponseEntity<List<ImageDto>> getMenu(@PathVariable Long placeId) {
-    //    List<ImageDto> responseDto = adminPlaceService.getMenu(placeId);
-    //    return ResponseEntity.ok().body(responseDto);
-    //}
+    @Operation(summary = "장소 메뉴 조회")
+    @GetMapping("/{placeId}/menu")
+    public ResponseEntity<List<MenuDto>> getMenu(@PathVariable Long placeId) {
+        List<MenuDto> responseDto = adminPlaceService.getMenu(placeId);
+        return ResponseEntity.ok().body(responseDto);
+    }
 
     @Operation(summary = "장소 메뉴 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
     @ApiResponse(responseCode = "201")

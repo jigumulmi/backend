@@ -152,6 +152,11 @@ public class AdminPlaceService {
         placeImageRepository.saveAll(placeImageList);
     }
 
+    public List<MenuDto> getMenu(Long placeId) {
+        return menuRepository.findAllByPlaceId(placeId).stream()
+            .map(MenuDto::from).toList();
+    }
+
     @Transactional
     public void updateMenu(Long placeId, List<MenuDto> menuDtoList) {
         Place place = placeRepository.findById(placeId)
