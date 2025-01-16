@@ -13,6 +13,7 @@ import com.jigumulmi.config.common.PageDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.place.PlaceService;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.PlaceCategoryMapping;
@@ -20,9 +21,10 @@ import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.dto.ImageDto;
+import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
@@ -51,6 +53,7 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 public class AdminPlaceService {
 
     private final S3Service s3Service;
+    private final PlaceService placeService;
 
     private final AdminCustomPlaceRepository adminCustomPlaceRepository;
     private final PlaceRepository placeRepository;
@@ -147,6 +150,30 @@ public class AdminPlaceService {
         }
 
         placeImageRepository.saveAll(placeImageList);
+    }
+
+    @Transactional
+    public void updateMenu(Long placeId, List<MenuDto> menuDtoList) {
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+        menuRepository.deleteAllByPlace(place);
+
+        List<Menu> menuList = new ArrayList<>();
+        for (MenuDto menuDto : menuDtoList) {
+            String imageS3Key = placeService.MENU_IMAGE_S3_PREFIX + menuDto.getFullFilename();
+            menuList.add(
+                Menu.builder()
+                    .name(menuDto.getName())
+                    .place(place)
+                    .isMain(menuDto.getIsMain())
+                    .price(menuDto.getPrice())
+                    .description(menuDto.getDescription())
+                    .imageS3Key(imageS3Key)
+                    .build()
+            );
+        }
+
+        menuRepository.saveAll(menuList);
     }
 
     @Transactional

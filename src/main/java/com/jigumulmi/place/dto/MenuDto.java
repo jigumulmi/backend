@@ -3,7 +3,6 @@ package com.jigumulmi.place.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.jigumulmi.place.domain.Menu;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class MenuDto {
-
-    @JsonProperty(access = Access.READ_ONLY)
-    private Long id;
 
     private String name;
 
@@ -36,7 +32,6 @@ public class MenuDto {
 
     public static MenuDto from(Menu menu) {
         return MenuDto.builder()
-            .id(menu.getId())
             .name(menu.getName())
             .isMain(menu.getIsMain())
             .price(menu.getPrice())
