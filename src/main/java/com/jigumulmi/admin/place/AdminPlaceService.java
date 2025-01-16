@@ -22,7 +22,7 @@ import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
+import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;

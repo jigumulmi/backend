@@ -1,6 +1,6 @@
 package com.jigumulmi.place.dto.response;
 
-import com.jigumulmi.place.domain.PlaceImage;
+import com.jigumulmi.place.dto.ImageDto;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,23 +24,6 @@ public class PlaceResponseDto {
         private Double latitude;
 
         private Double longitude;
-    }
-
-    @Getter
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ImageDto {
-
-        private String url;
-        private Boolean isMain;
-
-        public static ImageDto from(PlaceImage image) {
-            return ImageDto.builder()
-                .url(image.getUrl())
-                .isMain(image.getIsMain())
-                .build();
-        }
     }
 
     @Getter

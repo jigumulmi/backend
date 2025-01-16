@@ -10,7 +10,7 @@ import com.jigumulmi.config.common.PageableParams;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.ImageDto;
+import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.vo.Region;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
