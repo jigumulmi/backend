@@ -1,7 +1,6 @@
 package com.jigumulmi.admin.place;
 
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
@@ -121,10 +120,9 @@ public class AdminPlaceController {
 
     @Operation(summary = "장소 삭제")
     @ApiResponse(responseCode = "204")
-    @DeleteMapping("")
-    public ResponseEntity<?> deletePlace(
-        @RequestBody AdminDeletePlaceRequestDto requestDto) {
-        adminPlaceService.deletePlace(requestDto);
+    @DeleteMapping("/{placeId}")
+    public ResponseEntity<?> deletePlace(@PathVariable Long placeId) {
+        adminPlaceService.deletePlace(placeId);
         return ResponseEntity.noContent().build();
     }
 
