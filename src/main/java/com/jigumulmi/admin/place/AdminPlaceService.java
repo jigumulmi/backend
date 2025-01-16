@@ -4,7 +4,7 @@ package com.jigumulmi.admin.place;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.place.dto.response.AdminPlaceDetailResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
@@ -76,11 +76,47 @@ public class AdminPlaceService {
     }
 
     @Transactional(readOnly = true)
-    public AdminPlaceDetailResponseDto getPlaceDetail(Long placeId) {
-        return placeRepository.findById(placeId).map(AdminPlaceDetailResponseDto::from)
-            .orElseThrow(() -> new CustomException(
-                CommonErrorCode.RESOURCE_NOT_FOUND)
+    public AdminPlaceBasicResponseDto getPlaceBasic(Long placeId) {
+        return placeRepository.findById(placeId).map(AdminPlaceBasicResponseDto::from)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+    }
+
+    @Transactional
+    public void updatePlaceBasic(Long placeId, AdminCreatePlaceRequestDto requestDto) {
+
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        List<Long> subwayStationIdList = requestDto.getSubwayStationIdList();
+        List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(
+            subwayStationIdList);
+
+        ArrayList<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
+        for (SubwayStation subwayStation : subwayStationList) {
+            SubwayStationPlace subwayStationPlace = SubwayStationPlace.builder()
+                .isMain(
+                    subwayStation.getId().equals(subwayStationIdList.getFirst())) // 첫 요소가 메인 지하철역
+                .subwayStation(subwayStation)
+                .place(place)
+                .build();
+
+            subwayStationPlaceList.add(subwayStationPlace);
+        }
+
+        ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
+        for (PlaceCategoryDto categoryRequestDto : requestDto.getCategoryList()) {
+            categoryMappingList.add(
+                PlaceCategoryMapping.builder()
+                    .category(categoryRequestDto.getCategory())
+                    .categoryGroup(categoryRequestDto.getCategoryGroup())
+                    .place(place)
+                    .build()
             );
+        }
+
+        place.adminBasicUpdate(requestDto, categoryMappingList, subwayStationPlaceList);
+
+        placeRepository.save(place);
     }
 
     @Transactional
@@ -128,8 +164,7 @@ public class AdminPlaceService {
             );
         }
 
-        place.addChildren(categoryMappingList, subwayStationPlaceList, new ArrayList<>(),
-            new ArrayList<>());
+        place.addCategoryAndSubwayStation(categoryMappingList, subwayStationPlaceList);
 
         Place savedPlace = placeRepository.save(place);
         return CreatePlaceResponseDto.builder().placeId(savedPlace.getId()).build();

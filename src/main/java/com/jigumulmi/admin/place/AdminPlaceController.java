@@ -3,7 +3,7 @@ package com.jigumulmi.admin.place;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.place.dto.response.AdminPlaceDetailResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
 import com.jigumulmi.config.common.PageableParams;
@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,15 +58,20 @@ public class AdminPlaceController {
         return ResponseEntity.ok().body(placeList);
     }
 
-    @Operation(summary = "장소 상세 조회")
-    @ApiResponses(
-        value = {@ApiResponse(responseCode = "200", content = {
-            @Content(schema = @Schema(implementation = AdminPlaceDetailResponseDto.class))})}
-    )
-    @GetMapping("/{placeId}")
-    public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
-        AdminPlaceDetailResponseDto placeDetail = adminPlaceService.getPlaceDetail(placeId);
-        return ResponseEntity.ok().body(placeDetail);
+    @Operation(summary = "장소 기본 정보 조회")
+    @GetMapping("/{placeId}/basic")
+    public ResponseEntity<AdminPlaceBasicResponseDto> getPlaceBasic(@PathVariable Long placeId) {
+        AdminPlaceBasicResponseDto responseDto = adminPlaceService.getPlaceBasic(placeId);
+        return ResponseEntity.ok().body(responseDto);
+    }
+
+    @Operation(summary = "장소 기본 정보 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
+    @ApiResponse(responseCode = "201")
+    @PutMapping("/{placeId}/basic")
+    public ResponseEntity<?> updatePlaceBasic(@PathVariable Long placeId,
+        @RequestBody AdminCreatePlaceRequestDto requestDto) {
+        adminPlaceService.updatePlaceBasic(placeId, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(summary = "장소 생성")
