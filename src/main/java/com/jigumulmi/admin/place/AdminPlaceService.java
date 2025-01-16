@@ -4,7 +4,7 @@ package com.jigumulmi.admin.place;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.place.dto.response.AdminPlaceDetailResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
@@ -76,11 +76,9 @@ public class AdminPlaceService {
     }
 
     @Transactional(readOnly = true)
-    public AdminPlaceDetailResponseDto getPlaceDetail(Long placeId) {
-        return placeRepository.findById(placeId).map(AdminPlaceDetailResponseDto::from)
-            .orElseThrow(() -> new CustomException(
-                CommonErrorCode.RESOURCE_NOT_FOUND)
-            );
+    public AdminPlaceBasicResponseDto getPlaceBasic(Long placeId) {
+        return placeRepository.findById(placeId).map(AdminPlaceBasicResponseDto::from)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
     }
 
     @Transactional

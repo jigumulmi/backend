@@ -3,7 +3,7 @@ package com.jigumulmi.admin.place;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminDeletePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.place.dto.response.AdminPlaceDetailResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
 import com.jigumulmi.config.common.PageableParams;
@@ -57,15 +57,11 @@ public class AdminPlaceController {
         return ResponseEntity.ok().body(placeList);
     }
 
-    @Operation(summary = "장소 상세 조회")
-    @ApiResponses(
-        value = {@ApiResponse(responseCode = "200", content = {
-            @Content(schema = @Schema(implementation = AdminPlaceDetailResponseDto.class))})}
-    )
-    @GetMapping("/{placeId}")
-    public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
-        AdminPlaceDetailResponseDto placeDetail = adminPlaceService.getPlaceDetail(placeId);
-        return ResponseEntity.ok().body(placeDetail);
+    @Operation(summary = "장소 기본 정보 조회")
+    @GetMapping("/{placeId}/basic")
+    public ResponseEntity<AdminPlaceBasicResponseDto> getPlaceBasic(@PathVariable Long placeId) {
+        AdminPlaceBasicResponseDto responseDto = adminPlaceService.getPlaceBasic(placeId);
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @Operation(summary = "장소 생성")
