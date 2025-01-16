@@ -32,13 +32,11 @@ public class PlaceResponseDto {
     @AllArgsConstructor
     public static class ImageDto {
 
-        private Long id;
         private String url;
         private Boolean isMain;
 
         public static ImageDto from(PlaceImage image) {
             return ImageDto.builder()
-                .id(image.getId())
                 .url(image.getUrl())
                 .isMain(image.getIsMain())
                 .build();
