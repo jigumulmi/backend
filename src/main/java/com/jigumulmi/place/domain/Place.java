@@ -1,12 +1,9 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.jigumulmi.admin.place.dto.request.AdminUpdatePlaceRequestDto;
 import com.jigumulmi.banner.domain.BannerPlaceMapping;
 import com.jigumulmi.config.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
 import jakarta.persistence.CascadeType;
@@ -59,6 +56,12 @@ public class Place extends Timestamped {
     private String address;
 
     private String contact;
+
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FixedBusinessHour> fixedBusinessHourList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TemporaryBusinessHour> temporaryBusinessHourList = new ArrayList<>();
 
     private String openingHourSun;
 
@@ -130,8 +133,9 @@ public class Place extends Timestamped {
 
     @Builder
     public Place(String name, List<PlaceCategoryMapping> categoryMappingList, Region region,
-        District district, String address,
-        String contact, List<Menu> menuList,
+        District district, String address, String contact, List<Menu> menuList,
+        List<FixedBusinessHour> fixedBusinessHourList,
+        List<TemporaryBusinessHour> temporaryBusinessHourList,
         String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed,
         String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo,
         String placeUrl, Double longitude, Double latitude, String registrantComment,
@@ -149,6 +153,10 @@ public class Place extends Timestamped {
         this.address = address;
         this.contact = contact;
         this.menuList = menuList != null ? menuList : new ArrayList<>();
+        this.fixedBusinessHourList =
+            fixedBusinessHourList != null ? fixedBusinessHourList : new ArrayList<>();
+        this.temporaryBusinessHourList =
+            temporaryBusinessHourList != null ? temporaryBusinessHourList : new ArrayList<>();
         this.openingHourSun = openingHourSun;
         this.openingHourMon = openingHourMon;
         this.openingHourTue = openingHourTue;
@@ -181,49 +189,5 @@ public class Place extends Timestamped {
         this.menuList.addAll(menuList);
         this.subwayStationPlaceList.addAll(subwayStationPlaceList);
         this.placeImageList.addAll(placeImageList);
-    }
-
-    public void adminUpdate(AdminUpdatePlaceRequestDto requestDto,
-        List<PlaceCategoryMapping> categoryMappingList,
-        List<SubwayStationPlace> subwayStationPlaceList,
-        List<Menu> menuList, List<PlaceImage> placeImageList) {
-        OpeningHourDto openingHour = requestDto.getOpeningHour();
-        PositionDto position = requestDto.getPosition();
-
-        this.name = requestDto.getName();
-        this.region = requestDto.getRegion();
-        this.district = requestDto.getDistrict();
-        this.address = requestDto.getAddress();
-        this.contact = requestDto.getContact();
-        this.openingHourSun = openingHour.getOpeningHourSun();
-        this.openingHourMon = openingHour.getOpeningHourMon();
-        this.openingHourTue = openingHour.getOpeningHourTue();
-        this.openingHourWed = openingHour.getOpeningHourWed();
-        this.openingHourThu = openingHour.getOpeningHourThu();
-        this.openingHourFri = openingHour.getOpeningHourFri();
-        this.openingHourSat = openingHour.getOpeningHourSat();
-        this.additionalInfo = requestDto.getAdditionalInfo();
-        this.placeUrl = requestDto.getPlaceUrl();
-        this.longitude = position.getLongitude();
-        this.latitude = position.getLatitude();
-        this.registrantComment = requestDto.getRegistrantComment();
-        this.isApproved = requestDto.getIsApproved();
-        this.kakaoPlaceId = requestDto.getKakaoPlaceId();
-
-        // 실제 쿼리는 insert 후 delete가 이루어지므로
-        // 제약조건이 걸리는 경우 위배되지 않는 데이터만 addAll 해야한다
-        // TODO 메서드화
-        List<PlaceCategoryMapping> intersectionWithElementsFromLeft = PlaceCategoryMapping.getIntersectionWithElementsFromLeft(
-            this.categoryMappingList, categoryMappingList);
-
-        categoryMappingList.removeAll(this.categoryMappingList);
-        categoryMappingList.addAll(intersectionWithElementsFromLeft);
-
-        this.categoryMappingList.clear();
-        this.menuList.clear();
-        this.subwayStationPlaceList.clear();
-        this.placeImageList.clear();
-
-        addChildren(categoryMappingList, subwayStationPlaceList, menuList, placeImageList);
     }
 }
