@@ -1,7 +1,5 @@
 package com.jigumulmi.place.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.jigumulmi.place.domain.PlaceImage;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -34,14 +32,11 @@ public class PlaceResponseDto {
     @AllArgsConstructor
     public static class ImageDto {
 
-        @JsonProperty(access = Access.READ_ONLY)
-        private Long id;
         private String url;
         private Boolean isMain;
 
         public static ImageDto from(PlaceImage image) {
             return ImageDto.builder()
-                .id(image.getId())
                 .url(image.getUrl())
                 .isMain(image.getIsMain())
                 .build();

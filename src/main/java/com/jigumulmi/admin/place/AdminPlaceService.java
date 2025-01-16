@@ -123,6 +123,11 @@ public class AdminPlaceService {
         placeRepository.save(place);
     }
 
+    public List<ImageDto> getPlaceImage(Long placeId) {
+        return placeImageRepository.findByPlace_Id(placeId).stream()
+            .map(ImageDto::from).toList();
+    }
+
 
     @Transactional
     public void updatePlaceImage(Long placeId, List<ImageDto> imageDtoList) {
