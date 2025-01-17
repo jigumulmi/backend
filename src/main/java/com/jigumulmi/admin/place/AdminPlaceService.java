@@ -2,7 +2,7 @@ package com.jigumulmi.admin.place;
 
 
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminCreatedTemporaryBusinessHourRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto.BusinessHour;
@@ -220,7 +220,7 @@ public class AdminPlaceService {
     }
 
     public void createTemporaryBusinessHour(Long placeId,
-        AdminCreatedTemporaryBusinessHourRequestDto requestDto) {
+        AdminCreateTemporaryBusinessHourRequestDto requestDto) {
         Place place = placeRepository.findById(placeId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
@@ -241,6 +241,16 @@ public class AdminPlaceService {
             .breakEnd(businessHour.getBreakEnd())
             .isDayOff(businessHour.getIsDayOff())
             .build();
+
+        temporaryBusinessHourRepository.save(temporaryBusinessHour);
+    }
+
+    public void updateTemporaryBusinessHour(Long hourId,
+        AdminCreateTemporaryBusinessHourRequestDto requestDto) {
+        TemporaryBusinessHour temporaryBusinessHour = temporaryBusinessHourRepository.findById(
+            hourId).orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        temporaryBusinessHour.adminUpdate(requestDto);
 
         temporaryBusinessHourRepository.save(temporaryBusinessHour);
     }

@@ -1,5 +1,7 @@
 package com.jigumulmi.place.domain;
 
+import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto.BusinessHour;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,6 +16,7 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.temporal.WeekFields;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -60,5 +63,22 @@ public class TemporaryBusinessHour {
         this.breakStart = breakStart;
         this.breakEnd = breakEnd;
         this.isDayOff = isDayOff;
+    }
+
+    public void adminUpdate(AdminCreateTemporaryBusinessHourRequestDto requestDto) {
+        BusinessHour businessHour = requestDto.getBusinessHour();
+
+        LocalDate date = requestDto.getDate();
+        int weekOfYear = date.get(WeekFields.SUNDAY_START.weekOfYear());
+
+        this.month = date.getMonthValue();
+        this.weekOfYear = weekOfYear;
+        this.date = date;
+        this.dayOfWeek = date.getDayOfWeek();
+        this.openTime = businessHour.getOpenTime();
+        this.closeTime = businessHour.getCloseTime();
+        this.breakStart = businessHour.getBreakStart();
+        this.breakEnd = businessHour.getBreakEnd();
+        this.isDayOff = businessHour.getIsDayOff();
     }
 }

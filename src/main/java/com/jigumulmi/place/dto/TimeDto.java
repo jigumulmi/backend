@@ -1,6 +1,5 @@
 package com.jigumulmi.place.dto;
 
-import com.jigumulmi.admin.place.dto.request.AdminCreatedTemporaryBusinessHourRequestDto;
 import java.time.LocalTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

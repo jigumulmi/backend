@@ -1,7 +1,7 @@
 package com.jigumulmi.admin.place;
 
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminCreatedTemporaryBusinessHourRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
@@ -123,19 +123,19 @@ public class AdminPlaceController {
     @ApiResponse(responseCode = "201")
     @PostMapping("/{placeId}/business-hour/temporary")
     public ResponseEntity<?> createTemporaryBusinessHour(@PathVariable Long placeId,
-        @Valid @RequestBody AdminCreatedTemporaryBusinessHourRequestDto requestDto) {
+        @Valid @RequestBody AdminCreateTemporaryBusinessHourRequestDto requestDto) {
         adminPlaceService.createTemporaryBusinessHour(placeId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    //@Operation(summary = "장소 변동 영업시간 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
-    //@ApiResponse(responseCode = "201")
-    //@PutMapping("/{placeId}/business-hour/temporary/{hourId}")
-    //public ResponseEntity<?> updateTemporaryBusinessHour(@PathVariable Long placeId, @PathVariable Long hourId,
-    //    @Valid @RequestBody AdminUpdateFixedBusinessHourRequestDto requestDto) {
-    //    adminPlaceService.updateTemporaryBusinessHour(placeId, requestDto);
-    //    return ResponseEntity.status(HttpStatus.CREATED).build();
-    //}
+    @Operation(summary = "장소 변동 영업시간 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
+    @ApiResponse(responseCode = "201")
+    @PutMapping("/{placeId}/business-hour/temporary/{hourId}")
+    public ResponseEntity<?> updateTemporaryBusinessHour(@PathVariable Long placeId, @PathVariable Long hourId,
+        @Valid @RequestBody AdminCreateTemporaryBusinessHourRequestDto requestDto) {
+        adminPlaceService.updateTemporaryBusinessHour(hourId, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
 
     @Operation(summary = "장소 생성")
     @ApiResponse(responseCode = "201")
