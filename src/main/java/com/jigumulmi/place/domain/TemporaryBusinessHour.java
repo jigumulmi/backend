@@ -9,7 +9,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -19,6 +22,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"place_id", "date"})})
 public class TemporaryBusinessHour {
 
     @Id
@@ -29,9 +33,9 @@ public class TemporaryBusinessHour {
     @JoinColumn(name = "place_id")
     private Place place;
 
-    private Integer year;
     private Integer month;
     private Integer weekOfYear;
+    private LocalDate date;
 
     @Enumerated(EnumType.STRING)
     private DayOfWeek dayOfWeek;
@@ -43,13 +47,13 @@ public class TemporaryBusinessHour {
     private Boolean isDayOff;
 
     @Builder
-    public TemporaryBusinessHour(Place place, Integer year, Integer month, Integer weekOfYear,
-        DayOfWeek dayOfWeek, LocalTime openTime, LocalTime closeTime, LocalTime breakStart,
-        LocalTime breakEnd, Boolean isDayOff) {
+    public TemporaryBusinessHour(Place place, Integer month, Integer weekOfYear,
+        LocalDate date, DayOfWeek dayOfWeek, LocalTime openTime, LocalTime closeTime,
+        LocalTime breakStart, LocalTime breakEnd, Boolean isDayOff) {
         this.place = place;
-        this.year = year;
         this.month = month;
         this.weekOfYear = weekOfYear;
+        this.date = date;
         this.dayOfWeek = dayOfWeek;
         this.openTime = openTime;
         this.closeTime = closeTime;
