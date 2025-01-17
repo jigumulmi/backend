@@ -142,7 +142,6 @@ public class AdminPlaceService {
             .map(ImageDto::from).toList();
     }
 
-
     @Transactional
     public void updatePlaceImage(Long placeId, List<ImageDto> imageDtoList) {
         Place place = placeRepository.findById(placeId)
@@ -253,6 +252,10 @@ public class AdminPlaceService {
         temporaryBusinessHour.adminUpdate(requestDto);
 
         temporaryBusinessHourRepository.save(temporaryBusinessHour);
+    }
+
+    public void deleteTemporaryBusinessHour(Long hourId) {
+        temporaryBusinessHourRepository.deleteById(hourId);
     }
 
     @Transactional

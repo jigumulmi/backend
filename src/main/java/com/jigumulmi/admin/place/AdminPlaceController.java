@@ -137,6 +137,14 @@ public class AdminPlaceController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @Operation(summary = "장소 변동 영업시간 삭제")
+    @ApiResponse(responseCode = "204")
+    @DeleteMapping("/{placeId}/business-hour/temporary/{hourId}")
+    public ResponseEntity<?> deleteTemporaryBusinessHour(@PathVariable Long placeId, @PathVariable Long hourId) {
+        adminPlaceService.deleteTemporaryBusinessHour(hourId);
+        return ResponseEntity.noContent().build();
+    }
+
     @Operation(summary = "장소 생성")
     @ApiResponse(responseCode = "201")
     @PostMapping("")
