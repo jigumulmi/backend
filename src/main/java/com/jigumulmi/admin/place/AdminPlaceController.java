@@ -2,6 +2,7 @@ package com.jigumulmi.admin.place;
 
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -104,6 +106,15 @@ public class AdminPlaceController {
     public ResponseEntity<?> updateMenu(@PathVariable Long placeId,
         @RequestBody List<MenuDto> requestDto) {
         adminPlaceService.updateMenu(placeId, requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @Operation(summary = "장소 고정 영업시간 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
+    @ApiResponse(responseCode = "201")
+    @PutMapping("/{placeId}/business-hour/fixed")
+    public ResponseEntity<?> updateFixedBusinessHour(@PathVariable Long placeId,
+        @Valid @RequestBody AdminUpdateFixedBusinessHourRequestDto requestDto) {
+        adminPlaceService.updateFixedBusinessHour(placeId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
