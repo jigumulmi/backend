@@ -200,8 +200,7 @@ public class AdminPlaceService {
         fixedBusinessHourRepository.deleteAllByPlace(place);
 
         List<FixedBusinessHour> businessHourList = new ArrayList<>();
-        for (int i = 0; i < 7; i++) {
-            DayOfWeek dayOfWeek = DayOfWeek.of((i == 0) ? 7 : i); // 일요일 시작 처리
+        for (DayOfWeek dayOfWeek: DayOfWeek.values()) {
             BusinessHour businessHour = requestDto.getBusinessHour(dayOfWeek);
             businessHourList.add(
                 FixedBusinessHour.builder()
@@ -265,7 +264,7 @@ public class AdminPlaceService {
 
         AdminUpdateFixedBusinessHourRequestDto fixedBusinessHourResponseDto = new AdminUpdateFixedBusinessHourRequestDto();
         for (FixedBusinessHour fixedBusinessHour : fixedBusinessHourList) {
-            fixedBusinessHourResponseDto.updateBusinessHourByDayOfWeek(
+            fixedBusinessHourResponseDto.updateBusinessHour(
                 fixedBusinessHour.getDayOfWeek(),
                 AdminPlaceBusinessHourResponseDto.fromFixedBusinessHour(fixedBusinessHour));
         }

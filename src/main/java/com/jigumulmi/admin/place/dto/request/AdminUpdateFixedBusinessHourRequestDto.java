@@ -45,7 +45,7 @@ public class AdminUpdateFixedBusinessHourRequestDto {
         };
     }
 
-    public void updateBusinessHourByDayOfWeek(DayOfWeek dayOfWeek, BusinessHour businessHour) {
+    public void updateBusinessHour(DayOfWeek dayOfWeek, BusinessHour businessHour) {
         switch (dayOfWeek) {
             case SUNDAY -> this.sunday = businessHour;
             case MONDAY -> this.monday = businessHour;
