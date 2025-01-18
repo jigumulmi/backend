@@ -1,6 +1,6 @@
 package com.jigumulmi.admin.place.dto.validator;
 
-import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto.BusinessHour;
+import com.jigumulmi.place.dto.BusinessHour;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

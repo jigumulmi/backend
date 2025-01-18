@@ -5,8 +5,8 @@ import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto.BusinessHour;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
@@ -25,6 +25,7 @@ import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.domain.TemporaryBusinessHour;
+import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
@@ -256,6 +257,36 @@ public class AdminPlaceService {
 
     public void deleteTemporaryBusinessHour(Long hourId) {
         temporaryBusinessHourRepository.deleteById(hourId);
+    }
+
+    public AdminPlaceBusinessHourResponseDto getPlaceBusinessHour(Long placeId, Integer month) {
+        List<FixedBusinessHour> fixedBusinessHourList = fixedBusinessHourRepository.findAllByPlaceId(
+            placeId);
+
+        AdminUpdateFixedBusinessHourRequestDto fixedBusinessHourResponseDto = new AdminUpdateFixedBusinessHourRequestDto();
+        for (FixedBusinessHour fixedBusinessHour : fixedBusinessHourList) {
+            fixedBusinessHourResponseDto.updateBusinessHourByDayOfWeek(
+                fixedBusinessHour.getDayOfWeek(),
+                AdminPlaceBusinessHourResponseDto.fromFixedBusinessHour(fixedBusinessHour));
+        }
+
+        List<AdminCreateTemporaryBusinessHourRequestDto> tempBusinessHourResponseDto = new ArrayList<>();
+        List<TemporaryBusinessHour> tempBusinessHourList = temporaryBusinessHourRepository.findAllByPlaceIdAndMonth(
+            placeId, month);
+        for (TemporaryBusinessHour temporaryBusinessHour : tempBusinessHourList) {
+            tempBusinessHourResponseDto.add(
+                AdminCreateTemporaryBusinessHourRequestDto.builder()
+                    .date(temporaryBusinessHour.getDate())
+                    .businessHour(AdminPlaceBusinessHourResponseDto.fromTemporaryBusinessHour(
+                        temporaryBusinessHour))
+                    .build()
+            );
+        }
+
+        return AdminPlaceBusinessHourResponseDto.builder()
+            .fixedBusinessHour(fixedBusinessHourResponseDto)
+            .temporaryBusinessHour(tempBusinessHourResponseDto)
+            .build();
     }
 
     @Transactional

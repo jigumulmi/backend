@@ -1,58 +1,15 @@
 package com.jigumulmi.admin.place.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.jigumulmi.admin.place.dto.validator.ValidBusinessHour;
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.jigumulmi.place.dto.BusinessHour;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.time.DayOfWeek;
-import java.time.LocalTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
 public class AdminUpdateFixedBusinessHourRequestDto {
-
-    @Getter
-    @NoArgsConstructor
-    public static class TimeDto {
-
-        private int hour;
-        private int minute;
-
-        private static LocalTime from(TimeDto timeDto) {
-            return timeDto != null ? LocalTime.of(timeDto.getHour(), timeDto.getMinute()) : null;
-        }
-    }
-
-    @Getter
-    @NoArgsConstructor
-    @ValidBusinessHour
-    @Schema(description = "휴무인 경우 time 관련 필드는 모두 null")
-    public static class BusinessHour {
-
-        @Schema(implementation = TimeDto.class)
-        private LocalTime openTime;
-        @Schema(implementation = TimeDto.class)
-        private LocalTime closeTime;
-        @Schema(implementation = TimeDto.class)
-        private LocalTime breakStart;
-        @Schema(implementation = TimeDto.class)
-        private LocalTime breakEnd;
-        @Schema(defaultValue = "false")
-        private Boolean isDayOff = false;
-
-        @JsonCreator
-        public BusinessHour(TimeDto openTime, TimeDto closeTime, TimeDto breakStart,
-            TimeDto breakEnd, Boolean isDayOff) {
-            this.openTime = TimeDto.from(openTime);
-            this.closeTime = TimeDto.from(closeTime);
-            this.breakStart = TimeDto.from(breakStart);
-            this.breakEnd = TimeDto.from(breakEnd);
-            this.isDayOff = isDayOff == null ? false : isDayOff;
-        }
-    }
 
     @Valid
     @NotNull
@@ -86,6 +43,18 @@ public class AdminUpdateFixedBusinessHourRequestDto {
             case DayOfWeek.FRIDAY -> friday;
             case DayOfWeek.SATURDAY -> saturday;
         };
+    }
+
+    public void updateBusinessHourByDayOfWeek(DayOfWeek dayOfWeek, BusinessHour businessHour) {
+        switch (dayOfWeek) {
+            case SUNDAY -> this.sunday = businessHour;
+            case MONDAY -> this.monday = businessHour;
+            case TUESDAY -> this.tuesday = businessHour;
+            case WEDNESDAY -> this.wednesday = businessHour;
+            case THURSDAY -> this.thursday = businessHour;
+            case FRIDAY -> this.friday = businessHour;
+            case SATURDAY -> this.saturday = businessHour;
+        }
     }
 
 }

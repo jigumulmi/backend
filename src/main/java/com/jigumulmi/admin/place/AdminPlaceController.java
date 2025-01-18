@@ -5,6 +5,7 @@ import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourReq
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
 import com.jigumulmi.config.common.PageableParams;
@@ -22,6 +23,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -131,7 +133,8 @@ public class AdminPlaceController {
     @Operation(summary = "장소 변동 영업시간 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
     @ApiResponse(responseCode = "201")
     @PutMapping("/{placeId}/business-hour/temporary/{hourId}")
-    public ResponseEntity<?> updateTemporaryBusinessHour(@PathVariable Long placeId, @PathVariable Long hourId,
+    public ResponseEntity<?> updateTemporaryBusinessHour(@PathVariable Long placeId,
+        @PathVariable Long hourId,
         @Valid @RequestBody AdminCreateTemporaryBusinessHourRequestDto requestDto) {
         adminPlaceService.updateTemporaryBusinessHour(hourId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -140,9 +143,20 @@ public class AdminPlaceController {
     @Operation(summary = "장소 변동 영업시간 삭제")
     @ApiResponse(responseCode = "204")
     @DeleteMapping("/{placeId}/business-hour/temporary/{hourId}")
-    public ResponseEntity<?> deleteTemporaryBusinessHour(@PathVariable Long placeId, @PathVariable Long hourId) {
+    public ResponseEntity<?> deleteTemporaryBusinessHour(@PathVariable Long placeId,
+        @PathVariable Long hourId) {
         adminPlaceService.deleteTemporaryBusinessHour(hourId);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "장소 영업시간 조회")
+    @GetMapping("/{placeId}/business-hour")
+    public ResponseEntity<AdminPlaceBusinessHourResponseDto> getPlaceBusinessHour(
+        @PathVariable Long placeId, @RequestParam(required = false) Integer month) {
+        month = (month == null) ? LocalDate.now().getMonthValue() : month;
+        AdminPlaceBusinessHourResponseDto responseDto = adminPlaceService.getPlaceBusinessHour(
+            placeId, month);
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @Operation(summary = "장소 생성")
