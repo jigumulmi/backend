@@ -2,8 +2,12 @@ package com.jigumulmi.admin.place;
 
 
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto.TemporaryBusinessHourDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
@@ -13,6 +17,7 @@ import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.PlaceService;
+import com.jigumulmi.place.domain.FixedBusinessHour;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.PlaceCategoryMapping;
@@ -20,18 +25,25 @@ import com.jigumulmi.place.domain.PlaceImage;
 import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.domain.TemporaryBusinessHour;
+import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.repository.FixedBusinessHourRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
+import com.jigumulmi.place.repository.TemporaryBusinessHourRepository;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -60,6 +72,8 @@ public class AdminPlaceService {
     private final MenuRepository menuRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final PlaceImageRepository placeImageRepository;
+    private final FixedBusinessHourRepository fixedBusinessHourRepository;
+    private final TemporaryBusinessHourRepository temporaryBusinessHourRepository;
 
     @Transactional(readOnly = true)
     public AdminPlaceListResponseDto getPlaceList(Pageable pageable,
@@ -130,7 +144,6 @@ public class AdminPlaceService {
             .map(ImageDto::from).toList();
     }
 
-
     @Transactional
     public void updatePlaceImage(Long placeId, List<ImageDto> imageDtoList) {
         Place place = placeRepository.findById(placeId)
@@ -178,6 +191,103 @@ public class AdminPlaceService {
         }
 
         menuRepository.saveAll(menuList);
+    }
+
+    @Transactional
+    public void updateFixedBusinessHour(Long placeId,
+        AdminUpdateFixedBusinessHourRequestDto requestDto) {
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+        fixedBusinessHourRepository.deleteAllByPlace(place);
+
+        List<FixedBusinessHour> businessHourList = new ArrayList<>();
+        for (DayOfWeek dayOfWeek: DayOfWeek.values()) {
+            BusinessHour businessHour = requestDto.getBusinessHour(dayOfWeek);
+            businessHourList.add(
+                FixedBusinessHour.builder()
+                    .place(place)
+                    .dayOfWeek(dayOfWeek)
+                    .openTime(businessHour.getOpenTime())
+                    .closeTime(businessHour.getCloseTime())
+                    .breakStart(businessHour.getBreakStart())
+                    .breakEnd(businessHour.getBreakEnd())
+                    .isDayOff(businessHour.getIsDayOff())
+                    .build()
+            );
+        }
+
+        fixedBusinessHourRepository.saveAll(businessHourList);
+    }
+
+    public void createTemporaryBusinessHour(Long placeId,
+        AdminCreateTemporaryBusinessHourRequestDto requestDto) {
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        BusinessHour businessHour = requestDto.getBusinessHour();
+
+        LocalDate date = requestDto.getDate();
+        int weekOfYear = date.get(WeekFields.SUNDAY_START.weekOfYear());
+
+        TemporaryBusinessHour temporaryBusinessHour = TemporaryBusinessHour.builder()
+            .place(place)
+            .month(date.getMonthValue())
+            .weekOfYear(weekOfYear)
+            .date(date)
+            .dayOfWeek(date.getDayOfWeek())
+            .openTime(businessHour.getOpenTime())
+            .closeTime(businessHour.getCloseTime())
+            .breakStart(businessHour.getBreakStart())
+            .breakEnd(businessHour.getBreakEnd())
+            .isDayOff(businessHour.getIsDayOff())
+            .build();
+
+        temporaryBusinessHourRepository.save(temporaryBusinessHour);
+    }
+
+    public void updateTemporaryBusinessHour(Long hourId,
+        AdminCreateTemporaryBusinessHourRequestDto requestDto) {
+        TemporaryBusinessHour temporaryBusinessHour = temporaryBusinessHourRepository.findById(
+            hourId).orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        temporaryBusinessHour.adminUpdate(requestDto);
+
+        temporaryBusinessHourRepository.save(temporaryBusinessHour);
+    }
+
+    public void deleteTemporaryBusinessHour(Long hourId) {
+        temporaryBusinessHourRepository.deleteById(hourId);
+    }
+
+    public AdminPlaceBusinessHourResponseDto getPlaceBusinessHour(Long placeId, Integer month) {
+        List<FixedBusinessHour> fixedBusinessHourList = fixedBusinessHourRepository.findAllByPlaceId(
+            placeId);
+
+        AdminUpdateFixedBusinessHourRequestDto fixedBusinessHourResponseDto = new AdminUpdateFixedBusinessHourRequestDto();
+        for (FixedBusinessHour fixedBusinessHour : fixedBusinessHourList) {
+            fixedBusinessHourResponseDto.updateBusinessHour(
+                fixedBusinessHour.getDayOfWeek(),
+                AdminPlaceBusinessHourResponseDto.fromFixedBusinessHour(fixedBusinessHour));
+        }
+
+        List<TemporaryBusinessHourDto> tempBusinessHourResponseDto = new ArrayList<>();
+        List<TemporaryBusinessHour> tempBusinessHourList = temporaryBusinessHourRepository.findAllByPlaceIdAndMonth(
+            placeId, month);
+        for (TemporaryBusinessHour temporaryBusinessHour : tempBusinessHourList) {
+            tempBusinessHourResponseDto.add(
+                TemporaryBusinessHourDto.builder()
+                    .id(temporaryBusinessHour.getId())
+                    .date(temporaryBusinessHour.getDate())
+                    .businessHour(AdminPlaceBusinessHourResponseDto.fromTemporaryBusinessHour(
+                        temporaryBusinessHour))
+                    .build()
+            );
+        }
+
+        return AdminPlaceBusinessHourResponseDto.builder()
+            .fixedBusinessHour(fixedBusinessHourResponseDto)
+            .temporaryBusinessHour(tempBusinessHourResponseDto)
+            .build();
     }
 
     @Transactional
