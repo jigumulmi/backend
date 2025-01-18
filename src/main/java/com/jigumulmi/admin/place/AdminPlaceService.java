@@ -7,6 +7,7 @@ import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto.TemporaryBusinessHourDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
@@ -269,12 +270,13 @@ public class AdminPlaceService {
                 AdminPlaceBusinessHourResponseDto.fromFixedBusinessHour(fixedBusinessHour));
         }
 
-        List<AdminCreateTemporaryBusinessHourRequestDto> tempBusinessHourResponseDto = new ArrayList<>();
+        List<TemporaryBusinessHourDto> tempBusinessHourResponseDto = new ArrayList<>();
         List<TemporaryBusinessHour> tempBusinessHourList = temporaryBusinessHourRepository.findAllByPlaceIdAndMonth(
             placeId, month);
         for (TemporaryBusinessHour temporaryBusinessHour : tempBusinessHourList) {
             tempBusinessHourResponseDto.add(
-                AdminCreateTemporaryBusinessHourRequestDto.builder()
+                TemporaryBusinessHourDto.builder()
+                    .id(temporaryBusinessHour.getId())
                     .date(temporaryBusinessHour.getDate())
                     .businessHour(AdminPlaceBusinessHourResponseDto.fromTemporaryBusinessHour(
                         temporaryBusinessHour))

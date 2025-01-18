@@ -8,13 +8,20 @@ import com.jigumulmi.place.dto.BusinessHour;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Builder
 public class AdminPlaceBusinessHourResponseDto {
 
+    @Getter
+    @SuperBuilder
+    public static class TemporaryBusinessHourDto extends AdminCreateTemporaryBusinessHourRequestDto {
+        private Long id;
+    }
+
     private AdminUpdateFixedBusinessHourRequestDto fixedBusinessHour;
-    private List<AdminCreateTemporaryBusinessHourRequestDto> temporaryBusinessHour;
+    private List<TemporaryBusinessHourDto> temporaryBusinessHour;
 
     public static BusinessHour fromFixedBusinessHour(FixedBusinessHour fixedBusinessHour) {
         return BusinessHour.builder()
