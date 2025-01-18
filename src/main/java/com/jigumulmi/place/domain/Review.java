@@ -3,7 +3,7 @@ package com.jigumulmi.place.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.jigumulmi.config.common.Timestamped;
+import com.jigumulmi.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

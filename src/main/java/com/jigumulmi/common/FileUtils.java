@@ -1,4 +1,4 @@
-package com.jigumulmi.config.common;
+package com.jigumulmi.common;
 
 import java.util.UUID;
 import org.springframework.util.StringUtils;

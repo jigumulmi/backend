@@ -1,7 +1,7 @@
 package com.jigumulmi.admin.member;
 
 import com.jigumulmi.admin.member.dto.AdminMemberListResponseDto;
-import com.jigumulmi.config.common.PageableParams;
+import com.jigumulmi.common.PageableParams;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

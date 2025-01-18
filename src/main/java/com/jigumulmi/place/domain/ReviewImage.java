@@ -1,7 +1,7 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.jigumulmi.config.common.Timestamped;
+import com.jigumulmi.common.Timestamped;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

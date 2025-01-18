@@ -1,4 +1,4 @@
-package com.jigumulmi.config.common;
+package com.jigumulmi.common;
 
 import lombok.Builder;
 import lombok.Getter;

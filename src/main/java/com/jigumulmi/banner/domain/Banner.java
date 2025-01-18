@@ -1,7 +1,7 @@
 package com.jigumulmi.banner.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.jigumulmi.config.common.Timestamped;
+import com.jigumulmi.common.Timestamped;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

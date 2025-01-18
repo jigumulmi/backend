@@ -1,6 +1,6 @@
 package com.jigumulmi.admin.member.dto;
 
-import com.jigumulmi.config.common.PageDto;
+import com.jigumulmi.common.PageDto;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import java.time.LocalDateTime;

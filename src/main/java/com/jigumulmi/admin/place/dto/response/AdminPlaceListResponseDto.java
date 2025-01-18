@@ -1,6 +1,6 @@
 package com.jigumulmi.admin.place.dto.response;
 
-import com.jigumulmi.config.common.PageDto;
+import com.jigumulmi.common.PageDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto;

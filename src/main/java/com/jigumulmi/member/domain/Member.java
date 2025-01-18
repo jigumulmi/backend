@@ -2,7 +2,7 @@ package com.jigumulmi.member.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.jigumulmi.config.common.Timestamped;
+import com.jigumulmi.common.Timestamped;
 import com.jigumulmi.place.domain.PlaceLike;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
