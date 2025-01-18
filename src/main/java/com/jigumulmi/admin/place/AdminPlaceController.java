@@ -8,7 +8,7 @@ import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
-import com.jigumulmi.config.common.PageableParams;
+import com.jigumulmi.common.PageableParams;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.ImageDto;

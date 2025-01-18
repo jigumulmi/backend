@@ -3,7 +3,7 @@ package com.jigumulmi.place.domain;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.banner.domain.BannerPlaceMapping;
-import com.jigumulmi.config.common.Timestamped;
+import com.jigumulmi.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.vo.District;

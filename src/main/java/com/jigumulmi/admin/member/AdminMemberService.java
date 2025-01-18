@@ -2,7 +2,7 @@ package com.jigumulmi.admin.member;
 
 import com.jigumulmi.admin.member.dto.AdminMemberListResponseDto;
 import com.jigumulmi.admin.member.dto.AdminMemberListResponseDto.MemberDto;
-import com.jigumulmi.config.common.PageDto;
+import com.jigumulmi.common.PageDto;
 import com.jigumulmi.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

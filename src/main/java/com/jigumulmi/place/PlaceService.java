@@ -3,7 +3,7 @@ package com.jigumulmi.place;
 import static java.lang.Math.round;
 
 import com.jigumulmi.aws.S3Service;
-import com.jigumulmi.config.common.FileUtils;
+import com.jigumulmi.common.FileUtils;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;

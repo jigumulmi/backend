@@ -8,7 +8,7 @@ import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
 import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
-import com.jigumulmi.config.common.PageableParams;
+import com.jigumulmi.common.PageableParams;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;

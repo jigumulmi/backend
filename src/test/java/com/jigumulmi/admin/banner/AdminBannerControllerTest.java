@@ -26,7 +26,7 @@ import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
 import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
 import com.jigumulmi.common.ControllerTest;
 import com.jigumulmi.common.MultipartTestUtils;
-import com.jigumulmi.config.common.PageDto;
+import com.jigumulmi.common.PageDto;
 import com.jigumulmi.config.security.MockMember;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;

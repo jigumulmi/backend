@@ -1,4 +1,4 @@
-package com.jigumulmi.config.common;
+package com.jigumulmi.common;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;

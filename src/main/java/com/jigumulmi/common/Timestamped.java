@@ -1,4 +1,4 @@
-package com.jigumulmi.config.common;
+package com.jigumulmi.common;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.EntityListeners;
