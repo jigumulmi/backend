@@ -130,7 +130,7 @@ public class AdminPlaceController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @Operation(summary = "장소 변동 영업시간 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
+    @Operation(summary = "장소 변동 영업시간 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요, 날짜만 변경도 가능")
     @ApiResponse(responseCode = "201")
     @PutMapping("/{placeId}/business-hour/temporary/{hourId}")
     public ResponseEntity<?> updateTemporaryBusinessHour(@PathVariable Long placeId,
