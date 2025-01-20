@@ -10,11 +10,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,14 +22,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
 
-    private final List<String> excludedIpList;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public LoggingInterceptor(
-        @Value("${logging.access.excluded-ip-list}") String excludedIpsProperty) {
-        this.excludedIpList = Arrays.asList(excludedIpsProperty.split(","));
-    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
@@ -57,17 +47,12 @@ public class LoggingInterceptor implements HandlerInterceptor {
         long responseTime = System.currentTimeMillis() - startTime;
         response.setHeader("X-RESPONSE-TIME", responseTime + "ms");
 
-        String clientIp = getClientIp(request);
-        if (excludedIpList.contains(clientIp)) {
-            return;
-        }
-
         String queryString = request.getQueryString();
         String decodedQueryString =
             queryString == null ? null : URLDecoder.decode(queryString, StandardCharsets.UTF_8);
 
         LoggingVOBuilder loggingVOBuilder = LoggingVO.builder()
-            .clientIp(clientIp)
+            .clientIp(getClientIp(request))
             .requestId(requestId)
             .requestMethod(request.getMethod())
             .requestUri(request.getRequestURI())
