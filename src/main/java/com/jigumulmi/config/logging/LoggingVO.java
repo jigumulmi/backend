@@ -1,6 +1,6 @@
 package com.jigumulmi.config.logging;
 
-import com.jigumulmi.member.dto.vo.MemberRole;
+import com.jigumulmi.member.vo.MemberRole;
 import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Builder.Default;
