@@ -1,7 +1,6 @@
 package com.jigumulmi.place.dto;
 
 import com.jigumulmi.admin.place.dto.validator.ValidBusinessHour;
-import com.jigumulmi.place.dto.time.TimeDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
