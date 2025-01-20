@@ -12,6 +12,8 @@ services:
     restart: always
     depends_on:
       - loki
+    env_file:
+      - env/.env
 
   loki:
     image: grafana/loki:3.3.2

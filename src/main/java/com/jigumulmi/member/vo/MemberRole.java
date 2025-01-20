@@ -1,4 +1,4 @@
-package com.jigumulmi.member.dto.vo;
+package com.jigumulmi.member.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

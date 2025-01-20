@@ -1,7 +1,7 @@
 package com.jigumulmi.config.security;
 
 import com.jigumulmi.member.domain.Member;
-import com.jigumulmi.member.dto.vo.MemberRole;
+import com.jigumulmi.member.vo.MemberRole;
 import java.util.ArrayList;
 import java.util.Collection;
 import lombok.Getter;

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jigumulmi.config.logging.LoggingVO.LoggingVOBuilder;
 import com.jigumulmi.config.security.UserDetailsImpl;
 import com.jigumulmi.member.domain.Member;
-import com.jigumulmi.member.dto.vo.MemberRole;
+import com.jigumulmi.member.vo.MemberRole;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
@@ -52,11 +52,12 @@ public class LoggingInterceptor implements HandlerInterceptor {
             queryString == null ? null : URLDecoder.decode(queryString, StandardCharsets.UTF_8);
 
         LoggingVOBuilder loggingVOBuilder = LoggingVO.builder()
+            .clientIp(getClientIp(request))
             .requestId(requestId)
             .requestMethod(request.getMethod())
             .requestUri(request.getRequestURI())
             .requestQueryParam(decodedQueryString)
-            .httpStatusCode(response.getStatus())
+            .responseStatusCode(response.getStatus())
             .responseTime(responseTime);
 
         LoggingVO loggingVO;
@@ -82,6 +83,23 @@ public class LoggingInterceptor implements HandlerInterceptor {
             return userDetails.getMember();
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    /**
+     * AWS ALB의 X-Forwarded-For 헤더 추가 설정이 append 모드이므로 제일 마지막 값 사용
+     *
+     * @param request
+     * @return 실제 클라이언트 IP
+     */
+    public String getClientIp(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            String[] ipAddresses = xForwardedFor.split(",");
+            return ipAddresses[ipAddresses.length - 1].trim();
+        } else {
+            return request.getRemoteAddr();
         }
     }
 }

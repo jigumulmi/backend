@@ -1,4 +1,4 @@
-package com.jigumulmi.place.dto.time;
+package com.jigumulmi.common;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import com.jigumulmi.place.dto.TimeDto;
 import java.io.IOException;
 import java.time.LocalTime;
 import org.springframework.boot.jackson.JsonComponent;

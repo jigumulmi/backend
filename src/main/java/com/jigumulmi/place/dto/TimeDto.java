@@ -1,4 +1,4 @@
-package com.jigumulmi.place.dto.time;
+package com.jigumulmi.place.dto;
 
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
