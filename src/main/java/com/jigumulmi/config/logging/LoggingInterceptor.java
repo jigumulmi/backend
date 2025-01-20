@@ -10,8 +10,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +25,14 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class LoggingInterceptor implements HandlerInterceptor {
 
+    private final List<String> excludedIpList;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public LoggingInterceptor(
+        @Value("${logging.access.excluded-ip-list}") String excludedIpsProperty) {
+        this.excludedIpList = Arrays.asList(excludedIpsProperty.split(","));
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
@@ -47,16 +57,22 @@ public class LoggingInterceptor implements HandlerInterceptor {
         long responseTime = System.currentTimeMillis() - startTime;
         response.setHeader("X-RESPONSE-TIME", responseTime + "ms");
 
+        String clientIp = getClientIp(request);
+        if (excludedIpList.contains(clientIp)) {
+            return;
+        }
+
         String queryString = request.getQueryString();
         String decodedQueryString =
             queryString == null ? null : URLDecoder.decode(queryString, StandardCharsets.UTF_8);
 
         LoggingVOBuilder loggingVOBuilder = LoggingVO.builder()
+            .clientIp(clientIp)
             .requestId(requestId)
             .requestMethod(request.getMethod())
             .requestUri(request.getRequestURI())
             .requestQueryParam(decodedQueryString)
-            .httpStatusCode(response.getStatus())
+            .responseStatusCode(response.getStatus())
             .responseTime(responseTime);
 
         LoggingVO loggingVO;
@@ -82,6 +98,23 @@ public class LoggingInterceptor implements HandlerInterceptor {
             return userDetails.getMember();
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    /**
+     * AWS ALB의 X-Forwarded-For 헤더 추가 설정이 append 모드이므로 제일 마지막 값 사용
+     *
+     * @param request
+     * @return 실제 클라이언트 IP
+     */
+    public String getClientIp(HttpServletRequest request) {
+        String xForwardedFor = request.getHeader("X-Forwarded-For");
+
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            String[] ipAddresses = xForwardedFor.split(",");
+            return ipAddresses[ipAddresses.length - 1].trim();
+        } else {
+            return request.getRemoteAddr();
         }
     }
 }

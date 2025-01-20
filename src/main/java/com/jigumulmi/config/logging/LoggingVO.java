@@ -12,11 +12,12 @@ public class LoggingVO {
 
     @Default
     private String createdAt = LocalDateTime.now().toString();
+    private String clientIp;
     private String requestId;
     private String requestMethod;
     private String requestUri;
     private String requestQueryParam;
-    private int httpStatusCode;
+    private int responseStatusCode;
     private long responseTime;
     private Long memberId;
     private MemberRole memberRole;
