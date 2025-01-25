@@ -28,6 +28,7 @@ public class AdminCreatePlaceRequestDto {
     private String additionalInfo;
     private String registrantComment;
     private Boolean isApproved = false;
+    @Schema(description = "첫 ID가 메인 지하철이 됩니다")
     private List<Long> subwayStationIdList = new ArrayList<>();
     private String kakaoPlaceId = null;
 }
