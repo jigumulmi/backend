@@ -1,10 +1,10 @@
 package com.jigumulmi.admin.place.dto.response;
 
 import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
-import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +23,7 @@ public class AdminPlaceBasicResponseDto {
     private PositionDto position;
     private List<PlaceCategoryDto> categoryList;
     private Region region;
-    private District district;
+    private DistrictResponseDto district;
     private String address;
     private String contact;
     private List<SubwayStationResponseDto> subwayStationList;
@@ -53,7 +53,7 @@ public class AdminPlaceBasicResponseDto {
             .name(place.getName())
             .categoryList(categoryList)
             .region(place.getRegion())
-            .district(place.getDistrict())
+            .district(DistrictResponseDto.fromDistrict(place.getDistrict()))
             .address(place.getAddress())
             .contact(place.getContact())
             .registrantComment(place.getRegistrantComment())
