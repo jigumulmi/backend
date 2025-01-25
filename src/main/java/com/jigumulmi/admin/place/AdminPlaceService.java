@@ -108,20 +108,20 @@ public class AdminPlaceService {
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
         List<Long> subwayStationIdList = requestDto.getSubwayStationIdList();
-        List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(
-            subwayStationIdList);
+        List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(subwayStationIdList)
+            .stream()
+            .sorted(Comparator.comparingInt(station -> subwayStationIdList.indexOf(station.getId())))
+            .toList();
 
-        ArrayList<SubwayStationPlace> subwayStationPlaceList = new ArrayList<>();
-        for (SubwayStation subwayStation : subwayStationList) {
-            SubwayStationPlace subwayStationPlace = SubwayStationPlace.builder()
-                .isMain(
-                    subwayStation.getId().equals(subwayStationIdList.getFirst())) // 첫 요소가 메인 지하철역
-                .subwayStation(subwayStation)
+        List<SubwayStationPlace> subwayStationPlaceList = IntStream.range(0,
+                subwayStationList.size())
+            .mapToObj(i -> SubwayStationPlace.builder()
+                .subwayStation(subwayStationList.get(i))
                 .place(place)
-                .build();
-
-            subwayStationPlaceList.add(subwayStationPlace);
-        }
+                .isMain(i == 0)
+                .build()
+            )
+            .collect(Collectors.toList());
 
         ArrayList<PlaceCategoryMapping> categoryMappingList = new ArrayList<>();
         for (PlaceCategoryDto categoryRequestDto : requestDto.getCategoryList()) {
@@ -312,8 +312,12 @@ public class AdminPlaceService {
             .member(member)
             .build();
 
-        List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(
-            requestDto.getSubwayStationIdList());
+        List<Long> subwayStationIdList = requestDto.getSubwayStationIdList();
+        List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(subwayStationIdList)
+            .stream()
+            .sorted(Comparator.comparingInt(station -> subwayStationIdList.indexOf(station.getId())))
+            .toList();
+
         List<SubwayStationPlace> subwayStationPlaceList = IntStream.range(0,
                 subwayStationList.size())
             .mapToObj(i -> SubwayStationPlace.builder()

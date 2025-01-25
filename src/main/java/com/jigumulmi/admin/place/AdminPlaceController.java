@@ -142,10 +142,10 @@ public class AdminPlaceController {
 
     @Operation(summary = "장소 변동 영업시간 삭제")
     @ApiResponse(responseCode = "204")
-    @DeleteMapping("/{placeId}/business-hour/temporary/{hourId}")
+    @DeleteMapping("/{placeId}/business-hour/temporary/{temporaryBusinessHourId}")
     public ResponseEntity<?> deleteTemporaryBusinessHour(@PathVariable Long placeId,
-        @PathVariable Long hourId) {
-        adminPlaceService.deleteTemporaryBusinessHour(hourId);
+        @PathVariable Long temporaryBusinessHourId) {
+        adminPlaceService.deleteTemporaryBusinessHour(temporaryBusinessHourId);
         return ResponseEntity.noContent().build();
     }
 

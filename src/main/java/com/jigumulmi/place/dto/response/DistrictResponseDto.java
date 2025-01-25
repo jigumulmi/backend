@@ -12,7 +12,13 @@ public class DistrictResponseDto {
     private String title;
 
     public static DistrictResponseDto fromDistrict(District district) {
-        return DistrictResponseDto.builder().id(district.getId()).title(district.getTitle())
+        if (district == null) {
+            return null;
+        }
+
+        return DistrictResponseDto.builder()
+            .id(district.getId())
+            .title(district.getTitle())
             .build();
     }
 
