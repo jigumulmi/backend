@@ -25,19 +25,26 @@ public class MenuDto {
 
     private String description;
 
-    @JsonProperty(access = Access.READ_ONLY)
-    private String imageS3Key;
-
     @Schema(description = "확장자 포함한 파일 이름")
     private String fullFilename;
 
+    @JsonProperty(access = Access.READ_ONLY)
+    private String imageS3Key;
+
     public static MenuDto from(Menu menu) {
+        String fullFilename = null;
+        String imageS3Key = menu.getImageS3Key();
+        if (imageS3Key != null) {
+            fullFilename = imageS3Key.substring(imageS3Key.lastIndexOf("/") + 1);
+        }
+
         return MenuDto.builder()
             .name(menu.getName())
             .isMain(menu.getIsMain())
             .price(menu.getPrice())
             .description(menu.getDescription())
-            .imageS3Key(menu.getImageS3Key())
+            .fullFilename(fullFilename)
+            .imageS3Key(imageS3Key)
             .build();
     }
 
