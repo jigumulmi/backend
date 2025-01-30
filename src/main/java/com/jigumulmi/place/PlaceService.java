@@ -70,8 +70,8 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 @RequiredArgsConstructor
 public class PlaceService {
 
-    public final String REVIEW_IMAGE_S3_PREFIX = "reviewImage/";
-    public final String MENU_IMAGE_S3_PREFIX = "menuImage/";
+    public final static String REVIEW_IMAGE_S3_PREFIX = "reviewImage/";
+    public final static String MENU_IMAGE_S3_PREFIX = "menuImage/";
 
     private final S3Service s3Service;
 
