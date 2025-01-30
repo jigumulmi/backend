@@ -16,7 +16,6 @@ import com.jigumulmi.common.PageDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
-import com.jigumulmi.place.PlaceService;
 import com.jigumulmi.place.domain.FixedBusinessHour;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
@@ -64,7 +63,6 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 public class AdminPlaceService {
 
     private final S3Service s3Service;
-    private final PlaceService placeService;
 
     private final AdminCustomPlaceRepository adminCustomPlaceRepository;
     private final PlaceRepository placeRepository;
@@ -177,17 +175,7 @@ public class AdminPlaceService {
 
         List<Menu> menuList = new ArrayList<>();
         for (MenuDto menuDto : menuDtoList) {
-            String imageS3Key = placeService.MENU_IMAGE_S3_PREFIX + menuDto.getFullFilename();
-            menuList.add(
-                Menu.builder()
-                    .name(menuDto.getName())
-                    .place(place)
-                    .isMain(menuDto.getIsMain())
-                    .price(menuDto.getPrice())
-                    .description(menuDto.getDescription())
-                    .imageS3Key(imageS3Key)
-                    .build()
-            );
+            menuList.add(MenuDto.toMenu(menuDto, place));
         }
 
         menuRepository.saveAll(menuList);
