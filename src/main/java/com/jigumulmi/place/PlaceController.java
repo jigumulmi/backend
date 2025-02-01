@@ -6,13 +6,11 @@ import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
-import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
@@ -96,19 +94,6 @@ public class PlaceController {
         List<PlaceCategory> placeCategoryList = placeService.getPlaceCategoryList(
             placeCategoryGroup);
         return ResponseEntity.ok().body(placeCategoryList);
-    }
-
-    @Operation(summary = "장소 리스트 조회")
-    @ApiResponses(
-        value = {@ApiResponse(responseCode = "200", content = {
-            @Content(array = @ArraySchema(schema = @Schema(implementation = PlaceResponseDto.class)))})}
-    )
-    @GetMapping("")
-    public ResponseEntity<?> getPlaceList(
-        @ModelAttribute GetPlaceListRequestDto requestDto,
-        @OptionalAuthUser Member member) {
-        List<PlaceResponseDto> placeList = placeService.getPlaceList(requestDto, member);
-        return ResponseEntity.ok().body(placeList);
     }
 
     @Operation(summary = "장소 상세 조회")
