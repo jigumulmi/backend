@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Constraint(validatedBy = BusinessHourMultiFieldValidator.class)
-@Target({ElementType.TYPE})
+@Target({ElementType.TYPE, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ValidBusinessHour {
     String message() default "Invalid business hour configuration";
