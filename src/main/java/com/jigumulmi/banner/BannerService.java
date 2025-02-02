@@ -8,7 +8,6 @@ import com.jigumulmi.banner.repository.CustomBannerRepository;
 import com.jigumulmi.common.PageDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
-import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -24,8 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class BannerService {
-
-    private final Clock clock;
 
     private final BannerRepository bannerRepository;
     private final CustomBannerRepository customBannerRepository;
@@ -43,7 +40,7 @@ public class BannerService {
         List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
             .map(BannerPlaceDto::from).collect(Collectors.toList());
 
-        LocalDateTime now = LocalDateTime.now(clock);
+        LocalDateTime now = LocalDateTime.now();
         LocalTime localTime = now.toLocalTime();
         LocalDate localDate = now.toLocalDate();
 
