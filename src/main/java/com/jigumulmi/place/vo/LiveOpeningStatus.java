@@ -3,6 +3,7 @@ package com.jigumulmi.place.vo;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
+import java.time.Clock;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,8 +22,8 @@ public enum LiveOpeningStatus {
     private final String title;
 
     public static LiveOpeningStatus getCurrentOpeningInfo(
-        SurroundingDateBusinessHour surroundingDateBusinessHour) {
-        LocalTime currentTime = LocalTime.now();
+        SurroundingDateBusinessHour surroundingDateBusinessHour, Clock clock) {
+        LocalTime currentTime = LocalTime.now(clock);
 
         BusinessHour todayBusinessHour = surroundingDateBusinessHour.getToday();
         BusinessHour yesterdayBusinessHour = surroundingDateBusinessHour.getYesterday();

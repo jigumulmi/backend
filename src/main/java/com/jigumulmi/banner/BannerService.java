@@ -8,6 +8,7 @@ import com.jigumulmi.banner.repository.CustomBannerRepository;
 import com.jigumulmi.common.PageDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
+import java.time.Clock;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 public class BannerService {
+
+    private final Clock clock;
 
     private final BannerRepository bannerRepository;
     private final CustomBannerRepository customBannerRepository;
@@ -41,7 +44,7 @@ public class BannerService {
         Map<Long, SurroundingDateBusinessHour> surroundingBusinessHourMap = customBannerRepository.getSurroundingBusinessHourByPlaceIdIn(
             placeIdList);
         placeDtoList.forEach(
-            place -> place.setLiveOpeningStatus(surroundingBusinessHourMap.get(place.getId())));
+            place -> place.setLiveOpeningStatus(surroundingBusinessHourMap.get(place.getId()), clock));
 
         return BannerPlaceListResponseDto.builder()
             .data(placeDtoList)

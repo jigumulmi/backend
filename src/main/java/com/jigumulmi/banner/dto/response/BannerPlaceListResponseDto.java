@@ -8,6 +8,7 @@ import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
 import com.jigumulmi.place.vo.LiveOpeningStatus;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
+import java.time.Clock;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
@@ -41,9 +42,9 @@ public class BannerPlaceListResponseDto {
                 .build();
         }
 
-        public void setLiveOpeningStatus(SurroundingDateBusinessHour surroundingDateBusinessHour) {
+        public void setLiveOpeningStatus(SurroundingDateBusinessHour surroundingDateBusinessHour, Clock clock) {
             this.liveOpeningStatus = LiveOpeningStatus.getCurrentOpeningInfo(
-                surroundingDateBusinessHour);
+                surroundingDateBusinessHour, clock);
         }
     }
 
