@@ -1,16 +1,9 @@
 package com.jigumulmi.banner;
 
-import static org.mockito.BDDMockito.given;
-
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
 import com.jigumulmi.place.vo.LiveOpeningStatus;
-import java.time.Clock;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -18,14 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class LiveOpeningStatusTest {
-
-    @Mock
-    private Clock clock;
 
     static Stream<Arguments> provideBusinessHours() {
         return Stream.of(
@@ -119,14 +108,9 @@ class LiveOpeningStatusTest {
         surroundingDateBusinessHour.setYesterday(yesterday);
         surroundingDateBusinessHour.setToday(today);
 
-        Instant now = LocalDateTime.of(LocalDate.now(), currentTime)
-            .atZone(ZoneId.systemDefault()).toInstant();
-        given(clock.instant()).willReturn(now);
-        given(clock.getZone()).willReturn(ZoneId.systemDefault());
-
         // when
         LiveOpeningStatus actualStatus = LiveOpeningStatus.getCurrentOpeningInfo(surroundingDateBusinessHour,
-            clock);
+            currentTime);
 
         // then
         Assertions.assertEquals(expectedStatus, actualStatus);

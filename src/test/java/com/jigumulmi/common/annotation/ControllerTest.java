@@ -1,4 +1,4 @@
-package com.jigumulmi.common;
+package com.jigumulmi.common.annotation;
 
 import com.jigumulmi.config.security.SecurityConfig;
 import java.lang.annotation.ElementType;

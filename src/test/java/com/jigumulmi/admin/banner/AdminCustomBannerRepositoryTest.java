@@ -5,7 +5,7 @@ import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.domain.BannerPlaceMapping;
 import com.jigumulmi.banner.repository.BannerRepository;
-import com.jigumulmi.common.RepositoryTest;
+import com.jigumulmi.common.annotation.RepositoryTest;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.repository.PlaceRepository;
 import java.util.List;

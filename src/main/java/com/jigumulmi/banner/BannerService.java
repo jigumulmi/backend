@@ -9,6 +9,9 @@ import com.jigumulmi.common.PageDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
 import java.time.Clock;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,11 +43,15 @@ public class BannerService {
         List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
             .map(BannerPlaceDto::from).collect(Collectors.toList());
 
+        LocalDateTime now = LocalDateTime.now(clock);
+        LocalTime localTime = now.toLocalTime();
+        LocalDate localDate = now.toLocalDate();
+
         List<Long> placeIdList = placeDtoList.stream().map(BannerPlaceDto::getId).toList();
         Map<Long, SurroundingDateBusinessHour> surroundingBusinessHourMap = customBannerRepository.getSurroundingBusinessHourByPlaceIdIn(
-            placeIdList);
+            placeIdList, localDate);
         placeDtoList.forEach(
-            place -> place.setLiveOpeningStatus(surroundingBusinessHourMap.get(place.getId()), clock));
+            place -> place.setLiveOpeningStatus(surroundingBusinessHourMap.get(place.getId()), localTime));
 
         return BannerPlaceListResponseDto.builder()
             .data(placeDtoList)

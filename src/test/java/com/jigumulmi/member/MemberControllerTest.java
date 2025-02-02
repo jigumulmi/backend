@@ -13,7 +13,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jigumulmi.common.ControllerTest;
+import com.jigumulmi.common.annotation.ControllerTest;
 import com.jigumulmi.common.MemberTestUtils;
 import com.jigumulmi.config.security.MockMember;
 import com.jigumulmi.member.domain.Member;

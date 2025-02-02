@@ -51,8 +51,7 @@ public class CustomBannerRepository {
     }
 
     public Map<Long, SurroundingDateBusinessHour> getSurroundingBusinessHourByPlaceIdIn(
-        List<Long> idList) {
-        LocalDate today = LocalDate.now();
+        List<Long> idList, LocalDate today) {
         LocalDate yesterday = today.minusDays(1);
 
         DayOfWeek todayDayOfWeek = today.getDayOfWeek();
