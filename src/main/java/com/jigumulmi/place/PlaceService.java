@@ -16,10 +16,11 @@ import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.dto.ImageDto;
+import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
-import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
@@ -27,10 +28,6 @@ import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
-import com.jigumulmi.place.dto.MenuDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto;
-import com.jigumulmi.place.dto.ImageDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
@@ -47,7 +44,6 @@ import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
-import com.jigumulmi.place.vo.CurrentOpeningInfo;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.io.IOException;
@@ -121,32 +117,6 @@ public class PlaceService {
         placeRepository.save(newPlace);
     }
 
-    public List<PlaceResponseDto> getPlaceList(GetPlaceListRequestDto requestDto, Member member) {
-        List<PlaceResponseDto> placeList = customPlaceRepository.getPlaceList(requestDto, member);
-        for (PlaceResponseDto responseDto : placeList) {
-            List<ImageDto> imageList = responseDto.getImageList();
-            responseDto.setImageList(Collections.singletonList(imageList.getFirst()));
-
-            List<PlaceCategoryDto> distinctCategoryList = responseDto.getCategoryList().stream()
-                .distinct().toList();
-            responseDto.setCategoryList(distinctCategoryList);
-
-            SubwayStationResponseDto subwayStation = responseDto.getSubwayStation();
-            List<SubwayStationLineDto> distinctLineList = subwayStation.getSubwayStationLineList()
-                .stream()
-                .distinct().toList();
-            subwayStation.setSubwayStationLineList(distinctLineList);
-            responseDto.setSubwayStation(subwayStation);
-
-            SurroundingDateOpeningHour surroundingDateOpeningHour = responseDto.getSurroundingDateOpeningHour();
-            String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
-                surroundingDateOpeningHour);
-            responseDto.setCurrentOpeningInfo(currentOpeningInfo);
-        }
-
-        return placeList;
-    }
-
     @Transactional(readOnly = true)
     public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
         PlaceDetailResponseDto place = customPlaceRepository.getPlaceDetail(placeId);
@@ -186,9 +156,9 @@ public class PlaceService {
             .statistics(reviewRatingStatMap)
             .build();
 
-        SurroundingDateOpeningHour surroundingDateOpeningHour = place.getSurroundingDateOpeningHour();
-        String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
-            surroundingDateOpeningHour);
+        //SurroundingDateOpeningHour surroundingDateOpeningHour = place.getSurroundingDateOpeningHour();
+        //String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
+        //    surroundingDateOpeningHour);
 
         List<ReviewImageResponseDto> reviewImageList = reviewImageRepository.findAllByReview_Place_IdOrderByCreatedAtDesc(
                 placeId)
@@ -213,8 +183,8 @@ public class PlaceService {
             )
             .additionalInfo(place.getAdditionalInfo())
             .overallReview(overallReviewResponseDto)
-            .surroundingDateOpeningHour(surroundingDateOpeningHour)
-            .currentOpeningInfo(currentOpeningInfo)
+            //.surroundingDateOpeningHour(surroundingDateOpeningHour)
+            //.currentOpeningInfo(currentOpeningInfo)
             .reviewImageList(reviewImageList)
             .showLikeCount(likeCount != 0)
             .likeCount(likeCount)

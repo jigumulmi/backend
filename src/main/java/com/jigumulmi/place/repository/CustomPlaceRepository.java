@@ -5,7 +5,6 @@ import static com.jigumulmi.config.querydsl.Utils.nullSafeBuilder;
 import static com.jigumulmi.member.domain.QMember.member;
 import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
-import static com.jigumulmi.place.domain.QPlaceImage.placeImage;
 import static com.jigumulmi.place.domain.QPlaceLike.placeLike;
 import static com.jigumulmi.place.domain.QReview.review;
 import static com.jigumulmi.place.domain.QReviewImage.reviewImage;
@@ -14,7 +13,6 @@ import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
 import static com.jigumulmi.place.domain.QSubwayStationLine.subwayStationLine;
 import static com.jigumulmi.place.domain.QSubwayStationLineMapping.subwayStationLineMapping;
 import static com.jigumulmi.place.domain.QSubwayStationPlace.subwayStationPlace;
-import static com.jigumulmi.place.vo.CurrentOpeningInfo.getSurroundingDateOpeningHourExpressions;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static com.querydsl.core.types.dsl.Expressions.FALSE;
@@ -26,14 +24,9 @@ import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberBasicResponseDto;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
-import com.jigumulmi.place.domain.Place;
-import com.jigumulmi.place.dto.request.GetPlaceListRequestDto;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.ImageDto;
+import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.SurroundingDateOpeningHour;
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
@@ -46,7 +39,6 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.util.List;
 import java.util.Map;
@@ -58,68 +50,6 @@ import org.springframework.stereotype.Repository;
 public class CustomPlaceRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    public List<PlaceResponseDto> getPlaceList(GetPlaceListRequestDto requestDto, Member member) {
-
-        JPAQuery<Place> query = queryFactory
-            .selectFrom(place)
-            .join(place.categoryMappingList, placeCategoryMapping)
-            .join(place.placeImageList, placeImage)
-            .on(placeImage.isMain.eq(true))
-            .join(place.subwayStationPlaceList, subwayStationPlace)
-            .on(subwayStationPlace.isMain.eq(true))
-            .join(subwayStationPlace.subwayStation, subwayStation)
-            .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
-            .join(subwayStationLineMapping.subwayStationLine, subwayStationLine)
-            .where(place.isApproved.eq(true),
-                subwayStationCondition(requestDto.getSubwayStationId()),
-                categoryGroupCondition(requestDto.getCategoryGroup()),
-                placeNameContains(requestDto.getPlaceName())
-            );
-
-        if (requestDto.getShowLikedOnly() && member != null) {
-            query = query.join(place.placeLikeList, placeLike)
-                .on(placeLike.member.eq(member));
-        }
-
-        return query
-            .transform(
-                groupBy(place.id).list(
-                    Projections.fields(PlaceResponseDto.class,
-                        place.id,
-                        place.name,
-                        list(Projections.fields(PlaceCategoryDto.class,
-                            placeCategoryMapping.categoryGroup,
-                            placeCategoryMapping.category
-                        )).as("categoryList"),
-                        list(Projections.fields(ImageDto.class,
-                            placeImage.id,
-                            placeImage.url,
-                            TRUE.as("isMain")
-                        )).as("imageList"),
-                        Projections.fields(PositionDto.class,
-                            place.latitude,
-                            place.longitude
-                        ).as("position"),
-                        Projections.fields(SubwayStationResponseDto.class,
-                            subwayStation.id,
-                            subwayStation.stationName,
-                            TRUE.as("isMain"),
-                            list(
-                                Projections.fields(
-                                    SubwayStationLineDto.class,
-                                    subwayStationLine.id,
-                                    subwayStationLine.lineNumber
-                                )
-                            ).as("subwayStationLineList")
-                        ).as("subwayStation"),
-                        Projections.fields(SurroundingDateOpeningHour.class,
-                            getSurroundingDateOpeningHourExpressions()
-                        ).as("surroundingDateOpeningHour")
-                    )
-                )
-            );
-    }
 
     public BooleanExpression subwayStationCondition(Long subwayStationId) {
         if (subwayStationId == null) {
@@ -203,9 +133,9 @@ public class CustomPlaceRepository {
                             place.openingHourSat
                         ).as("openingHour"),
                         place.additionalInfo,
-                        Projections.fields(SurroundingDateOpeningHour.class,
-                            getSurroundingDateOpeningHourExpressions()
-                        ).as("surroundingDateOpeningHour"),
+                        //Projections.fields(SurroundingDateOpeningHour.class,
+                        //    getSurroundingDateOpeningHourExpressions()
+                        //).as("surroundingDateOpeningHour"),
                         Projections.fields(
                             MemberBasicResponseDto.class,
                             member.id,
