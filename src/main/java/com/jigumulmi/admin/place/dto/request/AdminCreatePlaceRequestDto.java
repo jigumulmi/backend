@@ -2,7 +2,7 @@ package com.jigumulmi.admin.place.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
 import io.swagger.v3.oas.annotations.media.Schema;

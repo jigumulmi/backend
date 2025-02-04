@@ -2,23 +2,41 @@ package com.jigumulmi.admin.place.dto.response;
 
 import com.jigumulmi.common.PageDto;
 import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.dto.ImageDto;
+import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import java.util.List;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.Setter;
 
 @Getter
 @Builder
 public class AdminPlaceListResponseDto {
 
     @Getter
-    @SuperBuilder
+    @Builder
     @NoArgsConstructor
-    public static class PlaceDto extends PlaceResponseDto {
+    @AllArgsConstructor
+    public static class PlaceDto {
+
+        private Long id;
+
+        private String name;
+
+        @Setter
+        private List<ImageDto> imageList;
+
+        private PositionDto position;
+
+        @Setter
+        private SubwayStationResponseDto subwayStation;
+
+        @Setter
+        private List<PlaceCategoryDto> categoryList;
 
         private Boolean isApproved;
 
