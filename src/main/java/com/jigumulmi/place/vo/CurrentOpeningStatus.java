@@ -9,7 +9,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum LiveOpeningStatus {
+public enum CurrentOpeningStatus {
     DAY_OFF("오늘 휴무"),
     BEFORE_OPEN("영업 전"),
     OPEN("영업 중"),
@@ -20,7 +20,7 @@ public enum LiveOpeningStatus {
     @JsonValue
     private final String title;
 
-    public static LiveOpeningStatus getCurrentOpeningInfo(
+    public static CurrentOpeningStatus getLiveOpeningStatus(
         SurroundingDateBusinessHour surroundingDateBusinessHour, LocalTime currentTime) {
         BusinessHour todayBusinessHour = surroundingDateBusinessHour.getToday();
         BusinessHour yesterdayBusinessHour = surroundingDateBusinessHour.getYesterday();
@@ -30,21 +30,28 @@ public enum LiveOpeningStatus {
             && yesterdayBusinessHour.getCloseTime() != null) && (
             yesterdayBusinessHour.getCloseTime().isBefore(yesterdayBusinessHour.getOpenTime())
                 && currentTime.isBefore(yesterdayBusinessHour.getCloseTime()))) {
-            return LiveOpeningStatus.OPEN;
-        } else if (todayBusinessHour.getIsDayOff() != null && todayBusinessHour.getIsDayOff()) {
-            return LiveOpeningStatus.DAY_OFF;
-        } else if (currentTime.isBefore(todayBusinessHour.getOpenTime())) {
-            return LiveOpeningStatus.BEFORE_OPEN;
-        } else if (
-            (todayBusinessHour.getBreakStart() != null && todayBusinessHour.getBreakEnd() != null)
-                && currentTime.isAfter(todayBusinessHour.getBreakStart()) && currentTime.isBefore(
-                todayBusinessHour.getBreakEnd())) {
-            return LiveOpeningStatus.BREAK;
-        } else if (currentTime.isAfter(todayBusinessHour.getOpenTime()) && currentTime.isBefore(
-            todayBusinessHour.getCloseTime())) {
-            return LiveOpeningStatus.OPEN;
+            return CurrentOpeningStatus.OPEN;
         }
 
-        return LiveOpeningStatus.CLOSED;
+        if (todayBusinessHour.getIsDayOff()) {
+            return CurrentOpeningStatus.DAY_OFF;
+        }
+
+        if (currentTime.isBefore(todayBusinessHour.getOpenTime())) {
+            return CurrentOpeningStatus.BEFORE_OPEN;
+        }
+
+        if ((todayBusinessHour.getBreakStart() != null && todayBusinessHour.getBreakEnd() != null)
+            && (currentTime.isAfter(todayBusinessHour.getBreakStart()) && currentTime.isBefore(
+            todayBusinessHour.getBreakEnd()))) {
+            return CurrentOpeningStatus.BREAK;
+        }
+
+        if (currentTime.isAfter(todayBusinessHour.getOpenTime()) && currentTime.isBefore(
+            todayBusinessHour.getCloseTime())) {
+            return CurrentOpeningStatus.OPEN;
+        }
+
+        return CurrentOpeningStatus.CLOSED;
     }
 }

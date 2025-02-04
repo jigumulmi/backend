@@ -48,7 +48,7 @@ public class BannerService {
         Map<Long, SurroundingDateBusinessHour> surroundingBusinessHourMap = customBannerRepository.getSurroundingBusinessHourByPlaceIdIn(
             placeIdList, localDate);
         placeDtoList.forEach(
-            place -> place.setLiveOpeningStatus(surroundingBusinessHourMap.get(place.getId()), localTime));
+            place -> place.setCurrentOpeningStatus(surroundingBusinessHourMap.get(place.getId()), localTime));
 
         return BannerPlaceListResponseDto.builder()
             .data(placeDtoList)

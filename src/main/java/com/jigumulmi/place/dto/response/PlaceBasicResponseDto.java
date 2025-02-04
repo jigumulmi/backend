@@ -3,7 +3,11 @@ package com.jigumulmi.place.dto.response;
 import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.PositionDto;
-import com.jigumulmi.place.vo.LiveOpeningStatus;
+import com.jigumulmi.place.dto.TimeDto;
+import com.jigumulmi.place.vo.CurrentOpeningStatus;
+import com.jigumulmi.place.vo.NextOpeningStatus;
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,12 +23,23 @@ public class PlaceBasicResponseDto {
 
     @Getter
     @Builder
-    public static class LiveBusinessInfoDto {
+    public static class LiveOpeningInfoDto {
 
-        private LiveOpeningStatus liveOpeningStatus;
-        // TODO 가장 빠른 미래의 변동사항 관련 필드
+        @Getter
+        @Builder
+        public static class NextOpeningInfo {
+
+            private NextOpeningStatus status;
+            @Schema(implementation = TimeDto.class)
+            private LocalTime at;
+        }
+
+
+        private CurrentOpeningStatus currentOpeningStatus;
+        @Schema(description = "현재 상태가 휴무 혹은 영업 종료인 경우 null")
+        private NextOpeningInfo nextOpeningInfo;
         private WeeklyBusinessHourDto weeklyBusinessHour;
-        
+
     }
 
     private Long id;
@@ -42,5 +57,5 @@ public class PlaceBasicResponseDto {
     private List<PlaceCategoryDto> categoryList;
 
     @Setter
-    private LiveBusinessInfoDto liveBusinessInfo;
+    private LiveOpeningInfoDto liveOpeningInfo;
 }

@@ -5,7 +5,7 @@ import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
-import com.jigumulmi.place.vo.LiveOpeningStatus;
+import com.jigumulmi.place.vo.CurrentOpeningStatus;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
 import java.time.LocalTime;
@@ -27,7 +27,7 @@ public class BannerPlaceListResponseDto {
         private District district;
         private List<PlaceCategoryDto> categoryList;
         private List<ImageDto> imageList;
-        private LiveOpeningStatus liveOpeningStatus;
+        private CurrentOpeningStatus currentOpeningStatus;
 
         public static BannerPlaceDto from(Place place) {
             return BannerPlaceDto.builder()
@@ -42,8 +42,8 @@ public class BannerPlaceListResponseDto {
                 .build();
         }
 
-        public void setLiveOpeningStatus(SurroundingDateBusinessHour surroundingDateBusinessHour, LocalTime currentTime) {
-            this.liveOpeningStatus = LiveOpeningStatus.getCurrentOpeningInfo(
+        public void setCurrentOpeningStatus(SurroundingDateBusinessHour surroundingDateBusinessHour, LocalTime currentTime) {
+            this.currentOpeningStatus = CurrentOpeningStatus.getLiveOpeningStatus(
                 surroundingDateBusinessHour, currentTime);
         }
     }

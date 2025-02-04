@@ -15,6 +15,7 @@ import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
@@ -24,7 +25,8 @@ import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
-import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveBusinessInfoDto;
+import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto;
+import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto.NextOpeningInfo;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
@@ -42,7 +44,8 @@ import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
-import com.jigumulmi.place.vo.LiveOpeningStatus;
+import com.jigumulmi.place.vo.CurrentOpeningStatus;
+import com.jigumulmi.place.vo.NextOpeningStatus;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.io.IOException;
@@ -141,19 +144,24 @@ public class PlaceService {
 
         DayOfWeek todayDayOfWeek = today.getDayOfWeek();
         DayOfWeek yesterdayDayOfWeek = today.minusDays(1).getDayOfWeek();
-        LocalTime currentTime = now.toLocalTime();
+        BusinessHour todayBusinessHour = weeklyBusinessHourDto.getBusinessHour(todayDayOfWeek);
         SurroundingDateBusinessHour surroundingDateBusinessHour = SurroundingDateBusinessHour.builder()
-            .today(weeklyBusinessHourDto.getBusinessHour(todayDayOfWeek))
+            .today(todayBusinessHour)
             .yesterday(weeklyBusinessHourDto.getBusinessHour(yesterdayDayOfWeek))
             .build();
-        LiveOpeningStatus liveOpeningStatus = LiveOpeningStatus.getCurrentOpeningInfo(
+
+        LocalTime currentTime = now.toLocalTime();
+        CurrentOpeningStatus currentOpeningStatus = CurrentOpeningStatus.getLiveOpeningStatus(
+            surroundingDateBusinessHour, currentTime);
+        NextOpeningInfo nextOpeningInfo = NextOpeningStatus.getNextOpeningInfo(
             surroundingDateBusinessHour, currentTime);
 
-        LiveBusinessInfoDto liveBusinessInfoDto = LiveBusinessInfoDto.builder()
-            .liveOpeningStatus(liveOpeningStatus)
+        LiveOpeningInfoDto liveOpeningInfoDto = LiveOpeningInfoDto.builder()
+            .currentOpeningStatus(currentOpeningStatus)
+            .nextOpeningInfo(nextOpeningInfo)
             .weeklyBusinessHour(weeklyBusinessHourDto)
             .build();
-        place.setLiveBusinessInfo(liveBusinessInfoDto);
+        place.setLiveOpeningInfo(liveOpeningInfoDto);
 
         return place;
     }
