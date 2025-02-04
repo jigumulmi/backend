@@ -1,7 +1,5 @@
 package com.jigumulmi.place;
 
-import static java.lang.Math.round;
-
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.common.FileUtils;
 import com.jigumulmi.config.exception.CustomException;
@@ -17,7 +15,6 @@ import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.ImageDto;
-import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
@@ -25,18 +22,16 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
-import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
+import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
-import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
-import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
+import com.jigumulmi.place.repository.PlaceCategoryMappingRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceLikeRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
@@ -80,6 +75,7 @@ public class PlaceService {
     private final PlaceImageRepository placeImageRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final PlaceLikeRepository placeLikeRepository;
+    private final PlaceCategoryMappingRepository placeCategoryMappingRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         return subwayStationRepository.findAllByStationNameStartsWith(stationName)
@@ -118,78 +114,21 @@ public class PlaceService {
     }
 
     @Transactional(readOnly = true)
-    public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
-        PlaceDetailResponseDto place = customPlaceRepository.getPlaceDetail(placeId);
+    public PlaceBasicResponseDto getPlaceDetail(Long placeId) {
+        PlaceBasicResponseDto place = customPlaceRepository.getPlaceById(placeId);
 
-        List<PlaceCategoryDto> distinctCategoryList = place.getCategoryList().stream().distinct()
-            .toList();
-
-        SubwayStationResponseDto subwayStation = place.getSubwayStation();
-        List<SubwayStationLineDto> distinctLineList = subwayStation.getSubwayStationLineList()
+        List<PlaceCategoryDto> categoryDtoList = placeCategoryMappingRepository.findByPlace_Id(placeId)
             .stream()
-            .distinct().toList();
-        subwayStation.setSubwayStationLineList(distinctLineList);
-
-        List<MenuDto> menuList = menuRepository.findAllByPlaceId(placeId).stream()
-            .map(MenuDto::from).toList();
+            .map(PlaceCategoryDto::fromPlaceCategoryMapping).toList();
+        place.setCategoryList(categoryDtoList);
 
         List<ImageDto> imageList = placeImageRepository.findByPlace_Id(placeId).stream()
             .map(ImageDto::from).toList();
+        place.setImageList(imageList);
 
-        Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
-            placeId);
+        // TODO 영업시간
 
-        long totalCount = 0L;
-        long totalRating = 0L;
-        for (int i = 1; i <= 5; i++) {
-            reviewRatingStatMap.putIfAbsent(i, 0L);
-
-            Long count = reviewRatingStatMap.get(i);
-            totalCount += count;
-            totalRating += (count * i);
-        }
-        Double averageRating = round((float) totalRating / totalCount * 100) / 100.0; // 소수점 둘째자리까지
-
-        OverallReviewResponseDto overallReviewResponseDto = OverallReviewResponseDto.builder()
-            .averageRating(averageRating)
-            .totalCount(totalCount)
-            .statistics(reviewRatingStatMap)
-            .build();
-
-        //SurroundingDateOpeningHour surroundingDateOpeningHour = place.getSurroundingDateOpeningHour();
-        //String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
-        //    surroundingDateOpeningHour);
-
-        List<ReviewImageResponseDto> reviewImageList = reviewImageRepository.findAllByReview_Place_IdOrderByCreatedAtDesc(
-                placeId)
-            .stream().map(ReviewImageResponseDto::from).toList();
-
-        Long likeCount = customPlaceRepository.getPlaceLikeCount(placeId);
-
-        return PlaceDetailResponseDto.builder()
-            .id(place.getId())
-            .name(place.getName())
-            .imageList(imageList)
-            .position(
-                place.getPosition()
-            )
-            .subwayStation(subwayStation)
-            .categoryList(distinctCategoryList)
-            .address(place.getAddress())
-            .contact(place.getContact())
-            .menuList(menuList)
-            .openingHour(
-                place.getOpeningHour()
-            )
-            .additionalInfo(place.getAdditionalInfo())
-            .overallReview(overallReviewResponseDto)
-            //.surroundingDateOpeningHour(surroundingDateOpeningHour)
-            //.currentOpeningInfo(currentOpeningInfo)
-            .reviewImageList(reviewImageList)
-            .showLikeCount(likeCount != 0)
-            .likeCount(likeCount)
-            .member(!place.getIsFromAdmin() ? place.getMember() : null)
-            .build();
+        return place;
     }
 
     @Transactional

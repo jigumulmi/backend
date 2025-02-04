@@ -19,14 +19,10 @@ import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
-import com.jigumulmi.config.exception.CustomException;
-import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
-import com.jigumulmi.member.dto.response.MemberBasicResponseDto;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
-import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.dto.PositionDto;
+import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
@@ -81,30 +77,29 @@ public class CustomPlaceRepository {
         }
     }
 
-
-    public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
-        // 둘 이상의 컬렉션에 fetchjoin() 불가
+    public PlaceBasicResponseDto getPlaceById(Long placeId) {
         // 중첩 리스트 프로젝션 안되는 듯...
 
         return queryFactory
             .from(place)
-            .join(place.categoryMappingList, placeCategoryMapping)
             .join(place.subwayStationPlaceList, subwayStationPlace)
             .on(subwayStationPlace.isMain.eq(true))
             .join(subwayStationPlace.subwayStation, subwayStation)
             .join(subwayStation.subwayStationLineMappingList, subwayStationLineMapping)
             .join(subwayStationLineMapping.subwayStationLine)
-            .leftJoin(place.member, member)
             .where(place.id.eq(placeId).and(place.isApproved.eq(true)))
             .transform(
-                groupBy(place.id).list(
-                    Projections.fields(PlaceDetailResponseDto.class,
+                groupBy(place.id).as(
+                    Projections.fields(PlaceBasicResponseDto.class,
                         place.id,
                         place.name,
                         Projections.fields(PositionDto.class,
                             place.latitude,
                             place.longitude
                         ).as("position"),
+                        place.address,
+                        place.contact,
+                        place.additionalInfo,
                         Projections.fields(SubwayStationResponseDto.class,
                             subwayStation.id,
                             subwayStation.stationName,
@@ -116,36 +111,10 @@ public class CustomPlaceRepository {
                                     subwayStationLine.lineNumber
                                 )
                             ).as("subwayStationLineList")
-                        ).as("subwayStation"),
-                        list(Projections.fields(PlaceCategoryDto.class,
-                            placeCategoryMapping.categoryGroup,
-                            placeCategoryMapping.category
-                        )).as("categoryList"),
-                        place.address,
-                        place.contact,
-                        Projections.fields(PlaceDetailResponseDto.OpeningHourDto.class,
-                            place.openingHourSun,
-                            place.openingHourMon,
-                            place.openingHourTue,
-                            place.openingHourWed,
-                            place.openingHourThu,
-                            place.openingHourFri,
-                            place.openingHourSat
-                        ).as("openingHour"),
-                        place.additionalInfo,
-                        //Projections.fields(SurroundingDateOpeningHour.class,
-                        //    getSurroundingDateOpeningHourExpressions()
-                        //).as("surroundingDateOpeningHour"),
-                        Projections.fields(
-                            MemberBasicResponseDto.class,
-                            member.id,
-                            member.nickname
-                        ).as("member"),
-                        place.isFromAdmin
+                        ).as("subwayStation")
                     )
                 )
-            ).stream().findFirst()
-            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+            ).get(placeId);
     }
 
     public Long getPlaceLikeCount(Long placeId) {

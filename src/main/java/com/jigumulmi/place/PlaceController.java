@@ -10,7 +10,7 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
+import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
@@ -96,14 +96,10 @@ public class PlaceController {
         return ResponseEntity.ok().body(placeCategoryList);
     }
 
-    @Operation(summary = "장소 상세 조회")
-    @ApiResponses(
-        value = {@ApiResponse(responseCode = "200", content = {
-            @Content(schema = @Schema(implementation = PlaceDetailResponseDto.class))})}
-    )
-    @GetMapping("/{placeId}")
-    public ResponseEntity<?> getPlaceDetail(@PathVariable(name = "placeId") Long placeId) {
-        PlaceDetailResponseDto placeDetail = placeService.getPlaceDetail(placeId);
+    @Operation(summary = "장소 기본정보 조회")
+    @GetMapping("/{placeId}/basic")
+    public ResponseEntity<PlaceBasicResponseDto> getPlaceHome(@PathVariable Long placeId) {
+        PlaceBasicResponseDto placeDetail = placeService.getPlaceDetail(placeId);
         return ResponseEntity.ok().body(placeDetail);
     }
 
