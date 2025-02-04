@@ -33,13 +33,13 @@ public class AdminPlaceBusinessHourResponseDto {
             .build();
     }
 
-    public static BusinessHour fromTemporaryBusinessHour(TemporaryBusinessHour fixedBusinessHour) {
+    public static BusinessHour fromTemporaryBusinessHour(TemporaryBusinessHour temporaryBusinessHour) {
         return BusinessHour.builder()
-            .openTime(fixedBusinessHour.getOpenTime())
-            .closeTime(fixedBusinessHour.getCloseTime())
-            .breakStart(fixedBusinessHour.getBreakStart())
-            .breakEnd(fixedBusinessHour.getBreakEnd())
-            .isDayOff(fixedBusinessHour.getIsDayOff())
+            .openTime(temporaryBusinessHour.getOpenTime())
+            .closeTime(temporaryBusinessHour.getCloseTime())
+            .breakStart(temporaryBusinessHour.getBreakStart())
+            .breakEnd(temporaryBusinessHour.getBreakEnd())
+            .isDayOff(temporaryBusinessHour.getIsDayOff())
             .build();
     }
 }
