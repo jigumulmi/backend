@@ -4,7 +4,7 @@ package com.jigumulmi.admin.place;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto.TemporaryBusinessHourDto;
@@ -183,7 +183,7 @@ public class AdminPlaceService {
 
     @Transactional
     public void updateFixedBusinessHour(Long placeId,
-        AdminUpdateFixedBusinessHourRequestDto requestDto) {
+        WeeklyBusinessHourDto requestDto) {
         Place place = placeRepository.findById(placeId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
         fixedBusinessHourRepository.deleteAllByPlace(place);
@@ -251,7 +251,7 @@ public class AdminPlaceService {
         List<FixedBusinessHour> fixedBusinessHourList = fixedBusinessHourRepository.findAllByPlaceId(
             placeId);
 
-        AdminUpdateFixedBusinessHourRequestDto fixedBusinessHourResponseDto = new AdminUpdateFixedBusinessHourRequestDto();
+        WeeklyBusinessHourDto fixedBusinessHourResponseDto = new WeeklyBusinessHourDto();
         for (FixedBusinessHour fixedBusinessHour : fixedBusinessHourList) {
             fixedBusinessHourResponseDto.updateBusinessHour(
                 fixedBusinessHour.getDayOfWeek(),

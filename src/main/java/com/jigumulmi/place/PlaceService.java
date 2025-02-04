@@ -1,5 +1,6 @@
 package com.jigumulmi.place;
 
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.common.FileUtils;
 import com.jigumulmi.config.exception.CustomException;
@@ -23,12 +24,14 @@ import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
+import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveBusinessInfoDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
+import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceCategoryMappingRepository;
@@ -39,9 +42,14 @@ import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
+import com.jigumulmi.place.vo.LiveOpeningStatus;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.io.IOException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -126,7 +134,26 @@ public class PlaceService {
             .map(ImageDto::from).toList();
         place.setImageList(imageList);
 
-        // TODO 영업시간
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
+        WeeklyBusinessHourDto weeklyBusinessHourDto = customPlaceRepository.getWeeklyBusinessHourByPlaceId(
+            placeId, today);
+
+        DayOfWeek todayDayOfWeek = today.getDayOfWeek();
+        DayOfWeek yesterdayDayOfWeek = today.minusDays(1).getDayOfWeek();
+        LocalTime currentTime = now.toLocalTime();
+        SurroundingDateBusinessHour surroundingDateBusinessHour = SurroundingDateBusinessHour.builder()
+            .today(weeklyBusinessHourDto.getBusinessHour(todayDayOfWeek))
+            .yesterday(weeklyBusinessHourDto.getBusinessHour(yesterdayDayOfWeek))
+            .build();
+        LiveOpeningStatus liveOpeningStatus = LiveOpeningStatus.getCurrentOpeningInfo(
+            surroundingDateBusinessHour, currentTime);
+
+        LiveBusinessInfoDto liveBusinessInfoDto = LiveBusinessInfoDto.builder()
+            .liveOpeningStatus(liveOpeningStatus)
+            .weeklyBusinessHour(weeklyBusinessHourDto)
+            .build();
+        place.setLiveBusinessInfo(liveBusinessInfoDto);
 
         return place;
     }

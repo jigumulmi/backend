@@ -1,5 +1,6 @@
 package com.jigumulmi.place.dto.response;
 
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.vo.LiveOpeningStatus;
@@ -16,6 +17,16 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PlaceBasicResponseDto {
 
+    @Getter
+    @Builder
+    public static class LiveBusinessInfoDto {
+
+        private LiveOpeningStatus liveOpeningStatus;
+        // TODO 가장 빠른 미래의 변동사항 관련 필드
+        private WeeklyBusinessHourDto weeklyBusinessHour;
+        
+    }
+
     private Long id;
     private String name;
     private PositionDto position;
@@ -31,5 +42,5 @@ public class PlaceBasicResponseDto {
     private List<PlaceCategoryDto> categoryList;
 
     @Setter
-    private LiveOpeningStatus liveOpeningStatus;
+    private LiveBusinessInfoDto liveBusinessInfo;
 }

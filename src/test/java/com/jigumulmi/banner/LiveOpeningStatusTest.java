@@ -104,9 +104,10 @@ class LiveOpeningStatusTest {
     public void testGetCurrentOpeningInfo(BusinessHour yesterday, BusinessHour today, LocalTime currentTime,
         LiveOpeningStatus expectedStatus) {
         // given
-        SurroundingDateBusinessHour surroundingDateBusinessHour = new SurroundingDateBusinessHour();
-        surroundingDateBusinessHour.setYesterday(yesterday);
-        surroundingDateBusinessHour.setToday(today);
+        SurroundingDateBusinessHour surroundingDateBusinessHour = SurroundingDateBusinessHour.builder()
+            .yesterday(yesterday)
+            .today(today)
+            .build();
 
         // when
         LiveOpeningStatus actualStatus = LiveOpeningStatus.getCurrentOpeningInfo(surroundingDateBusinessHour,

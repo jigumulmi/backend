@@ -1,4 +1,4 @@
-package com.jigumulmi.admin.place.dto.request;
+package com.jigumulmi.admin.place.dto;
 
 import com.jigumulmi.place.dto.BusinessHour;
 import jakarta.validation.Valid;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class AdminUpdateFixedBusinessHourRequestDto {
+public class WeeklyBusinessHourDto {
 
     @Valid
     @NotNull

@@ -23,5 +23,6 @@ public class BusinessHour {
     @Schema(implementation = TimeDto.class)
     private LocalTime breakEnd;
     @Schema(defaultValue = "false")
+    @Builder.Default
     private Boolean isDayOff = false;
 }

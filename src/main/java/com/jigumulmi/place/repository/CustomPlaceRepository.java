@@ -3,6 +3,7 @@ package com.jigumulmi.place.repository;
 
 import static com.jigumulmi.config.querydsl.Utils.nullSafeBuilder;
 import static com.jigumulmi.member.domain.QMember.member;
+import static com.jigumulmi.place.domain.QFixedBusinessHour.fixedBusinessHour;
 import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
 import static com.jigumulmi.place.domain.QPlaceLike.placeLike;
@@ -13,14 +14,18 @@ import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
 import static com.jigumulmi.place.domain.QSubwayStationLine.subwayStationLine;
 import static com.jigumulmi.place.domain.QSubwayStationLineMapping.subwayStationLineMapping;
 import static com.jigumulmi.place.domain.QSubwayStationPlace.subwayStationPlace;
+import static com.jigumulmi.place.domain.QTemporaryBusinessHour.temporaryBusinessHour;
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
 import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
+import com.jigumulmi.banner.repository.CustomBannerRepository;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
+import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
@@ -30,14 +35,19 @@ import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -46,6 +56,7 @@ import org.springframework.stereotype.Repository;
 public class CustomPlaceRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final CustomBannerRepository customBannerRepository;
 
     public BooleanExpression subwayStationCondition(Long subwayStationId) {
         if (subwayStationId == null) {
@@ -115,6 +126,44 @@ public class CustomPlaceRepository {
                     )
                 )
             ).get(placeId);
+    }
+
+    public WeeklyBusinessHourDto getWeeklyBusinessHourByPlaceId(
+        Long placeId, LocalDate today) {
+        int year = today.getYear();
+        int weekOfYear = today.get(WeekFields.SUNDAY_START.weekOfYear());
+
+        List<Tuple> results = queryFactory
+            .select(fixedBusinessHour.place.id,
+                fixedBusinessHour.openTime,
+                fixedBusinessHour.closeTime,
+                fixedBusinessHour.breakStart,
+                fixedBusinessHour.breakEnd,
+                fixedBusinessHour.isDayOff,
+                fixedBusinessHour.dayOfWeek,
+                temporaryBusinessHour.openTime,
+                temporaryBusinessHour.closeTime,
+                temporaryBusinessHour.breakStart,
+                temporaryBusinessHour.breakEnd,
+                temporaryBusinessHour.isDayOff
+            )
+            .from(fixedBusinessHour)
+            .leftJoin(temporaryBusinessHour)
+            .on(fixedBusinessHour.place.id.eq(temporaryBusinessHour.place.id)
+                .and(temporaryBusinessHour.year.eq(year))
+                .and(temporaryBusinessHour.weekOfYear.eq(weekOfYear))
+                .and(fixedBusinessHour.dayOfWeek.eq(temporaryBusinessHour.dayOfWeek)))
+            .where(fixedBusinessHour.place.id.eq(placeId))
+            .fetch();
+
+        WeeklyBusinessHourDto fixedBusinessHourResponseDto = new WeeklyBusinessHourDto();
+        for (Tuple row : results) {
+            DayOfWeek dayOfWeek = row.get(fixedBusinessHour.dayOfWeek);
+            BusinessHour businessHour = customBannerRepository.buildBusinessHour(row);
+            fixedBusinessHourResponseDto.updateBusinessHour(Objects.requireNonNull(dayOfWeek), businessHour);
+        }
+
+        return fixedBusinessHourResponseDto;
     }
 
     public Long getPlaceLikeCount(Long placeId) {

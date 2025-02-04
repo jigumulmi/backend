@@ -3,7 +3,7 @@ package com.jigumulmi.admin.place;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
@@ -116,7 +116,7 @@ public class AdminPlaceController {
     @ApiResponse(responseCode = "201")
     @PutMapping("/{placeId}/business-hour/fixed")
     public ResponseEntity<?> updateFixedBusinessHour(@PathVariable Long placeId,
-        @Valid @RequestBody AdminUpdateFixedBusinessHourRequestDto requestDto) {
+        @Valid @RequestBody WeeklyBusinessHourDto requestDto) {
         adminPlaceService.updateFixedBusinessHour(placeId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

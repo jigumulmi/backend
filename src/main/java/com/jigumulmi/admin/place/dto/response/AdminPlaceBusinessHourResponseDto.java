@@ -1,7 +1,7 @@
 package com.jigumulmi.admin.place.dto.response;
 
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.place.domain.FixedBusinessHour;
 import com.jigumulmi.place.domain.TemporaryBusinessHour;
 import com.jigumulmi.place.dto.BusinessHour;
@@ -20,7 +20,7 @@ public class AdminPlaceBusinessHourResponseDto {
         private Long id;
     }
 
-    private AdminUpdateFixedBusinessHourRequestDto fixedBusinessHour;
+    private WeeklyBusinessHourDto fixedBusinessHour;
     private List<TemporaryBusinessHourDto> temporaryBusinessHour;
 
     public static BusinessHour fromFixedBusinessHour(FixedBusinessHour fixedBusinessHour) {
