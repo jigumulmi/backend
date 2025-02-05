@@ -52,12 +52,7 @@ public class BannerService {
 
         return BannerPlaceListResponseDto.builder()
             .data(placeDtoList)
-            .page(PageDto.builder()
-                .totalCount(placePage.getTotalElements())
-                .currentPage(pageable.getPageNumber() + 1)
-                .totalPage(placePage.getTotalPages())
-                .build()
-            )
+            .page(PageDto.of(placePage, pageable))
             .build();
     }
 }

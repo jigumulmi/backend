@@ -101,12 +101,7 @@ public class AdminBannerService {
 
         return AdminBannerPlaceListResponseDto.builder()
             .data(placeDtoList)
-            .page(PageDto.builder()
-                .totalCount(placePage.getTotalElements())
-                .currentPage(pageable.getPageNumber() + 1)
-                .totalPage(placePage.getTotalPages())
-                .build()
-            )
+            .page(PageDto.of(placePage, pageable))
             .build();
     }
 
@@ -196,12 +191,7 @@ public class AdminBannerService {
 
         return AdminBannerPlaceListResponseDto.builder()
             .data(placeDtoList)
-            .page(PageDto.builder()
-                .totalCount(placePage.getTotalElements())
-                .currentPage(pageable.getPageNumber() + 1)
-                .totalPage(placePage.getTotalPages())
-                .build()
-            )
+            .page(PageDto.of(placePage, pageable))
             .build();
     }
 }

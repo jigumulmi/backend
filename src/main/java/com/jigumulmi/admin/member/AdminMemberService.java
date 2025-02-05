@@ -21,12 +21,7 @@ public class AdminMemberService {
 
         return AdminMemberListResponseDto.builder()
             .data(memberPage.getContent())
-            .page(PageDto.builder()
-                .totalCount(memberPage.getTotalElements())
-                .currentPage(pageable.getPageNumber() + 1)
-                .totalPage(memberPage.getTotalPages())
-                .build()
-            )
+            .page(PageDto.of(memberPage, pageable))
             .build();
     }
 
