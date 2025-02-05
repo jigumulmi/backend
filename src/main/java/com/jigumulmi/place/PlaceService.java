@@ -2,8 +2,10 @@ package com.jigumulmi.place;
 
 import static java.lang.Math.round;
 
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.common.FileUtils;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;
@@ -16,6 +18,7 @@ import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
+import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
@@ -25,18 +28,21 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
-import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
+import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
+import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto;
+import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto.NextOpeningInfo;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto;
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
+import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
 import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
-import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
+import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.MenuRepository;
+import com.jigumulmi.place.repository.PlaceCategoryMappingRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceLikeRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
@@ -44,9 +50,15 @@ import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
+import com.jigumulmi.place.vo.CurrentOpeningStatus;
+import com.jigumulmi.place.vo.NextOpeningStatus;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
 import java.io.IOException;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,6 +68,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,6 +94,7 @@ public class PlaceService {
     private final PlaceImageRepository placeImageRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final PlaceLikeRepository placeLikeRepository;
+    private final PlaceCategoryMappingRepository placeCategoryMappingRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationList(String stationName) {
         return subwayStationRepository.findAllByStationNameStartsWith(stationName)
@@ -111,31 +126,63 @@ public class PlaceService {
             .isMain(true)
             .build();
 
-        newPlace.addCategoryAndSubwayStation(new ArrayList<>(), Collections.singletonList(subwayStationPlace));
+        newPlace.addCategoryAndSubwayStation(new ArrayList<>(),
+            Collections.singletonList(subwayStationPlace));
         newPlace.addMenu(menuList);
 
         placeRepository.save(newPlace);
     }
 
     @Transactional(readOnly = true)
-    public PlaceDetailResponseDto getPlaceDetail(Long placeId) {
-        PlaceDetailResponseDto place = customPlaceRepository.getPlaceDetail(placeId);
+    public PlaceBasicResponseDto getPlaceBasic(Long placeId) {
+        PlaceBasicResponseDto place = customPlaceRepository.getPlaceById(placeId);
 
-        List<PlaceCategoryDto> distinctCategoryList = place.getCategoryList().stream().distinct()
-            .toList();
-
-        SubwayStationResponseDto subwayStation = place.getSubwayStation();
-        List<SubwayStationLineDto> distinctLineList = subwayStation.getSubwayStationLineList()
+        List<PlaceCategoryDto> categoryDtoList = placeCategoryMappingRepository.findByPlace_Id(
+                placeId)
             .stream()
-            .distinct().toList();
-        subwayStation.setSubwayStationLineList(distinctLineList);
-
-        List<MenuDto> menuList = menuRepository.findAllByPlaceId(placeId).stream()
-            .map(MenuDto::from).toList();
+            .map(PlaceCategoryDto::fromPlaceCategoryMapping).toList();
+        place.setCategoryList(categoryDtoList);
 
         List<ImageDto> imageList = placeImageRepository.findByPlace_Id(placeId).stream()
             .map(ImageDto::from).toList();
+        place.setImageList(imageList);
 
+        LocalDateTime now = LocalDateTime.now();
+        LocalDate today = now.toLocalDate();
+        WeeklyBusinessHourDto weeklyBusinessHourDto = customPlaceRepository.getWeeklyBusinessHourByPlaceId(
+            placeId, today);
+
+        DayOfWeek todayDayOfWeek = today.getDayOfWeek();
+        DayOfWeek yesterdayDayOfWeek = today.minusDays(1).getDayOfWeek();
+        BusinessHour todayBusinessHour = weeklyBusinessHourDto.getBusinessHour(todayDayOfWeek);
+        SurroundingDateBusinessHour surroundingDateBusinessHour = SurroundingDateBusinessHour.builder()
+            .today(todayBusinessHour)
+            .yesterday(weeklyBusinessHourDto.getBusinessHour(yesterdayDayOfWeek))
+            .build();
+
+        LocalTime currentTime = now.toLocalTime();
+        CurrentOpeningStatus currentOpeningStatus = CurrentOpeningStatus.getLiveOpeningStatus(
+            surroundingDateBusinessHour, currentTime);
+        NextOpeningInfo nextOpeningInfo = NextOpeningStatus.getNextOpeningInfo(
+            surroundingDateBusinessHour, currentTime);
+
+        LiveOpeningInfoDto liveOpeningInfoDto = LiveOpeningInfoDto.builder()
+            .currentOpeningStatus(currentOpeningStatus)
+            .nextOpeningInfo(nextOpeningInfo)
+            .weeklyBusinessHour(weeklyBusinessHourDto)
+            .build();
+        place.setLiveOpeningInfo(liveOpeningInfoDto);
+
+        return place;
+    }
+
+    public PagedResponseDto<MenuDto> getPlaceMenu(Pageable pageable, Long placeId) {
+        Page<MenuDto> menuPage = menuRepository.findAllByPlaceId(placeId, pageable)
+            .map(MenuDto::from);
+        return PagedResponseDto.of(menuPage, pageable);
+    }
+
+    public ReviewStatisticsResponseDto getReviewStatistics(Long placeId) {
         Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
             placeId);
 
@@ -150,57 +197,21 @@ public class PlaceService {
         }
         Double averageRating = round((float) totalRating / totalCount * 100) / 100.0; // 소수점 둘째자리까지
 
-        OverallReviewResponseDto overallReviewResponseDto = OverallReviewResponseDto.builder()
+        return ReviewStatisticsResponseDto.builder()
             .averageRating(averageRating)
             .totalCount(totalCount)
             .statistics(reviewRatingStatMap)
             .build();
-
-        //SurroundingDateOpeningHour surroundingDateOpeningHour = place.getSurroundingDateOpeningHour();
-        //String currentOpeningInfo = CurrentOpeningInfo.getCurrentOpeningInfo(
-        //    surroundingDateOpeningHour);
-
-        List<ReviewImageResponseDto> reviewImageList = reviewImageRepository.findAllByReview_Place_IdOrderByCreatedAtDesc(
-                placeId)
-            .stream().map(ReviewImageResponseDto::from).toList();
-
-        Long likeCount = customPlaceRepository.getPlaceLikeCount(placeId);
-
-        return PlaceDetailResponseDto.builder()
-            .id(place.getId())
-            .name(place.getName())
-            .imageList(imageList)
-            .position(
-                place.getPosition()
-            )
-            .subwayStation(subwayStation)
-            .categoryList(distinctCategoryList)
-            .address(place.getAddress())
-            .contact(place.getContact())
-            .menuList(menuList)
-            .openingHour(
-                place.getOpeningHour()
-            )
-            .additionalInfo(place.getAdditionalInfo())
-            .overallReview(overallReviewResponseDto)
-            //.surroundingDateOpeningHour(surroundingDateOpeningHour)
-            //.currentOpeningInfo(currentOpeningInfo)
-            .reviewImageList(reviewImageList)
-            .showLikeCount(likeCount != 0)
-            .likeCount(likeCount)
-            .member(!place.getIsFromAdmin() ? place.getMember() : null)
-            .build();
     }
 
     @Transactional
-    public void postReview(CreateReviewRequestDto requestDto, Member member) {
+    public void postReview(Long placeId, CreateReviewRequestDto requestDto, Member member) {
         boolean canPostReview = reviewRepository.findTopByPlaceIdAndMemberIdAndDeletedAtIsNull(
-            requestDto.getPlaceId(),
-            member.getId()
+            placeId, member.getId()
         ).isEmpty();
 
         if (canPostReview) {
-            Place place = placeRepository.findById(requestDto.getPlaceId())
+            Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
             Review review = Review.builder()
                 .place(place)
@@ -212,7 +223,7 @@ public class PlaceService {
             ArrayList<String> s3KeyList = new ArrayList<>();
             try {
                 for (MultipartFile image : requestDto.getImageList()) {
-                    String s3Key = REVIEW_IMAGE_S3_PREFIX + requestDto.getPlaceId() + "/"
+                    String s3Key = REVIEW_IMAGE_S3_PREFIX + placeId + "/"
                         + FileUtils.generateUniqueFilename(image);
 
                     s3KeyList.add(s3Key);
@@ -241,9 +252,9 @@ public class PlaceService {
         }
     }
 
-    public void postReviewReply(CreateReviewReplyRequestDto requestDto, Member member) {
-
-        Review review = reviewRepository.findById(requestDto.getReviewId())
+    public void postReviewReply(Long reviewId, CreateReviewReplyRequestDto requestDto,
+        Member member) {
+        Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
         ReviewReply reviewReply = ReviewReply.builder()
             .review(review)
@@ -254,9 +265,11 @@ public class PlaceService {
         reviewReplyRepository.save(reviewReply);
     }
 
-    public List<ReviewResponseDto> getReviewList(Member member, Long placeId) {
-        List<ReviewResponseDto> reviewList = customPlaceRepository.getReviewListByPlaceId(
-            placeId, member);
+    @Transactional(readOnly = true)
+    public PagedResponseDto<ReviewResponseDto> getReviewList(Member requestMember,
+        Pageable pageable, Long placeId) {
+        Page<ReviewResponseDto> reviewList = customPlaceRepository.getReviewListByPlaceId(
+            placeId, pageable).map(review -> ReviewResponseDto.from(review, requestMember));
 
         Map<Long, Long> reviewReplyCount = customPlaceRepository.getReviewReplyCount(placeId);
 
@@ -265,7 +278,7 @@ public class PlaceService {
             reviewDto.setReplyCount(count);
         }
 
-        return reviewList;
+        return PagedResponseDto.of(reviewList, pageable);
     }
 
 
@@ -274,8 +287,8 @@ public class PlaceService {
     }
 
     @Transactional
-    public void updateReview(UpdateReviewRequestDto requestDto, Member member) {
-        Review review = reviewRepository.findByIdAndMember(requestDto.getReviewId(), member);
+    public void updateReview(Long reviewId, UpdateReviewRequestDto requestDto, Member member) {
+        Review review = reviewRepository.findByIdAndMember(reviewId, member);
         Long placeId = review.getPlace().getId();
 
         ArrayList<String> s3KeyList = new ArrayList<>();
@@ -325,9 +338,9 @@ public class PlaceService {
         }
     }
 
-    public void updateReviewReply(UpdateReviewReplyRequestDto requestDto, Member member) {
-        ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(
-            requestDto.getReviewReplyId(), member);
+    public void updateReviewReply(Long replyId, UpdateReviewReplyRequestDto requestDto,
+        Member member) {
+        ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(replyId, member);
         reviewReply.updateReviewReply(requestDto.getContent());
         reviewReplyRepository.save(reviewReply);
     }
@@ -414,5 +427,12 @@ public class PlaceService {
         String url = s3Service.generateDeleteObjectPresignedUrl(s3Service.bucket,
             requestDto.getS3Key());
         return S3DeletePresignedUrlResponseDto.builder().url(url).build();
+    }
+
+    public PagedResponseDto<ReviewImageResponseDto> getReviewImage(Pageable pageable,
+        Long placeId) {
+        Page<ReviewImageResponseDto> imagePage = reviewImageRepository.findAllByReview_Place_IdOrderByCreatedAtDesc(
+            placeId, pageable).map(ReviewImageResponseDto::from);
+        return PagedResponseDto.of(imagePage, pageable);
     }
 }

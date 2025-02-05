@@ -1,7 +1,6 @@
 package com.jigumulmi.place.dto;
 
 import com.jigumulmi.place.domain.PlaceImage;
-import com.jigumulmi.place.dto.response.PlaceResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

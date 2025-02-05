@@ -13,14 +13,12 @@ import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.repository.BannerRepository;
 import com.jigumulmi.common.FileUtils;
-import com.jigumulmi.common.PageDto;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
-import com.jigumulmi.place.domain.Place;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -92,22 +90,11 @@ public class AdminBannerService {
     }
 
     @Transactional(readOnly = true)
-    public AdminBannerPlaceListResponseDto getMappedPlaceList(Pageable pageable, Long bannerId) {
-        Page<Place> placePage = adminCustomBannerRepository.getAllMappedPlaceByBannerId(pageable,
-            bannerId);
+    public PagedResponseDto<BannerPlaceDto> getMappedPlaceList(Pageable pageable, Long bannerId) {
+        Page<BannerPlaceDto> placePage = adminCustomBannerRepository.getAllMappedPlaceByBannerId(pageable,
+            bannerId).map(BannerPlaceDto::from);
 
-        List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
-            .map(BannerPlaceDto::from).collect(Collectors.toList());
-
-        return AdminBannerPlaceListResponseDto.builder()
-            .data(placeDtoList)
-            .page(PageDto.builder()
-                .totalCount(placePage.getTotalElements())
-                .currentPage(pageable.getPageNumber() + 1)
-                .totalPage(placePage.getTotalPages())
-                .build()
-            )
-            .build();
+        return AdminBannerPlaceListResponseDto.of(placePage, pageable);
     }
 
     @Transactional
@@ -186,22 +173,11 @@ public class AdminBannerService {
     }
 
     @Transactional(readOnly = true)
-    public AdminBannerPlaceListResponseDto getCandidatePlaceList(Pageable pageable,
+    public PagedResponseDto<BannerPlaceDto> getCandidatePlaceList(Pageable pageable,
         GetCandidatePlaceListRequestDto requestDto) {
-        Page<Place> placePage = adminCustomBannerRepository.getAllUnmappedPlaceByBannerIdAndFilters(
-            pageable, requestDto);
+        Page<BannerPlaceDto> placePage = adminCustomBannerRepository.getAllUnmappedPlaceByBannerIdAndFilters(
+            pageable, requestDto).map(BannerPlaceDto::from);
 
-        List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
-            .map(BannerPlaceDto::from).collect(Collectors.toList());
-
-        return AdminBannerPlaceListResponseDto.builder()
-            .data(placeDtoList)
-            .page(PageDto.builder()
-                .totalCount(placePage.getTotalElements())
-                .currentPage(pageable.getPageNumber() + 1)
-                .totalPage(placePage.getTotalPages())
-                .build()
-            )
-            .build();
+        return AdminBannerPlaceListResponseDto.of(placePage, pageable);
     }
 }

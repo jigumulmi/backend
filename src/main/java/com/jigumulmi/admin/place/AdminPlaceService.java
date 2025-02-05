@@ -4,7 +4,7 @@ package com.jigumulmi.admin.place;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto.TemporaryBusinessHourDto;
@@ -12,7 +12,7 @@ import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
 import com.jigumulmi.aws.S3Service;
-import com.jigumulmi.common.PageDto;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
@@ -30,7 +30,7 @@ import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.repository.FixedBusinessHourRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
@@ -74,23 +74,12 @@ public class AdminPlaceService {
     private final TemporaryBusinessHourRepository temporaryBusinessHourRepository;
 
     @Transactional(readOnly = true)
-    public AdminPlaceListResponseDto getPlaceList(Pageable pageable,
+    public PagedResponseDto<PlaceDto> getPlaceList(Pageable pageable,
         AdminGetPlaceListRequestDto requestDto) {
-        Page<Place> placePage = adminCustomPlaceRepository.getPlaceList(pageable,
-            requestDto);
+        Page<PlaceDto> placePage = adminCustomPlaceRepository.getPlaceList(pageable,
+            requestDto).map(PlaceDto::from);
 
-        List<PlaceDto> placeDtoList = placePage.getContent().stream()
-            .map(PlaceDto::from).collect(Collectors.toList());
-
-        return AdminPlaceListResponseDto.builder()
-            .data(placeDtoList)
-            .page(PageDto.builder()
-                .totalCount(placePage.getTotalElements())
-                .currentPage(pageable.getPageNumber() + 1)
-                .totalPage(placePage.getTotalPages())
-                .build()
-            )
-            .build();
+        return AdminPlaceListResponseDto.of(placePage, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -183,7 +172,7 @@ public class AdminPlaceService {
 
     @Transactional
     public void updateFixedBusinessHour(Long placeId,
-        AdminUpdateFixedBusinessHourRequestDto requestDto) {
+        WeeklyBusinessHourDto requestDto) {
         Place place = placeRepository.findById(placeId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
         fixedBusinessHourRepository.deleteAllByPlace(place);
@@ -251,7 +240,7 @@ public class AdminPlaceService {
         List<FixedBusinessHour> fixedBusinessHourList = fixedBusinessHourRepository.findAllByPlaceId(
             placeId);
 
-        AdminUpdateFixedBusinessHourRequestDto fixedBusinessHourResponseDto = new AdminUpdateFixedBusinessHourRequestDto();
+        WeeklyBusinessHourDto fixedBusinessHourResponseDto = new WeeklyBusinessHourDto();
         for (FixedBusinessHour fixedBusinessHour : fixedBusinessHourList) {
             fixedBusinessHourResponseDto.updateBusinessHour(
                 fixedBusinessHour.getDayOfWeek(),

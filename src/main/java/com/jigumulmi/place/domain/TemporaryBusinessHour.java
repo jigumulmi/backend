@@ -36,6 +36,7 @@ public class TemporaryBusinessHour {
     @JoinColumn(name = "place_id")
     private Place place;
 
+    private Integer year;
     private Integer month;
     private Integer weekOfYear;
     private LocalDate date;
@@ -50,10 +51,11 @@ public class TemporaryBusinessHour {
     private Boolean isDayOff;
 
     @Builder
-    public TemporaryBusinessHour(Place place, Integer month, Integer weekOfYear,
+    public TemporaryBusinessHour(Place place, Integer year, Integer month, Integer weekOfYear,
         LocalDate date, DayOfWeek dayOfWeek, LocalTime openTime, LocalTime closeTime,
         LocalTime breakStart, LocalTime breakEnd, Boolean isDayOff) {
         this.place = place;
+        this.year = year;
         this.month = month;
         this.weekOfYear = weekOfYear;
         this.date = date;
@@ -71,6 +73,7 @@ public class TemporaryBusinessHour {
         LocalDate date = requestDto.getDate();
         int weekOfYear = date.get(WeekFields.SUNDAY_START.weekOfYear());
 
+        this.year = date.getYear();
         this.month = date.getMonthValue();
         this.weekOfYear = weekOfYear;
         this.date = date;

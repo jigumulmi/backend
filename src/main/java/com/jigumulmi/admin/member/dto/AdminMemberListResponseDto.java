@@ -1,17 +1,16 @@
 package com.jigumulmi.admin.member.dto;
 
-import com.jigumulmi.common.PageDto;
+import com.jigumulmi.admin.member.dto.AdminMemberListResponseDto.MemberDto;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import java.time.LocalDateTime;
-import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
-public class AdminMemberListResponseDto {
+@SuperBuilder
+public class AdminMemberListResponseDto extends PagedResponseDto<MemberDto> {
 
     @Getter
     @SuperBuilder
@@ -34,7 +33,4 @@ public class AdminMemberListResponseDto {
         }
 
     }
-
-    private PageDto page;
-    private List<MemberDto> data;
 }

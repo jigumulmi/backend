@@ -5,7 +5,7 @@ import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto.BannerPlaceD
 import com.jigumulmi.banner.dto.response.BannerResponseDto;
 import com.jigumulmi.banner.repository.BannerRepository;
 import com.jigumulmi.banner.repository.CustomBannerRepository;
-import com.jigumulmi.common.PageDto;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
 import java.time.LocalDate;
@@ -33,7 +33,7 @@ public class BannerService {
     }
 
     @Transactional(readOnly = true)
-    public BannerPlaceListResponseDto getMappedPlaceList(Pageable pageable, Long bannerId) {
+    public PagedResponseDto<BannerPlaceDto> getMappedPlaceList(Pageable pageable, Long bannerId) {
         Page<Place> placePage = customBannerRepository.getAllMappedPlaceByBannerId(pageable,
             bannerId);
 
@@ -48,16 +48,8 @@ public class BannerService {
         Map<Long, SurroundingDateBusinessHour> surroundingBusinessHourMap = customBannerRepository.getSurroundingBusinessHourByPlaceIdIn(
             placeIdList, localDate);
         placeDtoList.forEach(
-            place -> place.setLiveOpeningStatus(surroundingBusinessHourMap.get(place.getId()), localTime));
+            place -> place.setCurrentOpeningStatus(surroundingBusinessHourMap.get(place.getId()), localTime));
 
-        return BannerPlaceListResponseDto.builder()
-            .data(placeDtoList)
-            .page(PageDto.builder()
-                .totalCount(placePage.getTotalElements())
-                .currentPage(pageable.getPageNumber() + 1)
-                .totalPage(placePage.getTotalPages())
-                .build()
-            )
-            .build();
+        return BannerPlaceListResponseDto.of(placeDtoList, placePage, pageable);
     }
 }

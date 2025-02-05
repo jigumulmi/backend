@@ -1,14 +1,14 @@
 package com.jigumulmi.admin.place;
 
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.place.dto.request.AdminUpdateFixedBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
-import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
-import com.jigumulmi.common.PageableParams;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.ImageDto;
@@ -51,16 +51,11 @@ public class AdminPlaceController {
 
 
     @Operation(summary = "장소 리스트 조회")
-    @ApiResponses(
-        value = {@ApiResponse(responseCode = "200", content = {
-            @Content(schema = @Schema(implementation = AdminPlaceListResponseDto.class))})}
-    )
-    @PageableParams
     @GetMapping("")
-    public ResponseEntity<?> getPlaceList(
+    public ResponseEntity<PagedResponseDto<PlaceDto>> getPlaceList(
         @ParameterObject Pageable pageable,
         @ModelAttribute AdminGetPlaceListRequestDto requestDto) {
-        AdminPlaceListResponseDto placeList = adminPlaceService.getPlaceList(pageable, requestDto);
+        PagedResponseDto<PlaceDto> placeList = adminPlaceService.getPlaceList(pageable, requestDto);
         return ResponseEntity.ok().body(placeList);
     }
 
@@ -116,7 +111,7 @@ public class AdminPlaceController {
     @ApiResponse(responseCode = "201")
     @PutMapping("/{placeId}/business-hour/fixed")
     public ResponseEntity<?> updateFixedBusinessHour(@PathVariable Long placeId,
-        @Valid @RequestBody AdminUpdateFixedBusinessHourRequestDto requestDto) {
+        @Valid @RequestBody WeeklyBusinessHourDto requestDto) {
         adminPlaceService.updateFixedBusinessHour(placeId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

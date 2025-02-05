@@ -84,7 +84,7 @@ public class CustomBannerRepository {
         for (Tuple row : results) {
             Long placeId = row.get(fixedBusinessHour.place.id);
             SurroundingDateBusinessHour surroundingDateBusinessHour = resultMap.getOrDefault(
-                placeId, new SurroundingDateBusinessHour());
+                placeId, SurroundingDateBusinessHour.builder().build());
 
             DayOfWeek dayOfWeek = row.get(fixedBusinessHour.dayOfWeek);
             BusinessHour businessHour = buildBusinessHour(row);
@@ -99,7 +99,7 @@ public class CustomBannerRepository {
         return resultMap;
     }
 
-    private BusinessHour buildBusinessHour(Tuple row) {
+    public BusinessHour buildBusinessHour(Tuple row) {
         if ((row.get(temporaryBusinessHour.openTime) != null
             && row.get(temporaryBusinessHour.closeTime) != null)
             || row.get(temporaryBusinessHour.isDayOff) != null) {

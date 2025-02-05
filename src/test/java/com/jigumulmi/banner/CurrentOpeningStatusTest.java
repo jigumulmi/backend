@@ -2,7 +2,7 @@ package com.jigumulmi.banner;
 
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
-import com.jigumulmi.place.vo.LiveOpeningStatus;
+import com.jigumulmi.place.vo.CurrentOpeningStatus;
 import java.time.LocalTime;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class LiveOpeningStatusTest {
+class CurrentOpeningStatusTest {
 
     static Stream<Arguments> provideBusinessHours() {
         return Stream.of(
@@ -25,7 +25,7 @@ class LiveOpeningStatusTest {
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
                     .build(),
                 LocalTime.of(1, 30),
-                LiveOpeningStatus.OPEN
+                CurrentOpeningStatus.OPEN
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(22, 0)).closeTime(LocalTime.of(2, 0))
@@ -33,7 +33,7 @@ class LiveOpeningStatusTest {
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
                     .build(),
                 LocalTime.of(3, 0),
-                LiveOpeningStatus.BEFORE_OPEN
+                CurrentOpeningStatus.BEFORE_OPEN
             ),
             //
             Arguments.of(
@@ -41,7 +41,7 @@ class LiveOpeningStatusTest {
                     .build(),
                 BusinessHour.builder().isDayOff(true).build(),
                 LocalTime.of(14, 30),
-                LiveOpeningStatus.DAY_OFF
+                CurrentOpeningStatus.DAY_OFF
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
@@ -49,7 +49,7 @@ class LiveOpeningStatusTest {
                 BusinessHour.builder().openTime(LocalTime.of(15, 0)).closeTime(LocalTime.of(22, 0))
                     .build(),
                 LocalTime.of(14, 30),
-                LiveOpeningStatus.BEFORE_OPEN
+                CurrentOpeningStatus.BEFORE_OPEN
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
@@ -61,7 +61,7 @@ class LiveOpeningStatusTest {
                     .breakEnd(LocalTime.of(15, 0))
                     .build(),
                 LocalTime.of(11, 30),
-                LiveOpeningStatus.OPEN
+                CurrentOpeningStatus.OPEN
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
@@ -73,7 +73,7 @@ class LiveOpeningStatusTest {
                     .breakEnd(LocalTime.of(15, 0))
                     .build(),
                 LocalTime.of(14, 30),
-                LiveOpeningStatus.BREAK
+                CurrentOpeningStatus.BREAK
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
@@ -85,7 +85,7 @@ class LiveOpeningStatusTest {
                     .breakEnd(LocalTime.of(15, 0))
                     .build(),
                 LocalTime.of(16, 30),
-                LiveOpeningStatus.OPEN
+                CurrentOpeningStatus.OPEN
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
@@ -93,7 +93,7 @@ class LiveOpeningStatusTest {
                 BusinessHour.builder().openTime(LocalTime.of(10, 0)).closeTime(LocalTime.of(14, 0))
                     .build(),
                 LocalTime.of(14, 30),
-                LiveOpeningStatus.CLOSED
+                CurrentOpeningStatus.CLOSED
             )
         );
     }
@@ -101,15 +101,16 @@ class LiveOpeningStatusTest {
     @ParameterizedTest
     @MethodSource("provideBusinessHours")
     @DisplayName("실시간 영업 정보")
-    public void testGetCurrentOpeningInfo(BusinessHour yesterday, BusinessHour today, LocalTime currentTime,
-        LiveOpeningStatus expectedStatus) {
+    public void testGetLiveOpeningStatus(BusinessHour yesterday, BusinessHour today, LocalTime currentTime,
+        CurrentOpeningStatus expectedStatus) {
         // given
-        SurroundingDateBusinessHour surroundingDateBusinessHour = new SurroundingDateBusinessHour();
-        surroundingDateBusinessHour.setYesterday(yesterday);
-        surroundingDateBusinessHour.setToday(today);
+        SurroundingDateBusinessHour surroundingDateBusinessHour = SurroundingDateBusinessHour.builder()
+            .yesterday(yesterday)
+            .today(today)
+            .build();
 
         // when
-        LiveOpeningStatus actualStatus = LiveOpeningStatus.getCurrentOpeningInfo(surroundingDateBusinessHour,
+        CurrentOpeningStatus actualStatus = CurrentOpeningStatus.getLiveOpeningStatus(surroundingDateBusinessHour,
             currentTime);
 
         // then
