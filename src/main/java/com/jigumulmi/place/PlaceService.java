@@ -205,14 +205,13 @@ public class PlaceService {
     }
 
     @Transactional
-    public void postReview(CreateReviewRequestDto requestDto, Member member) {
+    public void postReview(Long placeId, CreateReviewRequestDto requestDto, Member member) {
         boolean canPostReview = reviewRepository.findTopByPlaceIdAndMemberIdAndDeletedAtIsNull(
-            requestDto.getPlaceId(),
-            member.getId()
+            placeId, member.getId()
         ).isEmpty();
 
         if (canPostReview) {
-            Place place = placeRepository.findById(requestDto.getPlaceId())
+            Place place = placeRepository.findById(placeId)
                 .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
             Review review = Review.builder()
                 .place(place)
@@ -224,7 +223,7 @@ public class PlaceService {
             ArrayList<String> s3KeyList = new ArrayList<>();
             try {
                 for (MultipartFile image : requestDto.getImageList()) {
-                    String s3Key = REVIEW_IMAGE_S3_PREFIX + requestDto.getPlaceId() + "/"
+                    String s3Key = REVIEW_IMAGE_S3_PREFIX + placeId + "/"
                         + FileUtils.generateUniqueFilename(image);
 
                     s3KeyList.add(s3Key);
@@ -253,9 +252,9 @@ public class PlaceService {
         }
     }
 
-    public void postReviewReply(CreateReviewReplyRequestDto requestDto, Member member) {
-
-        Review review = reviewRepository.findById(requestDto.getReviewId())
+    public void postReviewReply(Long reviewId, CreateReviewReplyRequestDto requestDto,
+        Member member) {
+        Review review = reviewRepository.findById(reviewId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
         ReviewReply reviewReply = ReviewReply.builder()
             .review(review)
@@ -288,8 +287,8 @@ public class PlaceService {
     }
 
     @Transactional
-    public void updateReview(UpdateReviewRequestDto requestDto, Member member) {
-        Review review = reviewRepository.findByIdAndMember(requestDto.getReviewId(), member);
+    public void updateReview(Long reviewId, UpdateReviewRequestDto requestDto, Member member) {
+        Review review = reviewRepository.findByIdAndMember(reviewId, member);
         Long placeId = review.getPlace().getId();
 
         ArrayList<String> s3KeyList = new ArrayList<>();
@@ -339,9 +338,9 @@ public class PlaceService {
         }
     }
 
-    public void updateReviewReply(UpdateReviewReplyRequestDto requestDto, Member member) {
-        ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(
-            requestDto.getReviewReplyId(), member);
+    public void updateReviewReply(Long replyId, UpdateReviewReplyRequestDto requestDto,
+        Member member) {
+        ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(replyId, member);
         reviewReply.updateReviewReply(requestDto.getContent());
         reviewReplyRepository.save(reviewReply);
     }

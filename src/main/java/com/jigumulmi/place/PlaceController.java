@@ -141,21 +141,21 @@ public class PlaceController {
 
     @Operation(summary = "리뷰 등록")
     @ApiResponse(responseCode = "201")
-    @PostMapping(path = "/review", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> postReview(
+    @PostMapping(path = "/{placeId}/review", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> postReview(@PathVariable Long placeId,
         @Valid @ModelAttribute CreateReviewRequestDto requestDto,
         @RequiredAuthUser Member member) {
-        placeService.postReview(requestDto, member);
+        placeService.postReview(placeId, requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
     }
 
     @Operation(summary = "리뷰의 답글 등록")
     @ApiResponse(responseCode = "201")
-    @PostMapping("/review/reply")
-    public ResponseEntity<?> postReviewReply(
+    @PostMapping("/review/{reviewId}/reply")
+    public ResponseEntity<?> postReviewReply(@PathVariable Long reviewId,
         @Valid @RequestBody CreateReviewReplyRequestDto requestDto,
         @RequiredAuthUser Member member) {
-        placeService.postReviewReply(requestDto, member);
+        placeService.postReviewReply(reviewId, requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review reply success");
     }
 
@@ -172,14 +172,10 @@ public class PlaceController {
     }
 
     @Operation(summary = "답글 목록 조회")
-    @ApiResponses(
-        value = {@ApiResponse(responseCode = "200", content = {
-            @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewReplyResponseDto.class)))})}
-    )
-    @GetMapping("/review/reply")
-    public ResponseEntity<?> getReviewReplyList(
+    @GetMapping("/review/{reviewId}/reply")
+    public ResponseEntity<List<ReviewReplyResponseDto>> getReviewReplyList(
         @OptionalAuthUser Member member,
-        @RequestParam(name = "reviewId") Long reviewId) {
+        @PathVariable Long reviewId) {
         List<ReviewReplyResponseDto> reviewReplyList = placeService.getReviewReplyList(member,
             reviewId);
         return ResponseEntity.ok().body(reviewReplyList);
@@ -187,27 +183,28 @@ public class PlaceController {
 
     @Operation(summary = "리뷰 수정")
     @ApiResponse(responseCode = "204")
-    @PutMapping(path = "/review", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<?> updateReview(@Valid @ModelAttribute UpdateReviewRequestDto requestDto,
+    @PutMapping(path = "/review/{reviewId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<?> updateReview(@PathVariable Long reviewId,
+        @Valid @ModelAttribute UpdateReviewRequestDto requestDto,
         @RequiredAuthUser Member member) {
-        placeService.updateReview(requestDto, member);
+        placeService.updateReview(reviewId, requestDto, member);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "답글 수정")
     @ApiResponse(responseCode = "204")
-    @PutMapping("/review/reply")
-    public ResponseEntity<?> updateReviewReply(
+    @PutMapping("/review/reply/{reviewReplyId}")
+    public ResponseEntity<?> updateReviewReply(@PathVariable Long reviewReplyId,
         @Valid @RequestBody UpdateReviewReplyRequestDto requestDto,
         @RequiredAuthUser Member member) {
-        placeService.updateReviewReply(requestDto, member);
+        placeService.updateReviewReply(reviewReplyId, requestDto, member);
         return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "리뷰 삭제")
     @ApiResponse(responseCode = "204")
     @DeleteMapping("/review/{reviewId}")
-    public ResponseEntity<?> deleteReview(@PathVariable(name = "reviewId") Long reviewId,
+    public ResponseEntity<?> deleteReview(@PathVariable Long reviewId,
         @RequiredAuthUser Member member) {
         placeService.deleteReview(reviewId, member);
         return ResponseEntity.noContent().build();
@@ -216,8 +213,7 @@ public class PlaceController {
     @Operation(summary = "답글 삭제")
     @ApiResponse(responseCode = "204")
     @DeleteMapping("/review/reply/{reviewReplyId}")
-    public ResponseEntity<?> deleteReviewReply(
-        @PathVariable(name = "reviewReplyId") Long reviewReplyId,
+    public ResponseEntity<?> deleteReviewReply(@PathVariable Long reviewReplyId,
         @RequiredAuthUser Member member) {
         placeService.deleteReviewReply(reviewReplyId, member);
         return ResponseEntity.noContent().build();
