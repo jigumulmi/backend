@@ -1,5 +1,6 @@
 package com.jigumulmi.place;
 
+import com.jigumulmi.common.PageableParams;
 import com.jigumulmi.config.security.OptionalAuthUser;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
@@ -10,6 +11,7 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
+import com.jigumulmi.place.dto.response.MenuListResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
@@ -27,6 +29,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -101,6 +105,15 @@ public class PlaceController {
     public ResponseEntity<PlaceBasicResponseDto> getPlaceHome(@PathVariable Long placeId) {
         PlaceBasicResponseDto placeDetail = placeService.getPlaceBasic(placeId);
         return ResponseEntity.ok().body(placeDetail);
+    }
+
+    @Operation(summary = "장소 메뉴정보 조회", description = "홈 탭과 메뉴 탭에서 모두 사용 -> size 파라미터 조정")
+    @PageableParams
+    @GetMapping("/{placeId}/menu")
+    public ResponseEntity<MenuListResponseDto> getPlaceMenu(@ParameterObject Pageable pageable,
+        @PathVariable Long placeId) {
+        MenuListResponseDto responseDto = placeService.getPlaceMenu(pageable, placeId);
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @Operation(summary = "리뷰 등록")

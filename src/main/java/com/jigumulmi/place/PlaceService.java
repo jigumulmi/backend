@@ -3,6 +3,7 @@ package com.jigumulmi.place;
 import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.common.FileUtils;
+import com.jigumulmi.common.PageDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;
@@ -17,6 +18,7 @@ import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
+import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
@@ -24,6 +26,7 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
+import com.jigumulmi.place.dto.response.MenuListResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto.NextOpeningInfo;
@@ -62,6 +65,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -164,6 +169,17 @@ public class PlaceService {
         place.setLiveOpeningInfo(liveOpeningInfoDto);
 
         return place;
+    }
+
+    public MenuListResponseDto getPlaceMenu(Pageable pageable, Long placeId) {
+        Page<Menu> menuPage = menuRepository.findAllByPlaceId(placeId, pageable);
+
+        List<MenuDto> menuDtoList = menuPage.getContent().stream().map(MenuDto::from).toList();
+
+        return MenuListResponseDto.builder()
+            .page(PageDto.of(menuPage, pageable))
+            .data(menuDtoList)
+            .build();
     }
 
     @Transactional
