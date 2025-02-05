@@ -13,11 +13,11 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
-import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
+import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
 import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -159,19 +159,19 @@ public class PlaceController {
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review reply success");
     }
 
-    @Operation(summary = "리뷰 리스트 조회")
-    @ApiResponses(
-        value = {@ApiResponse(responseCode = "200", content = {
-            @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewResponseDto.class)))})}
-    )
-    @GetMapping("/review")
-    public ResponseEntity<?> getReviewList(@OptionalAuthUser Member member,
-        @RequestParam(name = "placeId") Long placeId) {
-        List<ReviewResponseDto> reviewList = placeService.getReviewList(member, placeId);
+    @Operation(summary = "리뷰 목록 조회", description = "홈 탭과 리뷰 탭에서 모두 사용 -> size 파라미터 조정")
+    @PageableParams
+    @GetMapping("/{placeId}/review")
+    public ResponseEntity<PagedResponseDto<ReviewResponseDto>> getReviewList(
+        @OptionalAuthUser Member member,
+        @ParameterObject Pageable pageable,
+        @PathVariable Long placeId) {
+        PagedResponseDto<ReviewResponseDto> reviewList = placeService.getReviewList(member,
+            pageable, placeId);
         return ResponseEntity.ok().body(reviewList);
     }
 
-    @Operation(summary = "답글 리스트 조회")
+    @Operation(summary = "답글 목록 조회")
     @ApiResponses(
         value = {@ApiResponse(responseCode = "200", content = {
             @Content(array = @ArraySchema(schema = @Schema(implementation = ReviewReplyResponseDto.class)))})}

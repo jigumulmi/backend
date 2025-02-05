@@ -25,12 +25,11 @@ import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.banner.repository.CustomBannerRepository;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
+import com.jigumulmi.place.domain.Review;
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
-import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
-import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
@@ -41,6 +40,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -49,6 +49,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -184,53 +187,22 @@ public class CustomPlaceRepository {
             .transform(groupBy(review.rating).as(review.rating.count()));
     }
 
-
-    public List<ReviewResponseDto> getReviewListByPlaceId(Long placeId, Member requestMember) {
-        // fetchJoin() 과 Projections 동시 사용 불가
-        // 엔티티인 상태로 탐색하는 것이 fetchJoin이기 때문
-
-        return queryFactory
+    public Page<Review> getReviewListByPlaceId(Long placeId, Pageable pageable) {
+        List<Review> reviewList = queryFactory
             .selectFrom(review)
-            .join(review.member, member)
-            .leftJoin(review.reviewImageList, reviewImage)
+            .join(review.member, member).fetchJoin()
             .where(review.place.id.eq(placeId))
-            .orderBy(review.createdAt.desc(), reviewImage.createdAt.desc())
-            .transform(
-                groupBy(review.id).list(
-                    Projections.fields(ReviewResponseDto.class,
-                        stringTemplate(
-                            "DATE_FORMAT({0}, {1})",
-                            review.modifiedAt,
-                            ConstantImpl.create("%Y.%m.%d")
-                        ).as("reviewedAt"),
-                        review.deletedAt,
-                        review.createdAt,
-                        review.id,
-                        review.rating,
-                        review.content,
-                        new CaseBuilder()
-                            .when(memberEq(requestMember)).then(true)
-                            .otherwise(false).as("isEditable"),
-                        Projections.fields(MemberDetailResponseDto.class,
-                            review.member.createdAt,
-                            review.member.deregisteredAt,
-                            review.member.id,
-                            review.member.nickname,
-                            review.member.email).as("member"),
-                        new CaseBuilder()
-                            .when(review.createdAt.eq(review.modifiedAt)).then(false)
-                            .otherwise(true).as("isEdited"),
-                        list(
-                            Projections.fields(
-                                ReviewImageResponseDto.class,
-                                reviewImage.id,
-                                reviewImage.s3Key,
-                                reviewImage.createdAt
-                            ).skipNulls()
-                        ).as("imageList")
-                    )
-                )
-            );
+            .orderBy(review.createdAt.desc())
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        JPAQuery<Long> totalCountQuery = queryFactory
+            .select(review.count())
+            .from(review)
+            .where(review.place.id.eq(placeId));
+
+        return PageableExecutionUtils.getPage(reviewList, pageable, totalCountQuery::fetchOne);
     }
 
     private BooleanExpression memberEq(Member requestMember) {

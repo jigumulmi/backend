@@ -28,7 +28,6 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
-import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto.NextOpeningInfo;
@@ -36,6 +35,7 @@ import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
+import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
 import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -266,9 +266,11 @@ public class PlaceService {
         reviewReplyRepository.save(reviewReply);
     }
 
-    public List<ReviewResponseDto> getReviewList(Member member, Long placeId) {
-        List<ReviewResponseDto> reviewList = customPlaceRepository.getReviewListByPlaceId(
-            placeId, member);
+    @Transactional(readOnly = true)
+    public PagedResponseDto<ReviewResponseDto> getReviewList(Member requestMember,
+        Pageable pageable, Long placeId) {
+        Page<ReviewResponseDto> reviewList = customPlaceRepository.getReviewListByPlaceId(
+            placeId, pageable).map(review -> ReviewResponseDto.from(review, requestMember));
 
         Map<Long, Long> reviewReplyCount = customPlaceRepository.getReviewReplyCount(placeId);
 
@@ -277,7 +279,7 @@ public class PlaceService {
             reviewDto.setReplyCount(count);
         }
 
-        return reviewList;
+        return PagedResponseDto.of(reviewList, pageable);
     }
 
 
