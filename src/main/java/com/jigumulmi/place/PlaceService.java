@@ -1,5 +1,7 @@
 package com.jigumulmi.place;
 
+import static java.lang.Math.round;
+
 import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.common.FileUtils;
@@ -26,6 +28,7 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
+import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto.NextOpeningInfo;
@@ -173,6 +176,28 @@ public class PlaceService {
     public PagedResponseDto<MenuDto> getPlaceMenu(Pageable pageable, Long placeId) {
         Page<MenuDto> menuPage = menuRepository.findAllByPlaceId(placeId, pageable).map(MenuDto::from);
         return PagedResponseDto.of(menuPage, pageable);
+    }
+
+    public OverallReviewResponseDto getReviewStatistics(Long placeId) {
+        Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
+            placeId);
+
+        long totalCount = 0L;
+        long totalRating = 0L;
+        for (int i = 1; i <= 5; i++) {
+            reviewRatingStatMap.putIfAbsent(i, 0L);
+
+            Long count = reviewRatingStatMap.get(i);
+            totalCount += count;
+            totalRating += (count * i);
+        }
+        Double averageRating = round((float) totalRating / totalCount * 100) / 100.0; // 소수점 둘째자리까지
+
+        return OverallReviewResponseDto.builder()
+            .averageRating(averageRating)
+            .totalCount(totalCount)
+            .statistics(reviewRatingStatMap)
+            .build();
     }
 
     @Transactional
