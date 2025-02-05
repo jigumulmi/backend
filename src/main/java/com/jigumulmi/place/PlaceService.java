@@ -28,11 +28,12 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
-import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
+import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto.NextOpeningInfo;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
+import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
@@ -125,7 +126,8 @@ public class PlaceService {
             .isMain(true)
             .build();
 
-        newPlace.addCategoryAndSubwayStation(new ArrayList<>(), Collections.singletonList(subwayStationPlace));
+        newPlace.addCategoryAndSubwayStation(new ArrayList<>(),
+            Collections.singletonList(subwayStationPlace));
         newPlace.addMenu(menuList);
 
         placeRepository.save(newPlace);
@@ -135,7 +137,8 @@ public class PlaceService {
     public PlaceBasicResponseDto getPlaceBasic(Long placeId) {
         PlaceBasicResponseDto place = customPlaceRepository.getPlaceById(placeId);
 
-        List<PlaceCategoryDto> categoryDtoList = placeCategoryMappingRepository.findByPlace_Id(placeId)
+        List<PlaceCategoryDto> categoryDtoList = placeCategoryMappingRepository.findByPlace_Id(
+                placeId)
             .stream()
             .map(PlaceCategoryDto::fromPlaceCategoryMapping).toList();
         place.setCategoryList(categoryDtoList);
@@ -174,11 +177,12 @@ public class PlaceService {
     }
 
     public PagedResponseDto<MenuDto> getPlaceMenu(Pageable pageable, Long placeId) {
-        Page<MenuDto> menuPage = menuRepository.findAllByPlaceId(placeId, pageable).map(MenuDto::from);
+        Page<MenuDto> menuPage = menuRepository.findAllByPlaceId(placeId, pageable)
+            .map(MenuDto::from);
         return PagedResponseDto.of(menuPage, pageable);
     }
 
-    public OverallReviewResponseDto getReviewStatistics(Long placeId) {
+    public ReviewStatisticsResponseDto getReviewStatistics(Long placeId) {
         Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
             placeId);
 
@@ -193,7 +197,7 @@ public class PlaceService {
         }
         Double averageRating = round((float) totalRating / totalCount * 100) / 100.0; // 소수점 둘째자리까지
 
-        return OverallReviewResponseDto.builder()
+        return ReviewStatisticsResponseDto.builder()
             .averageRating(averageRating)
             .totalCount(totalCount)
             .statistics(reviewRatingStatMap)
@@ -422,5 +426,12 @@ public class PlaceService {
         String url = s3Service.generateDeleteObjectPresignedUrl(s3Service.bucket,
             requestDto.getS3Key());
         return S3DeletePresignedUrlResponseDto.builder().url(url).build();
+    }
+
+    public PagedResponseDto<ReviewImageResponseDto> getReviewImage(Pageable pageable,
+        Long placeId) {
+        Page<ReviewImageResponseDto> imagePage = reviewImageRepository.findAllByReview_Place_IdOrderByCreatedAtDesc(
+            placeId, pageable).map(ReviewImageResponseDto::from);
+        return PagedResponseDto.of(imagePage, pageable);
     }
 }

@@ -13,8 +13,9 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
-import com.jigumulmi.place.dto.response.OverallReviewResponseDto;
+import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
+import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
@@ -121,10 +122,21 @@ public class PlaceController {
 
     @Operation(summary = "장소 리뷰 통계 조회", description = "홈 탭과 리뷰 탭에서 모두 사용")
     @GetMapping("/{placeId}/review/statistics")
-    public ResponseEntity<OverallReviewResponseDto> getReviewStatistics(
+    public ResponseEntity<ReviewStatisticsResponseDto> getReviewStatistics(
         @PathVariable Long placeId) {
-        OverallReviewResponseDto reviewStatistics = placeService.getReviewStatistics(placeId);
+        ReviewStatisticsResponseDto reviewStatistics = placeService.getReviewStatistics(placeId);
         return ResponseEntity.ok().body(reviewStatistics);
+    }
+
+    @Operation(summary = "리뷰 사진 모음 조회", description = "홈 탭과 리뷰 탭에서 모두 사용 -> size 파라미터 조정")
+    @PageableParams
+    @GetMapping("/{placeId}/review/image")
+    public ResponseEntity<PagedResponseDto<ReviewImageResponseDto>> getReviewImage(
+        @ParameterObject Pageable pageable,
+        @PathVariable Long placeId) {
+        PagedResponseDto<ReviewImageResponseDto> responseDto = placeService.getReviewImage(pageable,
+            placeId);
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @Operation(summary = "리뷰 등록")

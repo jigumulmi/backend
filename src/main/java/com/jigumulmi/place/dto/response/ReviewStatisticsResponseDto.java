@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class OverallReviewResponseDto {
+public class ReviewStatisticsResponseDto {
 
     private Double averageRating;
     private Long totalCount;
