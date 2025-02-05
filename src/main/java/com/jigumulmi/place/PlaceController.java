@@ -99,7 +99,7 @@ public class PlaceController {
     @Operation(summary = "장소 기본정보 조회")
     @GetMapping("/{placeId}/basic")
     public ResponseEntity<PlaceBasicResponseDto> getPlaceHome(@PathVariable Long placeId) {
-        PlaceBasicResponseDto placeDetail = placeService.getPlaceDetail(placeId);
+        PlaceBasicResponseDto placeDetail = placeService.getPlaceBasic(placeId);
         return ResponseEntity.ok().body(placeDetail);
     }
 
@@ -206,7 +206,8 @@ public class PlaceController {
     public ResponseEntity<?> createMenuImageS3PutPresignedUrl(
         @RequestBody MenuImageS3PutPresignedUrlRequestDto requestDto,
         @RequiredAuthUser Member Member) {
-        S3PutPresignedUrlResponseDto responseDto = placeService.createMenuImageS3PutPresignedUrl(requestDto);
+        S3PutPresignedUrlResponseDto responseDto = placeService.createMenuImageS3PutPresignedUrl(
+            requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 

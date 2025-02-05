@@ -125,7 +125,7 @@ public class PlaceService {
     }
 
     @Transactional(readOnly = true)
-    public PlaceBasicResponseDto getPlaceDetail(Long placeId) {
+    public PlaceBasicResponseDto getPlaceBasic(Long placeId) {
         PlaceBasicResponseDto place = customPlaceRepository.getPlaceById(placeId);
 
         List<PlaceCategoryDto> categoryDtoList = placeCategoryMappingRepository.findByPlace_Id(placeId)
