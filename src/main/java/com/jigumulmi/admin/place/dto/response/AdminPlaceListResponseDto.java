@@ -1,6 +1,7 @@
 package com.jigumulmi.admin.place.dto.response;
 
-import com.jigumulmi.common.PageDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.PositionDto;
@@ -12,10 +13,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
-public class AdminPlaceListResponseDto {
+@SuperBuilder
+public class AdminPlaceListResponseDto extends PagedResponseDto<PlaceDto> {
 
     @Getter
     @Builder
@@ -65,7 +67,4 @@ public class AdminPlaceListResponseDto {
                 .build();
         }
     }
-
-    private PageDto page;
-    private List<PlaceDto> data;
 }

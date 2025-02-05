@@ -1,6 +1,7 @@
 package com.jigumulmi.banner.dto.response;
 
-import com.jigumulmi.common.PageDto;
+import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto.BannerPlaceDto;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
@@ -12,10 +13,11 @@ import java.time.LocalTime;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
-public class BannerPlaceListResponseDto {
+@SuperBuilder
+public class BannerPlaceListResponseDto extends PagedResponseDto<BannerPlaceDto> {
 
     @Getter
     @Builder
@@ -47,8 +49,4 @@ public class BannerPlaceListResponseDto {
                 surroundingDateBusinessHour, currentTime);
         }
     }
-
-    private PageDto page;
-    private List<BannerPlaceDto> data;
-
 }

@@ -3,7 +3,7 @@ package com.jigumulmi.place;
 import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.common.FileUtils;
-import com.jigumulmi.common.PageDto;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;
@@ -26,7 +26,6 @@ import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
-import com.jigumulmi.place.dto.response.MenuListResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto.LiveOpeningInfoDto.NextOpeningInfo;
@@ -171,15 +170,9 @@ public class PlaceService {
         return place;
     }
 
-    public MenuListResponseDto getPlaceMenu(Pageable pageable, Long placeId) {
-        Page<Menu> menuPage = menuRepository.findAllByPlaceId(placeId, pageable);
-
-        List<MenuDto> menuDtoList = menuPage.getContent().stream().map(MenuDto::from).toList();
-
-        return MenuListResponseDto.builder()
-            .page(PageDto.of(menuPage, pageable))
-            .data(menuDtoList)
-            .build();
+    public PagedResponseDto<MenuDto> getPlaceMenu(Pageable pageable, Long placeId) {
+        Page<MenuDto> menuPage = menuRepository.findAllByPlaceId(placeId, pageable).map(MenuDto::from);
+        return PagedResponseDto.of(menuPage, pageable);
     }
 
     @Transactional

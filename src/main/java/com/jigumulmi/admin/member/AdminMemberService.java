@@ -2,7 +2,7 @@ package com.jigumulmi.admin.member;
 
 import com.jigumulmi.admin.member.dto.AdminMemberListResponseDto;
 import com.jigumulmi.admin.member.dto.AdminMemberListResponseDto.MemberDto;
-import com.jigumulmi.common.PageDto;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,13 +16,9 @@ public class AdminMemberService {
     private final MemberRepository memberRepository;
 
 
-    public AdminMemberListResponseDto getMemberList(Pageable pageable) {
+    public PagedResponseDto<MemberDto> getMemberList(Pageable pageable) {
         Page<MemberDto> memberPage = memberRepository.findAll(pageable).map(MemberDto::from);
-
-        return AdminMemberListResponseDto.builder()
-            .data(memberPage.getContent())
-            .page(PageDto.of(memberPage, pageable))
-            .build();
+        return AdminMemberListResponseDto.of(memberPage, pageable);
     }
 
 }

@@ -6,9 +6,12 @@ import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
+import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
 import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.common.PageableParams;
+import com.jigumulmi.common.PagedResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -90,13 +93,12 @@ public class AdminBannerController {
     }
 
     @Operation(summary = "배너와 연관된 장소 목록 조회")
-    @ApiResponse(responseCode = "200", content = {
-        @Content(schema = @Schema(implementation = AdminBannerPlaceListResponseDto.class))})
     @PageableParams
     @GetMapping("/{bannerId}/place")
-    public ResponseEntity<?> getMappedPlaceList(@ParameterObject Pageable pageable,
+    public ResponseEntity<PagedResponseDto<BannerPlaceDto>> getMappedPlaceList(
+        @ParameterObject Pageable pageable,
         @PathVariable Long bannerId) {
-        AdminBannerPlaceListResponseDto responseDto = adminBannerService.getMappedPlaceList(
+        PagedResponseDto<BannerPlaceDto> responseDto = adminBannerService.getMappedPlaceList(
             pageable, bannerId);
         return ResponseEntity.ok(responseDto);
     }
@@ -137,13 +139,12 @@ public class AdminBannerController {
     }
 
     @Operation(summary = "할당 가능한 장소 목록 조회")
-    @ApiResponse(responseCode = "200", content = {
-        @Content(schema = @Schema(implementation = AdminBannerPlaceListResponseDto.class))})
     @PageableParams
     @GetMapping("/place")
-    public ResponseEntity<?> getCandidatePlaceList(@ParameterObject Pageable pageable,
+    public ResponseEntity<PagedResponseDto<BannerPlaceDto>> getCandidatePlaceList(
+        @ParameterObject Pageable pageable,
         @Valid @ModelAttribute GetCandidatePlaceListRequestDto requestDto) {
-        AdminBannerPlaceListResponseDto responseDto = adminBannerService.getCandidatePlaceList(
+        PagedResponseDto<BannerPlaceDto> responseDto = adminBannerService.getCandidatePlaceList(
             pageable, requestDto);
         return ResponseEntity.ok(responseDto);
     }

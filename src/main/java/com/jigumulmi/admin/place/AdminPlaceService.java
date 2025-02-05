@@ -12,7 +12,7 @@ import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
 import com.jigumulmi.aws.S3Service;
-import com.jigumulmi.common.PageDto;
+import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
@@ -74,18 +74,12 @@ public class AdminPlaceService {
     private final TemporaryBusinessHourRepository temporaryBusinessHourRepository;
 
     @Transactional(readOnly = true)
-    public AdminPlaceListResponseDto getPlaceList(Pageable pageable,
+    public PagedResponseDto<PlaceDto> getPlaceList(Pageable pageable,
         AdminGetPlaceListRequestDto requestDto) {
-        Page<Place> placePage = adminCustomPlaceRepository.getPlaceList(pageable,
-            requestDto);
+        Page<PlaceDto> placePage = adminCustomPlaceRepository.getPlaceList(pageable,
+            requestDto).map(PlaceDto::from);
 
-        List<PlaceDto> placeDtoList = placePage.getContent().stream()
-            .map(PlaceDto::from).collect(Collectors.toList());
-
-        return AdminPlaceListResponseDto.builder()
-            .data(placeDtoList)
-            .page(PageDto.of(placePage, pageable))
-            .build();
+        return AdminPlaceListResponseDto.of(placePage, pageable);
     }
 
     @Transactional(readOnly = true)
