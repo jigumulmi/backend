@@ -1,7 +1,6 @@
 package com.jigumulmi.admin.member;
 
 import com.jigumulmi.admin.member.dto.AdminMemberListResponseDto.MemberDto;
-import com.jigumulmi.common.PageableParams;
 import com.jigumulmi.common.PagedResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +21,6 @@ public class AdminMemberController {
     private final AdminMemberService adminMemberService;
 
     @Operation(summary = "멤버 리스트 조회")
-    @PageableParams
     @GetMapping("")
     public ResponseEntity<PagedResponseDto<MemberDto>> getMemberList(
         @ParameterObject Pageable pageable) {

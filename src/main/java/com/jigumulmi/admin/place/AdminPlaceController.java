@@ -8,7 +8,6 @@ import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
-import com.jigumulmi.common.PageableParams;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
@@ -52,7 +51,6 @@ public class AdminPlaceController {
 
 
     @Operation(summary = "장소 리스트 조회")
-    @PageableParams
     @GetMapping("")
     public ResponseEntity<PagedResponseDto<PlaceDto>> getPlaceList(
         @ParameterObject Pageable pageable,

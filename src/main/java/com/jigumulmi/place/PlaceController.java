@@ -1,6 +1,5 @@
 package com.jigumulmi.place;
 
-import com.jigumulmi.common.PageableParams;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.security.OptionalAuthUser;
 import com.jigumulmi.config.security.RequiredAuthUser;
@@ -103,7 +102,7 @@ public class PlaceController {
         return ResponseEntity.ok().body(placeCategoryList);
     }
 
-    @Operation(summary = "장소 기본정보 조회")
+    @Operation(summary = "장소 기본정보 조회", description = "홈 탭에서 사용")
     @GetMapping("/{placeId}/basic")
     public ResponseEntity<PlaceBasicResponseDto> getPlaceHome(@PathVariable Long placeId) {
         PlaceBasicResponseDto placeDetail = placeService.getPlaceBasic(placeId);
@@ -111,7 +110,6 @@ public class PlaceController {
     }
 
     @Operation(summary = "장소 메뉴정보 조회", description = "홈 탭과 메뉴 탭에서 모두 사용 -> size 파라미터 조정")
-    @PageableParams
     @GetMapping("/{placeId}/menu")
     public ResponseEntity<PagedResponseDto<MenuDto>> getPlaceMenu(
         @ParameterObject Pageable pageable,
@@ -129,7 +127,6 @@ public class PlaceController {
     }
 
     @Operation(summary = "리뷰 사진 모음 조회", description = "홈 탭과 리뷰 탭에서 모두 사용 -> size 파라미터 조정")
-    @PageableParams
     @GetMapping("/{placeId}/review/image")
     public ResponseEntity<PagedResponseDto<ReviewImageResponseDto>> getReviewImage(
         @ParameterObject Pageable pageable,
@@ -160,7 +157,6 @@ public class PlaceController {
     }
 
     @Operation(summary = "리뷰 목록 조회", description = "홈 탭과 리뷰 탭에서 모두 사용 -> size 파라미터 조정")
-    @PageableParams
     @GetMapping("/{placeId}/review")
     public ResponseEntity<PagedResponseDto<ReviewResponseDto>> getReviewList(
         @OptionalAuthUser Member member,

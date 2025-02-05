@@ -5,12 +5,9 @@ import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerDetailResponseDto;
-import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
 import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
-import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
-import com.jigumulmi.common.PageableParams;
 import com.jigumulmi.common.PagedResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -93,7 +90,6 @@ public class AdminBannerController {
     }
 
     @Operation(summary = "배너와 연관된 장소 목록 조회")
-    @PageableParams
     @GetMapping("/{bannerId}/place")
     public ResponseEntity<PagedResponseDto<BannerPlaceDto>> getMappedPlaceList(
         @ParameterObject Pageable pageable,
@@ -139,7 +135,6 @@ public class AdminBannerController {
     }
 
     @Operation(summary = "할당 가능한 장소 목록 조회")
-    @PageableParams
     @GetMapping("/place")
     public ResponseEntity<PagedResponseDto<BannerPlaceDto>> getCandidatePlaceList(
         @ParameterObject Pageable pageable,

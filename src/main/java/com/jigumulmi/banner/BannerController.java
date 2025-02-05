@@ -1,9 +1,7 @@
 package com.jigumulmi.banner;
 
-import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto;
 import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.banner.dto.response.BannerResponseDto;
-import com.jigumulmi.common.PageableParams;
 import com.jigumulmi.common.PagedResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.List;
@@ -32,7 +30,6 @@ public class BannerController {
 
     @Operation(summary = "배너에 연관된 장소 목록 조회")
     @GetMapping("/{bannerId}/place")
-    @PageableParams
     public ResponseEntity<PagedResponseDto<BannerPlaceDto>> getMappedPlaceList(
         @ParameterObject Pageable pageable,
         @PathVariable Long bannerId) {
