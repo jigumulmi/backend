@@ -8,7 +8,6 @@ import static com.jigumulmi.place.domain.QPlace.place;
 import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
 import static com.jigumulmi.place.domain.QPlaceLike.placeLike;
 import static com.jigumulmi.place.domain.QReview.review;
-import static com.jigumulmi.place.domain.QReviewImage.reviewImage;
 import static com.jigumulmi.place.domain.QReviewReply.reviewReply;
 import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
 import static com.jigumulmi.place.domain.QSubwayStationLine.subwayStationLine;
@@ -27,7 +26,6 @@ import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.place.domain.Review;
 import com.jigumulmi.place.dto.BusinessHour;
-import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
@@ -107,10 +105,6 @@ public class CustomPlaceRepository {
                     Projections.fields(PlaceBasicResponseDto.class,
                         place.id,
                         place.name,
-                        Projections.fields(PositionDto.class,
-                            place.latitude,
-                            place.longitude
-                        ).as("position"),
                         place.address,
                         place.contact,
                         place.additionalInfo,
