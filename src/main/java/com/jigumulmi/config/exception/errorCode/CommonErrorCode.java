@@ -12,11 +12,11 @@ import static com.fasterxml.jackson.annotation.JsonFormat.Shape.OBJECT;
 @Getter
 public enum CommonErrorCode implements ErrorCode {
     INVALID_PARAMETER(HttpStatus.BAD_REQUEST, "Invalid parameter included"),
-    RDB_INTEGRITY_VIOLATION(HttpStatus.BAD_REQUEST, "Cannot execute sql statement"),
     UNPROCESSABLE_ENTITY(HttpStatus.UNPROCESSABLE_ENTITY, "Invalid http request"),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "Login required"),
     FORBIDDEN(HttpStatus.FORBIDDEN, "Admin role required"),
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "Resource not exists"),
+    RDB_INTEGRITY_VIOLATION(HttpStatus.INTERNAL_SERVER_ERROR, "Cannot execute sql statement"),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
     ;
 

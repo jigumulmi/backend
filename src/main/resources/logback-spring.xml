@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+  <property name="ACCESS_LOG_PATH" value="./logs/access/"/>
+  <property name="ERROR_LOG_PATH" value="./logs/error/"/>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <charset>utf8</charset>
+      <pattern>
+        %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+      </pattern>
+    </encoder>
+  </appender>
+
+  <appender name="ACCESS_FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${ACCESS_LOG_PATH}/access-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <maxFileSize>20MB</maxFileSize>
+      <maxHistory>7</maxHistory>
+      <totalSizeCap>9GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <charset>utf8</charset>
+      <pattern>%msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <appender name="ERROR_FILE_APPENDER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+      <fileNamePattern>${ERROR_LOG_PATH}/error-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <maxFileSize>20MB</maxFileSize>
+      <maxHistory>7</maxHistory>
+      <totalSizeCap>9GB</totalSizeCap>
+    </rollingPolicy>
+    <encoder>
+      <charset>utf8</charset>
+      <pattern>${FILE_LOG_PATTERN}</pattern>
+    </encoder>
+  </appender>
+
+<!--  로컬 환경-->
+  <springProfile name="local">
+<!--    <root level="INFO">-->
+<!--      <appender-ref ref="STDOUT" />-->
+<!--    </root>-->
+
+<!--    <logger name="ERROR_LOGGER" level="ERROR" additivity="true">-->
+<!--      <appender-ref ref="ERROR_FILE_APPENDER"/>-->
+<!--    </logger>-->
+
+<!--    <logger name="ACCESS_LOGGER" level="DEBUG" additivity="true">-->
+<!--      <appender-ref ref="ACCESS_FILE_APPENDER"/>-->
+<!--    </logger>-->
+  </springProfile>
+<!--  배포 환경-->
+  <springProfile name="default">
+    <logger name="ERROR_LOGGER" level="ERROR" additivity="true">
+      <appender-ref ref="ERROR_FILE_APPENDER"/>
+    </logger>
+
+    <logger name="ACCESS_LOGGER" level="DEBUG" additivity="true">
+      <appender-ref ref="ACCESS_FILE_APPENDER"/>
+    </logger>
+  </springProfile>
+</configuration>

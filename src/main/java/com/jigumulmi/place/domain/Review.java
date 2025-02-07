@@ -3,7 +3,7 @@ package com.jigumulmi.place.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.jigumulmi.config.common.Timestamped;
+import com.jigumulmi.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -56,10 +56,6 @@ public class Review extends Timestamped {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime deletedAt;
 
-    @OneToMany(mappedBy = "review")
-    @JsonManagedReference
-    private List<ReviewReaction> reviewReactionList = new ArrayList<>();
-
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("createdAt DESC")
     @JsonManagedReference
@@ -68,15 +64,13 @@ public class Review extends Timestamped {
     @Builder
     public Review(Integer rating, String content, Member member, Place place,
         List<ReviewReply> reviewReplyList, LocalDateTime deletedAt,
-        List<ReviewReaction> reviewReactionList, List<ReviewImage> reviewImageList) {
+        List<ReviewImage> reviewImageList) {
         this.rating = rating;
         this.content = content;
         this.member = member;
         this.place = place;
         this.reviewReplyList = reviewReplyList != null ? reviewReplyList : new ArrayList<>();
         this.deletedAt = deletedAt;
-        this.reviewReactionList =
-            reviewReactionList != null ? reviewReactionList : new ArrayList<>();
         this.reviewImageList = reviewImageList != null ? reviewImageList : new ArrayList<>();
     }
 

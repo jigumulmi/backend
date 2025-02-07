@@ -23,7 +23,9 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final ExceptionHandlingFilter exceptionHandlingFilter;
     private final HttpTestBasicAuthFilter httpTestBasicAuthFilter;
+    private final ActuatorBasicAuthFilter actuatorBasicAuthFilter;
 
     private final String[] origins = new String[]{"http://localhost:3000", "https://jigumulmi.com",
         "https://www.jigumulmi.com", "https://dev.jigumulmi.com"};
@@ -38,16 +40,6 @@ public class SecurityConfig {
         return new AuthenticationEntryPointImpl();
     }
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    ForwardedHeaderFilter forwardedHeaderFilter() {
-        return new ForwardedHeaderFilter();
-    }
-
     CorsConfigurationSource corsConfigurationSource() {
         return request -> {
             CorsConfiguration config = new CorsConfiguration();
@@ -59,22 +51,22 @@ public class SecurityConfig {
         };
     }
 
-    public static final String[] SwaggerPatterns = {
-        "/swagger-resources/**", "/swagger-ui/**", "/docs/**", "/docs",
-    };
-
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
             .httpBasic(HttpBasicConfigurer::disable)
-            .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
             .csrf(AbstractHttpConfigurer::disable)
+            .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource()))
             .addFilterBefore(httpTestBasicAuthFilter,
                 UsernamePasswordAuthenticationFilter.class
             )
+            .addFilterBefore(actuatorBasicAuthFilter,
+                UsernamePasswordAuthenticationFilter.class
+            )
+            .addFilterBefore(exceptionHandlingFilter, ActuatorBasicAuthFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/admin/*").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll()
             )
             .exceptionHandling(

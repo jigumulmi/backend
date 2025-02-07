@@ -1,26 +1,27 @@
 package com.jigumulmi.member.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.jigumulmi.config.common.Timestamped;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.jigumulmi.common.Timestamped;
+import com.jigumulmi.place.domain.PlaceLike;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@ToString
 public class Member extends Timestamped {
 
     @Id
@@ -37,31 +38,28 @@ public class Member extends Timestamped {
     @ColumnDefault("false")
     private Boolean isAdmin;
 
+    @OneToMany(mappedBy = "member")
+    @JsonManagedReference
+    private List<PlaceLike> placeLikeList = new ArrayList<>();
+
     @Builder
     public Member(String nickname, String email, Long kakaoUserId, LocalDateTime deregisteredAt,
-        Boolean isAdmin) {
+        Boolean isAdmin, List<PlaceLike> placeLikeList) {
         this.nickname = nickname;
         this.email = email;
         this.kakaoUserId = kakaoUserId;
         this.deregisteredAt = deregisteredAt;
         this.isAdmin = (isAdmin != null) ? isAdmin : false;
-    }
-
-    /**
-     * 선택적으로 사용자 인증을 하는 api에서 인증되지 않은 요청의 경우 생성되는 가짜 사용자
-     *
-     * @param fakeId 가짜 사용자를 생성하기 위한 존재하지 않는 memberId
-     */
-    public Member(Long fakeId) {
-        this.id = fakeId;
+        this.placeLikeList = placeLikeList != null ? placeLikeList : new ArrayList<>();
     }
 
     /**
      * 스웨거 또는 포스트맨으로 인증된 테스트 사용자
      */
-    public Member(Long id, String nickname) {
+    @Builder(builderMethodName = "testMemberBuilder", builderClassName="TestMemberBuilder")
+    public Member(Long id) {
         this.id = id;
-        this.nickname = nickname;
+        this.nickname = "testMember";
         this.isAdmin = true;
     }
 

@@ -30,9 +30,13 @@ public class MemberService {
     }
 
     public MemberDetailResponseDto getUserDetail(Member member) {
-        return new MemberDetailResponseDto(
-            member.getCreatedAt(), member.getDeregisteredAt(), member.getId(), member.getNickname(),
-            member.getEmail(), member.getIsAdmin()
-        );
+        return MemberDetailResponseDto.builder()
+            .id(member.getId())
+            .nickname(member.getNickname())
+            .email(member.getEmail())
+            .isAdmin(member.getIsAdmin())
+            .createdAt(member.getCreatedAt())
+            .deregisteredAt(member.getDeregisteredAt())
+            .build();
     }
 }

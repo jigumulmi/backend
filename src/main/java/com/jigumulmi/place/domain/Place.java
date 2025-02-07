@@ -1,17 +1,25 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.jigumulmi.admin.dto.request.AdminUpdatePlaceRequestDto;
-import com.jigumulmi.config.common.Timestamped;
-import com.jigumulmi.place.dto.response.PlaceDetailResponseDto.OpeningHourDto;
-import com.jigumulmi.place.dto.response.PlaceResponseDto.PositionDto;
+import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
+import com.jigumulmi.banner.domain.BannerPlaceMapping;
+import com.jigumulmi.common.Timestamped;
+import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.place.dto.PositionDto;
+import com.jigumulmi.place.vo.District;
+import com.jigumulmi.place.vo.Region;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
@@ -22,6 +30,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.Comment;
 
 @Entity
 @Getter
@@ -35,9 +44,26 @@ public class Place extends Timestamped {
 
     private String name;
 
-    private String address; // 도로명 주소
+    @Comment("광역시도")
+    @Column(columnDefinition = "varchar(40)")
+    @Enumerated(EnumType.STRING)
+    private Region region;
+
+    @Comment("시군구")
+    @Column(columnDefinition = "varchar(40)")
+    @Enumerated(EnumType.STRING)
+    private District district;
+
+    @Comment("도로명 주소")
+    private String address;
 
     private String contact;
+
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FixedBusinessHour> fixedBusinessHourList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "place", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TemporaryBusinessHour> temporaryBusinessHourList = new ArrayList<>();
 
     private String openingHourSun;
 
@@ -96,23 +122,43 @@ public class Place extends Timestamped {
     @ColumnDefault("false")
     private Boolean isFromAdmin;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @OneToMany(mappedBy = "place")
+    @JsonManagedReference
+    private List<PlaceLike> placeLikeList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "place", orphanRemoval = true)
+    private List<BannerPlaceMapping> bannerPlaceMappingList = new ArrayList<>();
+
     @Builder
-    public Place(String name, List<PlaceCategoryMapping> categoryMappingList, String address,
-        String contact, List<Menu> menuList,
+    public Place(String name, List<PlaceCategoryMapping> categoryMappingList, Region region,
+        District district, String address, String contact, List<Menu> menuList,
+        List<FixedBusinessHour> fixedBusinessHourList,
+        List<TemporaryBusinessHour> temporaryBusinessHourList,
         String openingHourSun, String openingHourMon, String openingHourTue, String openingHourWed,
         String openingHourThu, String openingHourFri, String openingHourSat, String additionalInfo,
         String placeUrl, Double longitude, Double latitude, String registrantComment,
         Boolean isApproved, List<Review> reviewList,
         List<SubwayStationPlace> subwayStationPlaceList,
         List<PlaceImage> placeImageList, String kakaoPlaceId,
-        Boolean isFromAdmin
+        Boolean isFromAdmin, Member member, List<PlaceLike> placeLikeList,
+        List<BannerPlaceMapping> bannerPlaceMappingList
     ) {
         this.name = name;
         this.categoryMappingList =
             categoryMappingList != null ? categoryMappingList : new ArrayList<>();
+        this.region = region;
+        this.district = district;
         this.address = address;
         this.contact = contact;
         this.menuList = menuList != null ? menuList : new ArrayList<>();
+        this.fixedBusinessHourList =
+            fixedBusinessHourList != null ? fixedBusinessHourList : new ArrayList<>();
+        this.temporaryBusinessHourList =
+            temporaryBusinessHourList != null ? temporaryBusinessHourList : new ArrayList<>();
         this.openingHourSun = openingHourSun;
         this.openingHourMon = openingHourMon;
         this.openingHourTue = openingHourTue;
@@ -132,34 +178,32 @@ public class Place extends Timestamped {
         this.placeImageList = placeImageList != null ? placeImageList : new ArrayList<>();
         this.kakaoPlaceId = kakaoPlaceId;
         this.isFromAdmin = (isFromAdmin != null) ? isFromAdmin : false;
+        this.member = member;
+        this.placeLikeList = placeLikeList != null ? placeLikeList : new ArrayList<>();
+        this.bannerPlaceMappingList =
+            bannerPlaceMappingList != null ? bannerPlaceMappingList : new ArrayList<>();
     }
 
-    public void addChildren(List<PlaceCategoryMapping> categoryMappingList,
-        List<SubwayStationPlace> subwayStationPlaceList,
-        List<Menu> menuList, List<PlaceImage> placeImageList) {
+    public void addCategoryAndSubwayStation(List<PlaceCategoryMapping> categoryMappingList,
+        List<SubwayStationPlace> subwayStationPlaceList) {
         this.categoryMappingList.addAll(categoryMappingList);
-        this.menuList.addAll(menuList);
         this.subwayStationPlaceList.addAll(subwayStationPlaceList);
-        this.placeImageList.addAll(placeImageList);
     }
 
-    public void adminUpdate(AdminUpdatePlaceRequestDto requestDto,
+    public void addMenu(List<Menu> menuList) {
+        this.menuList.addAll(menuList);
+    }
+
+    public void adminBasicUpdate(AdminCreatePlaceRequestDto requestDto,
         List<PlaceCategoryMapping> categoryMappingList,
-        List<SubwayStationPlace> subwayStationPlaceList,
-        List<Menu> menuList, List<PlaceImage> placeImageList) {
-        OpeningHourDto openingHour = requestDto.getOpeningHour();
+        List<SubwayStationPlace> subwayStationPlaceList) {
         PositionDto position = requestDto.getPosition();
 
         this.name = requestDto.getName();
+        this.region = requestDto.getRegion();
+        this.district = requestDto.getDistrict();
         this.address = requestDto.getAddress();
         this.contact = requestDto.getContact();
-        this.openingHourSun = openingHour.getOpeningHourSun();
-        this.openingHourMon = openingHour.getOpeningHourMon();
-        this.openingHourTue = openingHour.getOpeningHourTue();
-        this.openingHourWed = openingHour.getOpeningHourWed();
-        this.openingHourThu = openingHour.getOpeningHourThu();
-        this.openingHourFri = openingHour.getOpeningHourFri();
-        this.openingHourSat = openingHour.getOpeningHourSat();
         this.additionalInfo = requestDto.getAdditionalInfo();
         this.placeUrl = requestDto.getPlaceUrl();
         this.longitude = position.getLongitude();
@@ -168,20 +212,12 @@ public class Place extends Timestamped {
         this.isApproved = requestDto.getIsApproved();
         this.kakaoPlaceId = requestDto.getKakaoPlaceId();
 
-        // 실제 쿼리는 insert 후 delete가 이루어지므로
-        // 제약조건이 걸리는 경우 위배되지 않는 데이터만 addAll 해야한다
-        // TODO 메서드화
-        List<PlaceCategoryMapping> intersectionWithElementsFromLeft = PlaceCategoryMapping.getIntersectionWithElementsFromLeft(
+        List<PlaceCategoryMapping> categoryMappingListToOverwrite = PlaceCategoryMapping.getCategoryMappingListToOverwrite(
             this.categoryMappingList, categoryMappingList);
 
-        categoryMappingList.removeAll(this.categoryMappingList);
-        categoryMappingList.addAll(intersectionWithElementsFromLeft);
-
         this.categoryMappingList.clear();
-        this.menuList.clear();
         this.subwayStationPlaceList.clear();
-        this.placeImageList.clear();
 
-        addChildren(categoryMappingList, subwayStationPlaceList, menuList, placeImageList);
+        addCategoryAndSubwayStation(categoryMappingListToOverwrite, subwayStationPlaceList);
     }
 }

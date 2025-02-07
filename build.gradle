@@ -29,8 +29,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     testImplementation 'org.springframework.security:spring-security-test'
     compileOnly 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
@@ -49,8 +51,11 @@ dependencies {
     // aws sdk
     implementation("software.amazon.awssdk:s3:2.29.4")
 
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.18.1'
-    implementation 'com.fasterxml.jackson.core:jackson-core:2.18.1'
+    // actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // micrometer
+    runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 }
 
 tasks.named('test') {

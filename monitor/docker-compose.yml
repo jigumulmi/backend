@@ -1,0 +1,66 @@
+services:
+  fluent-bit:
+    image: fluent/fluent-bit:3.2.3
+    container_name: fluent-bit
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+      - ./fluent-bit/parsers.conf:/fluent-bit/etc/parsers.conf
+      - ../logs:/logs
+    ports:
+      - "2020:2020"
+      - "2021:2021"
+    restart: always
+    depends_on:
+      - loki
+    env_file:
+      - env/.env
+
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: loki
+    volumes:
+      - ./loki/loki.yml:/etc/loki/local-config.yml
+      - loki_data:/loki
+    ports:
+      - "3100:3100"
+    command:
+      - -config.file=/etc/loki/local-config.yml
+      - -log-config-reverse-order
+    restart: always
+
+  prometheus:
+    image: prom/prometheus:v2.50.0
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.retention.size=2GB
+    volumes:
+      - ./prometheus/password.txt:/etc/prometheus/password.txt
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    restart: always
+
+#  grafana:
+#    image: grafana/grafana:11.4.0
+#    container_name: grafana
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+#      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+#      - grafana_data:/var/lib/grafana
+#    restart: unless-stopped
+#    depends_on:
+#      - prometheus
+#      - loki
+#    env_file:
+#      - env/.env
+
+volumes:
+  loki_data:
+#  grafana_data:
+  prometheus_data:
