@@ -1,4 +1,4 @@
-name: Deploy to Development Server
+name: Deploy Backend Application to Development Server
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - dev
     paths-ignore:
       - "**.md"
-      - "**/dev-monitor-deploy.yml"
+      - "**/**-monitor-deploy.yml"
       - "monitor/**"
 
 permissions:
