@@ -32,7 +32,7 @@ public class PagedResponseDto<T> {
     private List<T> data;
 
     /**
-     * Page가 DTO를 감싼 경우 사용
+     * Page 인스턴스의 contents 데이터가 완벽히 구성된 경우 사용
      */
     public static <T> PagedResponseDto<T> of(Page<T> pageData, Pageable pageable) {
         return PagedResponseDto.<T>builder()
@@ -42,8 +42,8 @@ public class PagedResponseDto<T> {
     }
 
     /**
-     * Page가 DTO가 아닌 엔티티를 감싼 경우 사용
-     * 응답 데이터에 직접적으로 사용되는 data 파라미터 추가
+     * Page 인스턴스의 contents 데이터가 완성되지 않은 경우 사용
+     * @param data 페이지네이션 적용된 최종 응답 데이터
      */
     public static <T> PagedResponseDto<T> of(List<T> data, Page<?> page, Pageable pageable) {
         return PagedResponseDto.<T>builder()

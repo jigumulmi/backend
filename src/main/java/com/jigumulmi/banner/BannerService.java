@@ -6,14 +6,12 @@ import com.jigumulmi.banner.dto.response.BannerResponseDto;
 import com.jigumulmi.banner.repository.BannerRepository;
 import com.jigumulmi.banner.repository.CustomBannerRepository;
 import com.jigumulmi.common.PagedResponseDto;
-import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,11 +32,10 @@ public class BannerService {
 
     @Transactional(readOnly = true)
     public PagedResponseDto<BannerPlaceDto> getMappedPlaceList(Pageable pageable, Long bannerId) {
-        Page<Place> placePage = customBannerRepository.getAllMappedPlaceByBannerId(pageable,
-            bannerId);
+        Page<BannerPlaceDto> placePage = customBannerRepository.getAllMappedPlaceByBannerId(pageable,
+            bannerId).map(BannerPlaceDto::from);
 
-        List<BannerPlaceDto> placeDtoList = placePage.getContent().stream()
-            .map(BannerPlaceDto::from).collect(Collectors.toList());
+        List<BannerPlaceDto> placeDtoList = placePage.getContent();
 
         LocalDateTime now = LocalDateTime.now();
         LocalTime localTime = now.toLocalTime();
