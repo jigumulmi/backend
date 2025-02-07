@@ -1,7 +1,5 @@
 package com.jigumulmi.place;
 
-import static java.lang.Math.round;
-
 import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.common.FileUtils;
@@ -186,22 +184,7 @@ public class PlaceService {
         Map<Integer, Long> reviewRatingStatMap = customPlaceRepository.getReviewRatingStatsByPlaceId(
             placeId);
 
-        long totalCount = 0L;
-        long totalRating = 0L;
-        for (int i = 1; i <= 5; i++) {
-            reviewRatingStatMap.putIfAbsent(i, 0L);
-
-            Long count = reviewRatingStatMap.get(i);
-            totalCount += count;
-            totalRating += (count * i);
-        }
-        Double averageRating = round((float) totalRating / totalCount * 100) / 100.0; // 소수점 둘째자리까지
-
-        return ReviewStatisticsResponseDto.builder()
-            .averageRating(averageRating)
-            .totalCount(totalCount)
-            .statistics(reviewRatingStatMap)
-            .build();
+        return ReviewStatisticsResponseDto.fromReviewRatingStatMap(reviewRatingStatMap);
     }
 
     @Transactional
