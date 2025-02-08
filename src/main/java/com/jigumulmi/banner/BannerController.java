@@ -28,6 +28,13 @@ public class BannerController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "배너 개별 조회")
+    @GetMapping("/{bannerId}")
+    public ResponseEntity<BannerResponseDto> getBanner(@PathVariable Long bannerId) {
+        BannerResponseDto response = bannerService.getBanner(bannerId);
+        return ResponseEntity.ok(response);
+    }
+
     @Operation(summary = "배너에 연관된 장소 목록 조회")
     @GetMapping("/{bannerId}/place")
     public ResponseEntity<PagedResponseDto<BannerPlaceDto>> getMappedPlaceList(
