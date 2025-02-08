@@ -1,12 +1,9 @@
 package com.jigumulmi.place.repository;
 
 
-import static com.jigumulmi.config.querydsl.Utils.nullSafeBuilder;
 import static com.jigumulmi.member.domain.QMember.member;
 import static com.jigumulmi.place.domain.QFixedBusinessHour.fixedBusinessHour;
 import static com.jigumulmi.place.domain.QPlace.place;
-import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
-import static com.jigumulmi.place.domain.QPlaceLike.placeLike;
 import static com.jigumulmi.place.domain.QReview.review;
 import static com.jigumulmi.place.domain.QReviewReply.reviewReply;
 import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
@@ -30,14 +27,11 @@ import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
-import com.jigumulmi.place.vo.PlaceCategoryGroup;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.DayOfWeek;
@@ -58,36 +52,6 @@ public class CustomPlaceRepository {
 
     private final JPAQueryFactory queryFactory;
     private final CustomBannerRepository customBannerRepository;
-
-    public BooleanExpression subwayStationCondition(Long subwayStationId) {
-        if (subwayStationId == null) {
-            return null;
-        } else {
-            return place.id.in(
-                JPAExpressions
-                    .select(subwayStationPlace.place.id)
-                    .from(subwayStationPlace)
-                    .where(subwayStationPlace.subwayStation.id.eq(subwayStationId))
-            );
-        }
-    }
-
-    public BooleanBuilder placeNameContains(String name) {
-        return nullSafeBuilder(() -> place.name.contains(name));
-    }
-
-    public BooleanExpression categoryGroupCondition(PlaceCategoryGroup categoryGroup) {
-        if (categoryGroup == null) {
-            return null;
-        } else {
-            return place.id.in(
-                JPAExpressions
-                    .select(placeCategoryMapping.place.id)
-                    .from(placeCategoryMapping)
-                    .where(placeCategoryMapping.categoryGroup.eq(categoryGroup))
-            );
-        }
-    }
 
     public PlaceBasicResponseDto getPlaceById(Long placeId) {
         // 중첩 리스트 프로젝션 안되는 듯...
@@ -163,17 +127,7 @@ public class CustomPlaceRepository {
         return fixedBusinessHourResponseDto;
     }
 
-    public Long getPlaceLikeCount(Long placeId) {
-        return queryFactory
-            .select(placeLike.id.count())
-            .from(placeLike)
-            .where(placeLike.place.id.eq(placeId))
-            .fetchOne();
-    }
-
-
     public Map<Integer, Long> getReviewRatingStatsByPlaceId(Long placeId) {
-
         return queryFactory
             .from(review)
             .where(review.place.id.eq(placeId).and(review.deletedAt.isNull()))
@@ -199,16 +153,7 @@ public class CustomPlaceRepository {
         return PageableExecutionUtils.getPage(reviewList, pageable, totalCountQuery::fetchOne);
     }
 
-    private BooleanExpression memberEq(Member requestMember) {
-        if (requestMember == null) {
-            return FALSE;
-        } else {
-            return member.eq(requestMember);
-        }
-    }
-
     public Map<Long, Long> getReviewReplyCount(Long placeId) {
-
         return queryFactory
             .selectFrom(review)
             .join(review.reviewReplyList, reviewReply)
@@ -251,4 +196,13 @@ public class CustomPlaceRepository {
             .orderBy(reviewReply.createdAt.asc())
             .fetch();
     }
+
+    private BooleanExpression memberEq(Member requestMember) {
+        if (requestMember == null) {
+            return FALSE;
+        } else {
+            return member.eq(requestMember);
+        }
+    }
+
 }
