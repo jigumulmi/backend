@@ -19,6 +19,7 @@ import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
 import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.banner.repository.CustomBannerRepository;
+import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.place.domain.Review;
@@ -36,7 +37,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -92,7 +92,7 @@ public class CustomPlaceRepository {
     public WeeklyBusinessHourDto getWeeklyBusinessHourByPlaceId(
         Long placeId, LocalDate today) {
         int year = today.getYear();
-        int weekOfYear = today.get(WeekFields.SUNDAY_START.weekOfYear());
+        int weekOfYear = WeekUtils.getWeekOfYear(today);
 
         List<Tuple> results = queryFactory
             .select(fixedBusinessHour.place.id,
