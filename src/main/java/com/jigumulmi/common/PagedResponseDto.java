@@ -31,24 +31,10 @@ public class PagedResponseDto<T> {
     private PageDto page;
     private List<T> data;
 
-    /**
-     * Page 인스턴스의 contents 데이터가 완벽히 구성된 경우 사용
-     */
     public static <T> PagedResponseDto<T> of(Page<T> pageData, Pageable pageable) {
         return PagedResponseDto.<T>builder()
             .page(PageDto.of(pageData, pageable))
             .data(pageData.getContent())
-            .build();
-    }
-
-    /**
-     * Page 인스턴스의 contents 데이터가 완성되지 않은 경우 사용
-     * @param data 페이지네이션 적용된 최종 응답 데이터
-     */
-    public static <T> PagedResponseDto<T> of(List<T> data, Page<?> page, Pageable pageable) {
-        return PagedResponseDto.<T>builder()
-            .page(PageDto.of(page, pageable))
-            .data(data)
             .build();
     }
 }
