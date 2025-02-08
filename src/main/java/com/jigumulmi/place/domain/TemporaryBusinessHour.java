@@ -1,6 +1,7 @@
 package com.jigumulmi.place.domain;
 
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
+import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.place.dto.BusinessHour;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,7 +17,6 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.time.temporal.WeekFields;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -71,7 +71,7 @@ public class TemporaryBusinessHour {
         BusinessHour businessHour = requestDto.getBusinessHour();
 
         LocalDate date = requestDto.getDate();
-        int weekOfYear = date.get(WeekFields.SUNDAY_START.weekOfYear());
+        int weekOfYear = WeekUtils.getWeekOfYear(date);
 
         this.year = date.getYear();
         this.month = date.getMonthValue();

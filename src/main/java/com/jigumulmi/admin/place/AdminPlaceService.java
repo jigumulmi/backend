@@ -1,10 +1,10 @@
 package com.jigumulmi.admin.place;
 
 
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
-import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto.TemporaryBusinessHourDto;
@@ -13,6 +13,7 @@ import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
 import com.jigumulmi.aws.S3Service;
 import com.jigumulmi.common.PagedResponseDto;
+import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
@@ -28,9 +29,9 @@ import com.jigumulmi.place.domain.TemporaryBusinessHour;
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
+import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.repository.FixedBusinessHourRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
@@ -42,7 +43,6 @@ import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.WeekFields;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -204,7 +204,7 @@ public class AdminPlaceService {
         BusinessHour businessHour = requestDto.getBusinessHour();
 
         LocalDate date = requestDto.getDate();
-        int weekOfYear = date.get(WeekFields.SUNDAY_START.weekOfYear());
+        int weekOfYear = WeekUtils.getWeekOfYear(date);
 
         TemporaryBusinessHour temporaryBusinessHour = TemporaryBusinessHour.builder()
             .place(place)

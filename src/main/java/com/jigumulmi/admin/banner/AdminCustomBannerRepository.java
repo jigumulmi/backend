@@ -8,8 +8,8 @@ import static com.jigumulmi.place.domain.QMenu.menu;
 import static com.jigumulmi.place.domain.QPlace.place;
 
 import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
+import com.jigumulmi.admin.place.AdminCustomPlaceRepository;
 import com.jigumulmi.place.domain.Place;
-import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
 import com.querydsl.core.BooleanBuilder;
@@ -36,7 +36,7 @@ public class AdminCustomBannerRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final JPAQueryFactory queryFactory;
 
-    private final CustomPlaceRepository customPlaceRepository;
+    private final AdminCustomPlaceRepository adminCustomPlaceRepository;
 
     public void batchInsertBannerPlace(Long bannerId, List<Long> placeIdList) {
         String sql = "INSERT INTO banner_place_mapping (banner_id, place_id) " +
@@ -111,6 +111,19 @@ public class AdminCustomBannerRepository {
         return PageableExecutionUtils.getPage(content, pageable, totalCountQuery::fetchOne);
     }
 
+    public BooleanExpression placeCondition(GetCandidatePlaceListRequestDto requestDto) {
+        return (
+            bannerPlaceMapping.place.id.isNull().and(place.isApproved.isTrue())
+                .and(adminCustomPlaceRepository.subwayStationCondition(requestDto.getSubwayStationId()))
+                .and(adminCustomPlaceRepository.categoryGroupCondition(
+                    requestDto.getPlaceCategoryGroup()))
+                .and(adminCustomPlaceRepository.placeNameContains(requestDto.getPlaceName()))
+                .and(regionEq(requestDto.getRegion()))
+                .and(districtEq(requestDto.getDistrict()))
+                .and(menuNameContains(requestDto.getMenuName()))
+        );
+    }
+
     public BooleanBuilder regionEq(Region region) {
         return nullSafeBuilder(() -> place.region.eq(region));
     }
@@ -130,18 +143,5 @@ public class AdminCustomBannerRepository {
                     .where(menu.name.contains(name))
             );
         }
-    }
-
-    public BooleanExpression placeCondition(GetCandidatePlaceListRequestDto requestDto) {
-        return (
-            bannerPlaceMapping.place.id.isNull().and(place.isApproved.isTrue())
-                .and(customPlaceRepository.subwayStationCondition(requestDto.getSubwayStationId()))
-                .and(customPlaceRepository.categoryGroupCondition(
-                    requestDto.getPlaceCategoryGroup()))
-                .and(customPlaceRepository.placeNameContains(requestDto.getPlaceName()))
-                .and(regionEq(requestDto.getRegion()))
-                .and(districtEq(requestDto.getDistrict()))
-                .and(menuNameContains(requestDto.getMenuName()))
-        );
     }
 }
