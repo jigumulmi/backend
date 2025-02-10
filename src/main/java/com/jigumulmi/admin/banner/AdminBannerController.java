@@ -66,7 +66,7 @@ public class AdminBannerController {
     @ApiResponse(responseCode = "201")
     @PostMapping(path = "/{bannerId}/place")
     public ResponseEntity<?> createBannerPlace(@PathVariable Long bannerId,
-        @RequestBody BannerPlaceMappingRequestDto requestDto) {
+        @Valid @RequestBody BannerPlaceMappingRequestDto requestDto) {
         adminBannerService.addBannerPlace(bannerId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -75,7 +75,7 @@ public class AdminBannerController {
     @ApiResponse(responseCode = "204")
     @DeleteMapping(path = "/{bannerId}/place")
     public ResponseEntity<?> deleteBannerPlace(@PathVariable Long bannerId,
-        @RequestBody BannerPlaceMappingRequestDto requestDto) {
+        @Valid @RequestBody BannerPlaceMappingRequestDto requestDto) {
         adminBannerService.removeBannerPlace(bannerId, requestDto);
         return ResponseEntity.noContent().build();
     }
