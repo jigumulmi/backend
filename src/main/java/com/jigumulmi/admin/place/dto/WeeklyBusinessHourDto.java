@@ -2,7 +2,6 @@ package com.jigumulmi.admin.place.dto;
 
 import com.jigumulmi.admin.place.dto.validator.ValidBusinessHour;
 import com.jigumulmi.place.dto.BusinessHour;
-import jakarta.validation.constraints.NotNull;
 import java.time.DayOfWeek;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,25 +11,18 @@ import lombok.NoArgsConstructor;
 public class WeeklyBusinessHourDto {
 
     @ValidBusinessHour
-    @NotNull
     private BusinessHour sunday;
     @ValidBusinessHour
-    @NotNull
     private BusinessHour monday;
     @ValidBusinessHour
-    @NotNull
     private BusinessHour tuesday;
     @ValidBusinessHour
-    @NotNull
     private BusinessHour wednesday;
     @ValidBusinessHour
-    @NotNull
     private BusinessHour thursday;
     @ValidBusinessHour
-    @NotNull
     private BusinessHour friday;
     @ValidBusinessHour
-    @NotNull
     private BusinessHour saturday;
 
     public BusinessHour getBusinessHour(DayOfWeek dayOfWeek) {
