@@ -2,7 +2,7 @@ package com.jigumulmi.place.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
-import com.jigumulmi.place.PlaceService;
+import com.jigumulmi.place.PlaceManager;
 import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -51,7 +51,7 @@ public class MenuDto {
     public static Menu toMenu(MenuDto menuDto, Place place) {
         String imageS3Key = null;
         if (menuDto.getFullFilename() != null) {
-            imageS3Key = PlaceService.MENU_IMAGE_S3_PREFIX + menuDto.getFullFilename();
+            imageS3Key = PlaceManager.MENU_IMAGE_S3_PREFIX + menuDto.getFullFilename();
         }
 
         return Menu.builder()
