@@ -128,7 +128,7 @@ public class PlaceController {
     @ApiResponse(responseCode = "201")
     @PostMapping(path = "/{placeId}/review", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> postReview(@PathVariable Long placeId,
-        @Valid @ModelAttribute CreateReviewRequestDto requestDto,
+        @ModelAttribute CreateReviewRequestDto requestDto,
         @RequiredAuthUser Member member) {
         placeService.postReview(placeId, requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
@@ -169,7 +169,7 @@ public class PlaceController {
     @ApiResponse(responseCode = "204")
     @PutMapping(path = "/review/{reviewId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateReview(@PathVariable Long reviewId,
-        @Valid @ModelAttribute UpdateReviewRequestDto requestDto,
+        @ModelAttribute UpdateReviewRequestDto requestDto,
         @RequiredAuthUser Member member) {
         placeService.updateReview(reviewId, requestDto, member);
         return ResponseEntity.noContent().build();

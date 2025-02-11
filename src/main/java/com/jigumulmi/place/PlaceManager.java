@@ -49,10 +49,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -257,9 +255,8 @@ public class PlaceManager {
         }
 
         List<ReviewImage> currentImageList = review.getReviewImageList();
-        Set<Long> trashImageIdSet = new HashSet<>(requestDto.getTrashImageIdList());
         List<ReviewImage> trashReviewImageList = currentImageList.stream()
-            .filter(image -> trashImageIdSet.contains(image.getId()))
+            .filter(image -> requestDto.getTrashImageIdList().contains(image.getId()))
             .toList();
 
         review.updateReview(requestDto.getRating(), requestDto.getContent(), newReviewImageList,
