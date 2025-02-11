@@ -11,7 +11,7 @@ import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto.
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
-import com.jigumulmi.aws.S3Service;
+import com.jigumulmi.aws.S3Manager;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.config.exception.CustomException;
@@ -62,7 +62,7 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 @RequiredArgsConstructor
 public class AdminPlaceService {
 
-    private final S3Service s3Service;
+    private final S3Manager s3Manager;
 
     private final AdminCustomPlaceRepository adminCustomPlaceRepository;
     private final PlaceRepository placeRepository;
@@ -338,7 +338,7 @@ public class AdminPlaceService {
             List<ObjectIdentifier> objectIdentifierList = Stream.concat(
                 menuImageObjectIdentifierList, reviewImageObjectIdentifierList).toList();
 
-            s3Service.deleteObjects(s3Service.bucket, objectIdentifierList);
+            s3Manager.deleteObjects(s3Manager.bucket, objectIdentifierList);
         } catch (SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }

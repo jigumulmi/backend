@@ -1,7 +1,7 @@
 package com.jigumulmi.place;
 
 import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
-import com.jigumulmi.aws.S3Service;
+import com.jigumulmi.aws.S3Manager;
 import com.jigumulmi.common.FileUtils;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.exception.CustomException;
@@ -81,7 +81,7 @@ public class PlaceService {
     public final static String REVIEW_IMAGE_S3_PREFIX = "reviewImage/";
     public final static String MENU_IMAGE_S3_PREFIX = "menuImage/";
 
-    private final S3Service s3Service;
+    private final S3Manager s3Manager;
 
     private final SubwayStationRepository subwayStationRepository;
     private final PlaceRepository placeRepository;
@@ -211,7 +211,7 @@ public class PlaceService {
 
                     s3KeyList.add(s3Key);
 
-                    s3Service.putObject(s3Service.bucket, s3Key, image);
+                    s3Manager.putObject(s3Manager.bucket, s3Key, image);
                 }
             } catch (SdkException | IOException e) {
                 throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
@@ -283,7 +283,7 @@ public class PlaceService {
 
                 s3KeyList.add(s3Key);
 
-                s3Service.putObject(s3Service.bucket, s3Key, image);
+                s3Manager.putObject(s3Manager.bucket, s3Key, image);
             }
         } catch (SdkException | IOException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
@@ -315,7 +315,7 @@ public class PlaceService {
                 i -> ObjectIdentifier.builder().key(i.getS3Key()).build()
             ).toList();
 
-            s3Service.deleteObjects(s3Service.bucket, objectIdentifierList);
+            s3Manager.deleteObjects(s3Manager.bucket, objectIdentifierList);
         } catch (SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
@@ -338,7 +338,7 @@ public class PlaceService {
                 i -> ObjectIdentifier.builder().key(i.getS3Key()).build()
             ).toList();
 
-            s3Service.deleteObjects(s3Service.bucket, objectIdentifierList);
+            s3Manager.deleteObjects(s3Manager.bucket, objectIdentifierList);
         } catch (SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
@@ -398,7 +398,7 @@ public class PlaceService {
         String filename = UUID.randomUUID().toString();
         String s3Key = MENU_IMAGE_S3_PREFIX + filename + "." + requestDto.getFileExtension();
 
-        String url = s3Service.generatePutObjectPresignedUrl(s3Service.bucket, s3Key);
+        String url = s3Manager.generatePutObjectPresignedUrl(s3Manager.bucket, s3Key);
         return S3PutPresignedUrlResponseDto.builder()
             .url(url)
             .filename(filename)
@@ -407,7 +407,7 @@ public class PlaceService {
 
     public S3DeletePresignedUrlResponseDto createMenuImageS3DeletePresignedUrl(
         MenuImageS3DeletePresignedUrlRequestDto requestDto) {
-        String url = s3Service.generateDeleteObjectPresignedUrl(s3Service.bucket,
+        String url = s3Manager.generateDeleteObjectPresignedUrl(s3Manager.bucket,
             requestDto.getS3Key());
         return S3DeletePresignedUrlResponseDto.builder().url(url).build();
     }
