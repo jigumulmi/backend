@@ -1,4 +1,4 @@
-package com.jigumulmi.banner;
+package com.jigumulmi.place;
 
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;

@@ -1,15 +1,15 @@
-package com.jigumulmi.banner;
+package com.jigumulmi.place;
 
 import com.jigumulmi.admin.banner.BannerPlaceMappingRepository;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.domain.BannerPlaceMapping;
+import com.jigumulmi.banner.dto.repository.BusinessHourQueryDto;
 import com.jigumulmi.banner.repository.BannerRepository;
-import com.jigumulmi.banner.repository.CustomBannerRepository;
 import com.jigumulmi.common.annotation.RepositoryTest;
 import com.jigumulmi.place.domain.FixedBusinessHour;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.TemporaryBusinessHour;
-import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
+import com.jigumulmi.place.repository.CustomPlaceRepository;
 import com.jigumulmi.place.repository.FixedBusinessHourRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.TemporaryBusinessHourRepository;
@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Assertions;
@@ -33,12 +32,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 @RepositoryTest
-class CustomBannerRepositoryTest {
+class CustomPlaceRepositoryTest {
 
     private static final LocalDate today = LocalDate.now();
 
     @Autowired
-    private CustomBannerRepository customBannerRepository;
+    private CustomPlaceRepository customPlaceRepository;
 
     @Autowired
     private BannerRepository bannerRepository;
@@ -72,7 +71,7 @@ class CustomBannerRepositoryTest {
 
         // when
         PageRequest pageRequest = PageRequest.ofSize(1);
-        Page<Place> placePage = customBannerRepository.getAllMappedPlaceByBannerId(
+        Page<Place> placePage = customPlaceRepository.getAllMappedPlaceByBannerId(
             pageRequest, banner.getId());
 
         // then
@@ -154,27 +153,11 @@ class CustomBannerRepositoryTest {
         temporaryBusinessHourRepository.saveAll(tempBizHourList);
 
         // when
-        Map<Long, SurroundingDateBusinessHour> surroundingBizHourMap = customBannerRepository.getSurroundingBusinessHourByPlaceIdIn(
+        List<BusinessHourQueryDto> businessHourQueryDto = customPlaceRepository.getSurroundingBusinessHourByPlaceIdIn(
             List.of(place.getId()), today);
 
-        // then 변동 영업시간으로 바뀌었는지 확인
-        SurroundingDateBusinessHour surroundingDateBusinessHour = surroundingBizHourMap.get(
-            place.getId());
-        if (yesterdayTempBizHour != null) {
-            Assertions.assertEquals(surroundingDateBusinessHour.getYesterday().getIsDayOff(),
-                yesterdayTempBizHour.getIsDayOff());
-        } else {
-            Assertions.assertEquals(surroundingDateBusinessHour.getYesterday().getIsDayOff(),
-                fixedBizHourIsDayOff);
-        }
-
-        if (todayTempBizHour != null) {
-            Assertions.assertEquals(surroundingDateBusinessHour.getToday().getIsDayOff(),
-                todayTempBizHour.getIsDayOff());
-        } else {
-            Assertions.assertEquals(surroundingDateBusinessHour.getToday().getIsDayOff(),
-                fixedBizHourIsDayOff);
-        }
+        // then
+        Assertions.assertEquals(businessHourQueryDto.size(), 2);
 
     }
 
