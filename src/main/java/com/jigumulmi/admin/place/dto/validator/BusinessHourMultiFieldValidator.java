@@ -17,6 +17,12 @@ public class BusinessHourMultiFieldValidator implements
             return false;
         }
 
+        if (businessHour.getIsDayOff() == null) {
+            context.buildConstraintViolationWithTemplate("휴무 여부 데이터가 없습니다")
+                .addConstraintViolation();
+            return false;
+        }
+
         if (businessHour.getIsDayOff().equals(true)) { // 휴무일
             if (businessHour.getOpenTime() != null || businessHour.getCloseTime() != null
                 || businessHour.getBreakStart() != null || businessHour.getBreakEnd() != null) {

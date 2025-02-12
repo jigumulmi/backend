@@ -9,7 +9,7 @@ import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.admin.banner.dto.response.AdminBannerResponseDto;
 import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
-import com.jigumulmi.aws.S3Service;
+import com.jigumulmi.aws.S3Manager;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.repository.BannerRepository;
 import com.jigumulmi.common.FileUtils;
@@ -33,7 +33,7 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 public class AdminBannerService {
 
     private final String BANNER_S3_PREFIX = "banner/";
-    private final S3Service s3Service;
+    private final S3Manager s3Manager;
 
     private final BannerRepository bannerRepository;
     private final AdminCustomBannerRepository adminCustomBannerRepository;
@@ -45,13 +45,13 @@ public class AdminBannerService {
             MultipartFile outerImage = requestDto.getOuterImage();
             if (outerImage != null) {
                 outerImageS3Key = BANNER_S3_PREFIX + FileUtils.generateUniqueFilename(outerImage);
-                s3Service.putObject(s3Service.bucket, outerImageS3Key, outerImage);
+                s3Manager.putObject(s3Manager.bucket, outerImageS3Key, outerImage);
             }
 
             MultipartFile innerImage = requestDto.getInnerImage();
             if (innerImage != null) {
                 innerImageS3Key = BANNER_S3_PREFIX + FileUtils.generateUniqueFilename(innerImage);
-                s3Service.putObject(s3Service.bucket, innerImageS3Key, innerImage);
+                s3Manager.putObject(s3Manager.bucket, innerImageS3Key, innerImage);
             }
         } catch (IOException | SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
@@ -115,12 +115,12 @@ public class AdminBannerService {
 
         try {
             String newS3Key = BANNER_S3_PREFIX + FileUtils.generateUniqueFilename(image);
-            s3Service.putObject(s3Service.bucket, newS3Key, image);
+            s3Manager.putObject(s3Manager.bucket, newS3Key, image);
 
             banner.updateOuterS3ImageKey(newS3Key);
             bannerRepository.save(banner);
 
-            s3Service.deleteObject(s3Service.bucket, oldS3Key);
+            s3Manager.deleteObject(s3Manager.bucket, oldS3Key);
         } catch (IOException | SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
@@ -134,12 +134,12 @@ public class AdminBannerService {
 
         try {
             String newS3Key = BANNER_S3_PREFIX + FileUtils.generateUniqueFilename(image);
-            s3Service.putObject(s3Service.bucket, newS3Key, image);
+            s3Manager.putObject(s3Manager.bucket, newS3Key, image);
 
             banner.updateInnerS3ImageKey(newS3Key);
             bannerRepository.save(banner);
 
-            s3Service.deleteObject(s3Service.bucket, oldS3Key);
+            s3Manager.deleteObject(s3Manager.bucket, oldS3Key);
         } catch (IOException | SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
@@ -166,7 +166,7 @@ public class AdminBannerService {
                     ObjectIdentifier.builder().key(innerImageS3Key).build());
             }
 
-            s3Service.deleteObjects(s3Service.bucket, objectIdentifierList);
+            s3Manager.deleteObjects(s3Manager.bucket, objectIdentifierList);
         } catch (SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }

@@ -74,14 +74,10 @@ public class Review extends Timestamped {
         this.reviewImageList = reviewImageList != null ? reviewImageList : new ArrayList<>();
     }
 
-    public void updateReview(Integer rating, String content, List<ReviewImage> newReviewImageList,
+    public void updateReview(int rating, String content, List<ReviewImage> newReviewImageList,
         List<ReviewImage> trashReviewImageList) {
-        if (rating != null) {
-            this.rating = rating;
-        }
-        if (content != null) {
-            this.content = content;
-        }
+        this.rating = rating;
+        this.content = content;
         this.reviewImageList.addAll(newReviewImageList);
         this.reviewImageList.removeAll(trashReviewImageList);
     }

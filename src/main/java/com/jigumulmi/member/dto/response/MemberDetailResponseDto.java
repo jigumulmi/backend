@@ -20,10 +20,12 @@ public class MemberDetailResponseDto extends MemberBasicResponseDto{
 
     public static MemberDetailResponseDto from(Member member) {
         return MemberDetailResponseDto.builder()
-            .createdAt(member.getCreatedAt())
-            .deregisteredAt(member.getDeregisteredAt())
+            .id(member.getId())
+            .nickname(member.getNickname())
             .email(member.getEmail())
             .isAdmin(member.getIsAdmin())
+            .createdAt(member.getCreatedAt())
+            .deregisteredAt(member.getDeregisteredAt())
             .build();
     }
 }

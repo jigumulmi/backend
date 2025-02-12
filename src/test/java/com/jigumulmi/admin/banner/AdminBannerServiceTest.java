@@ -13,7 +13,7 @@ import static org.mockito.Mockito.verify;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.response.CreateBannerResponseDto;
-import com.jigumulmi.aws.S3Service;
+import com.jigumulmi.aws.S3Manager;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.repository.BannerRepository;
 import com.jigumulmi.common.MultipartTestUtils;
@@ -44,7 +44,7 @@ class AdminBannerServiceTest {
     private AdminBannerService adminBannerService;
 
     @Mock
-    private S3Service s3Service;
+    private S3Manager s3Manager;
 
     @Mock
     private AdminCustomBannerRepository adminCustomBannerRepository;
@@ -53,7 +53,7 @@ class AdminBannerServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        ReflectionTestUtils.setField(s3Service, "bucket", "testBucket");
+        ReflectionTestUtils.setField(s3Manager, "bucket", "testBucket");
     }
 
     private static Stream<Arguments> getImageParams() {
@@ -83,8 +83,8 @@ class AdminBannerServiceTest {
 
         // then
         Assertions.assertEquals(responseDto.getBannerId(), banner.getId());
-        verify(s3Service, times(invokeCount)).putObject(
-            eq(s3Service.bucket), any(String.class), any(MultipartFile.class)
+        verify(s3Manager, times(invokeCount)).putObject(
+            eq(s3Manager.bucket), any(String.class), any(MultipartFile.class)
         );
         verify(bannerRepository, times(1)).save(any(Banner.class));
 
@@ -98,7 +98,7 @@ class AdminBannerServiceTest {
             "testTitle", MultipartTestUtils.createMockFile("outerImage"), null, false
         );
 
-        willThrow(new IOException()).given(s3Service)
+        willThrow(new IOException()).given(s3Manager)
             .putObject(any(String.class), any(String.class), any(MultipartFile.class));
 
         // when
@@ -233,7 +233,7 @@ class AdminBannerServiceTest {
         adminBannerService.deleteBanner(bannerId);
 
         // then
-        verify(s3Service, times(1)).deleteObjects(eq(s3Service.bucket),
+        verify(s3Manager, times(1)).deleteObjects(eq(s3Manager.bucket),
             argThat(list -> list.size() == deleteCount));
 
     }

@@ -1,6 +1,7 @@
 package com.jigumulmi.place.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,7 +23,6 @@ public class BusinessHour {
     private LocalTime breakStart;
     @Schema(implementation = TimeDto.class)
     private LocalTime breakEnd;
-    @Schema(defaultValue = "false")
-    @Builder.Default
-    private Boolean isDayOff = false;
+    @Schema(requiredMode = RequiredMode.REQUIRED)
+    private Boolean isDayOff;
 }
