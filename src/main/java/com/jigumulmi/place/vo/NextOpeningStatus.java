@@ -38,7 +38,7 @@ public enum NextOpeningStatus {
                 .build();
         }
 
-        if (todayBusinessHour.getIsDayOff()) {
+        if (todayBusinessHour.isDayOff()) {
             return null;
         }
 

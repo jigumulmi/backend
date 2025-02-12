@@ -3,10 +3,8 @@ package com.jigumulmi.banner.dto.repository;
 import com.jigumulmi.place.dto.BusinessHour;
 import java.time.DayOfWeek;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
 public class BusinessHourQueryDto {
 
     private Long placeId;

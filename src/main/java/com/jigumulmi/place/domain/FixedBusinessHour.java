@@ -36,11 +36,11 @@ public class FixedBusinessHour {
     private LocalTime closeTime;
     private LocalTime breakStart;
     private LocalTime breakEnd;
-    private Boolean isDayOff;
+    private boolean isDayOff;
 
     @Builder
     public FixedBusinessHour(Place place, DayOfWeek dayOfWeek, LocalTime openTime,
-        LocalTime closeTime, LocalTime breakStart, LocalTime breakEnd, Boolean isDayOff) {
+        LocalTime closeTime, LocalTime breakStart, LocalTime breakEnd, boolean isDayOff) {
         this.place = place;
         this.dayOfWeek = dayOfWeek;
         this.openTime = openTime;

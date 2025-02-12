@@ -33,7 +33,7 @@ public enum CurrentOpeningStatus {
             return CurrentOpeningStatus.OPEN;
         }
 
-        if (todayBusinessHour.getIsDayOff()) {
+        if (todayBusinessHour.isDayOff()) {
             return CurrentOpeningStatus.DAY_OFF;
         }
 

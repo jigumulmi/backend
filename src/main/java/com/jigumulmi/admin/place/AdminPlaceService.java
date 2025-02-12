@@ -188,7 +188,7 @@ public class AdminPlaceService {
                     .closeTime(businessHour.getCloseTime())
                     .breakStart(businessHour.getBreakStart())
                     .breakEnd(businessHour.getBreakEnd())
-                    .isDayOff(businessHour.getIsDayOff())
+                    .isDayOff(businessHour.isDayOff())
                     .build()
             );
         }
@@ -216,7 +216,7 @@ public class AdminPlaceService {
             .closeTime(businessHour.getCloseTime())
             .breakStart(businessHour.getBreakStart())
             .breakEnd(businessHour.getBreakEnd())
-            .isDayOff(businessHour.getIsDayOff())
+            .isDayOff(businessHour.isDayOff())
             .build();
 
         temporaryBusinessHourRepository.save(temporaryBusinessHour);

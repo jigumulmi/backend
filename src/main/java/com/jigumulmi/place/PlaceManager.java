@@ -133,13 +133,13 @@ public class PlaceManager {
         BusinessHour temporaryBusinessHour = businessHourQueryDto.getTemporaryBusinessHour();
         if ((temporaryBusinessHour.getOpenTime() != null
             && temporaryBusinessHour.getCloseTime() != null)
-            || temporaryBusinessHour.getIsDayOff() != null) {
+            || temporaryBusinessHour.isDayOff()) {
             return BusinessHour.builder()
                 .openTime(temporaryBusinessHour.getOpenTime())
                 .closeTime(temporaryBusinessHour.getCloseTime())
                 .breakStart(temporaryBusinessHour.getBreakStart())
                 .breakEnd(temporaryBusinessHour.getBreakEnd())
-                .isDayOff(temporaryBusinessHour.getIsDayOff())
+                .isDayOff(temporaryBusinessHour.isDayOff())
                 .build();
         } else {
             BusinessHour fixedBusinessHour = businessHourQueryDto.getFixedBusinessHour();
@@ -148,7 +148,7 @@ public class PlaceManager {
                 .closeTime(fixedBusinessHour.getCloseTime())
                 .breakStart(fixedBusinessHour.getBreakStart())
                 .breakEnd(fixedBusinessHour.getBreakEnd())
-                .isDayOff(fixedBusinessHour.getIsDayOff())
+                .isDayOff(fixedBusinessHour.isDayOff())
                 .build();
         }
     }
