@@ -1,4 +1,4 @@
-package com.jigumulmi.banner.dto.repository;
+package com.jigumulmi.place.dto.repository;
 
 import com.jigumulmi.place.dto.BusinessHour;
 import java.time.DayOfWeek;

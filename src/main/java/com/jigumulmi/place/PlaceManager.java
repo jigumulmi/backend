@@ -2,7 +2,6 @@ package com.jigumulmi.place;
 
 import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.aws.S3Manager;
-import com.jigumulmi.banner.dto.repository.BusinessHourQueryDto;
 import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto;
 import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.common.FileUtils;
@@ -18,6 +17,7 @@ import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
+import com.jigumulmi.place.dto.repository.BusinessHourQueryDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;

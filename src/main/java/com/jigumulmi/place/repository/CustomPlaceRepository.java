@@ -19,13 +19,13 @@ import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
-import com.jigumulmi.banner.dto.repository.BusinessHourQueryDto;
 import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.Review;
 import com.jigumulmi.place.dto.BusinessHour;
+import com.jigumulmi.place.dto.repository.BusinessHourQueryDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
