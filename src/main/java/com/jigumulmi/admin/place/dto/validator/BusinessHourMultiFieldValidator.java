@@ -17,7 +17,7 @@ public class BusinessHourMultiFieldValidator implements
             return false;
         }
 
-        if (businessHour.isDayOff()) { // 휴무일
+        if (businessHour.getIsDayOff().equals(true)) { // 휴무일
             if (businessHour.getOpenTime() != null || businessHour.getCloseTime() != null
                 || businessHour.getBreakStart() != null || businessHour.getBreakEnd() != null) {
                 context.buildConstraintViolationWithTemplate("운영 시간 데이터를 제거해주세요")

@@ -1,7 +1,7 @@
 package com.jigumulmi.admin.place.dto.response;
 
-import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
+import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.place.domain.FixedBusinessHour;
 import com.jigumulmi.place.domain.TemporaryBusinessHour;
 import com.jigumulmi.place.dto.BusinessHour;
@@ -29,7 +29,7 @@ public class AdminPlaceBusinessHourResponseDto {
             .closeTime(fixedBusinessHour.getCloseTime())
             .breakStart(fixedBusinessHour.getBreakStart())
             .breakEnd(fixedBusinessHour.getBreakEnd())
-            .isDayOff(fixedBusinessHour.isDayOff())
+            .isDayOff(fixedBusinessHour.getIsDayOff())
             .build();
     }
 
@@ -39,7 +39,7 @@ public class AdminPlaceBusinessHourResponseDto {
             .closeTime(temporaryBusinessHour.getCloseTime())
             .breakStart(temporaryBusinessHour.getBreakStart())
             .breakEnd(temporaryBusinessHour.getBreakEnd())
-            .isDayOff(temporaryBusinessHour.isDayOff())
+            .isDayOff(temporaryBusinessHour.getIsDayOff())
             .build();
     }
 }

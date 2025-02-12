@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Schema(description = "요청 시, 휴무인 경우 time 관련 필드는 모두 미포함 혹은 null")
+@Schema(description = "휴무인 경우 time 관련 필드는 모두 미포함 혹은 null")
 public class BusinessHour {
 
     @Schema(implementation = TimeDto.class)
@@ -22,5 +22,7 @@ public class BusinessHour {
     private LocalTime breakStart;
     @Schema(implementation = TimeDto.class)
     private LocalTime breakEnd;
-    private boolean isDayOff;
+    @Schema(defaultValue = "false")
+    @Builder.Default
+    private Boolean isDayOff = false;
 }

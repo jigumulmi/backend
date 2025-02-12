@@ -48,12 +48,12 @@ public class TemporaryBusinessHour {
     private LocalTime closeTime;
     private LocalTime breakStart;
     private LocalTime breakEnd;
-    private boolean isDayOff;
+    private Boolean isDayOff;
 
     @Builder
     public TemporaryBusinessHour(Place place, Integer year, Integer month, Integer weekOfYear,
         LocalDate date, DayOfWeek dayOfWeek, LocalTime openTime, LocalTime closeTime,
-        LocalTime breakStart, LocalTime breakEnd, boolean isDayOff) {
+        LocalTime breakStart, LocalTime breakEnd, Boolean isDayOff) {
         this.place = place;
         this.year = year;
         this.month = month;
@@ -82,6 +82,6 @@ public class TemporaryBusinessHour {
         this.closeTime = businessHour.getCloseTime();
         this.breakStart = businessHour.getBreakStart();
         this.breakEnd = businessHour.getBreakEnd();
-        this.isDayOff = businessHour.isDayOff();
+        this.isDayOff = businessHour.getIsDayOff();
     }
 }
