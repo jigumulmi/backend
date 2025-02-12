@@ -127,29 +127,29 @@ public class AdminBannerManager {
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
     }
 
+    @Transactional
     public void updateBannerBasic(Long bannerId, UpdateBannerRequestDto requestDto) {
         Banner banner = getBannerEntity(bannerId);
 
         banner.updateBasic(requestDto.getTitle(), requestDto.getIsActive());
-        bannerRepository.save(banner); // TODO save 삭제
     }
 
+    @Transactional
     public String updateBannerOuterImage(Long bannerId, String newS3Key) {
         Banner banner = getBannerEntity(bannerId);
         String oldS3Key = banner.getOuterImageS3Key();
 
         banner.updateOuterS3ImageKey(newS3Key);
-        bannerRepository.save(banner); // TODO save 삭제
 
         return oldS3Key;
     }
 
+    @Transactional
     public String updateBannerInnerImage(Long bannerId, String newS3Key) {
         Banner banner = getBannerEntity(bannerId);
         String oldS3Key = banner.getInnerImageS3Key();
 
         banner.updateInnerS3ImageKey(newS3Key);
-        bannerRepository.save(banner); // TODO save 삭제
 
         return oldS3Key;
     }
