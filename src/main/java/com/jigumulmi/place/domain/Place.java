@@ -190,10 +190,6 @@ public class Place extends Timestamped {
         this.subwayStationPlaceList.addAll(subwayStationPlaceList);
     }
 
-    public void addMenu(List<Menu> menuList) {
-        this.menuList.addAll(menuList);
-    }
-
     public void adminBasicUpdate(AdminCreatePlaceRequestDto requestDto,
         List<PlaceCategoryMapping> categoryMappingList,
         List<SubwayStationPlace> subwayStationPlaceList) {
