@@ -1,5 +1,6 @@
 package com.jigumulmi.admin.banner;
 
+import com.jigumulmi.admin.banner.dto.AdminUpdateBannerImageS3KeyDto;
 import com.jigumulmi.admin.banner.dto.request.BannerPlaceMappingRequestDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
@@ -22,10 +23,14 @@ public class AdminBannerService {
     private final AdminBannerManager adminBannerManager;
 
     public CreateBannerResponseDto createBanner(CreateBannerRequestDto requestDto) {
-        String outerImageS3Key = adminBannerManager.saveBannerImageFile(requestDto.getOuterImage());
-        String innerImageS3Key = adminBannerManager.saveBannerImageFile(requestDto.getOuterImage());
+        CreateBannerResponseDto createBannerResponseDto = adminBannerManager.saveBanner(requestDto);
 
-        return adminBannerManager.saveBanner(requestDto, outerImageS3Key, innerImageS3Key);
+        adminBannerManager.saveBannerImageFile(requestDto.getOuterImage(),
+            createBannerResponseDto.getS3KeyDto().getOuterImage());
+        adminBannerManager.saveBannerImageFile(requestDto.getInnerImage(),
+            createBannerResponseDto.getS3KeyDto().getInnerImage());
+
+        return createBannerResponseDto;
     }
 
     public List<AdminBannerResponseDto> getBannerList() {
@@ -53,19 +58,22 @@ public class AdminBannerService {
     }
 
     public void updateBannerOuterImage(Long bannerId, MultipartFile image) {
-        String newS3Key = adminBannerManager.saveBannerImageFile(image);
-        String oldS3Key = adminBannerManager.updateBannerOuterImage(bannerId, newS3Key);
-        adminBannerManager.deleteBannerImageFile(oldS3Key);
+        AdminUpdateBannerImageS3KeyDto s3KeyDto = adminBannerManager.updateBannerOuterImage(bannerId);
+
+        adminBannerManager.saveBannerImageFile(image, s3KeyDto.getNewKey());
+        adminBannerManager.deleteBannerImageFile(s3KeyDto.getOldKey());
     }
 
     public void updateBannerInnerImage(Long bannerId, MultipartFile image) {
-        String newS3Key = adminBannerManager.saveBannerImageFile(image);
-        String oldS3Key = adminBannerManager.updateBannerInnerImage(bannerId, newS3Key);
-        adminBannerManager.deleteBannerImageFile(oldS3Key);
+        AdminUpdateBannerImageS3KeyDto s3KeyDto = adminBannerManager.updateBannerInnerImage(bannerId);
+
+        adminBannerManager.saveBannerImageFile(image, s3KeyDto.getNewKey());
+        adminBannerManager.deleteBannerImageFile(s3KeyDto.getOldKey());
     }
 
     public void deleteBanner(Long bannerId) {
         List<String> s3KeyList = adminBannerManager.deleteBanner(bannerId);
+
         adminBannerManager.deleteBannerImageFileList(s3KeyList);
     }
 
