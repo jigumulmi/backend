@@ -377,13 +377,14 @@ public class PlaceManager {
         return reviewImageList.stream().map(ReviewImage::getS3Key).toList();
     }
 
-    @Transactional
-    public void deleteReviewReply(Long reviewReplyId, Member member) {
+    public ReviewReply deleteReviewReply(Long reviewReplyId, Member member) {
         ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(reviewReplyId, member);
-
         reviewReplyRepository.delete(reviewReply);
 
-        // 속한 리뷰가 삭제된 상태고, 해당 답글이 마지막이었던 경우
+        return reviewReply;
+    }
+
+    public void hardDeleteReviewIfNeeded(ReviewReply reviewReply) {
         Review review = reviewReply.getReview();
         long reviewReplyCount = reviewReplyRepository.countByReview(review);
         if (review.getDeletedAt() != null && reviewReplyCount == 1) {

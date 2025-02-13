@@ -3,6 +3,7 @@ package com.jigumulmi.place;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Review;
+import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
@@ -25,6 +26,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -93,8 +95,10 @@ public class PlaceService {
         placeManager.deleteReviewImage(trashS3KeyList);
     }
 
+    @Transactional
     public void deleteReviewReply(Long reviewReplyId, Member member) {
-        placeManager.deleteReviewReply(reviewReplyId, member);
+        ReviewReply reviewReply = placeManager.deleteReviewReply(reviewReplyId, member);
+        placeManager.hardDeleteReviewIfNeeded(reviewReply);
     }
 
     public List<PlaceCategoryGroup> getPlaceCategoryGroupList() {
