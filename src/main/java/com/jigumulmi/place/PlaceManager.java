@@ -17,6 +17,7 @@ import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
+import com.jigumulmi.place.dto.UpdateReviewImageS3KeyDto;
 import com.jigumulmi.place.dto.repository.BusinessHourQueryDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
@@ -173,7 +174,8 @@ public class PlaceManager {
             DayOfWeek dayOfWeek = businessHourQueryDto.getDayOfWeek();
             BusinessHour businessHour = buildBusinessHour(businessHourQueryDto);
 
-            weeklyBusinessHourDto.updateBusinessHour(Objects.requireNonNull(dayOfWeek), businessHour);
+            weeklyBusinessHourDto.updateBusinessHour(Objects.requireNonNull(dayOfWeek),
+                businessHour);
         }
 
         DayOfWeek todayDayOfWeek = today.getDayOfWeek();
@@ -230,8 +232,8 @@ public class PlaceManager {
     }
 
     @Transactional
-    public void createReview(Long placeId, CreateReviewRequestDto requestDto, Member member,
-        List<String> s3KeyList) {
+    public List<String> createReview(Long placeId, CreateReviewRequestDto requestDto,
+        Member member) {
         Place place = placeRepository.findById(placeId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
         Review review = Review.builder()
@@ -240,6 +242,9 @@ public class PlaceManager {
             .rating(requestDto.getRating())
             .member(member)
             .build();
+
+        List<String> s3KeyList = makeReviewImageS3KeyList(placeId,
+            requestDto.getImageList().size());
 
         List<ReviewImage> reviewImageList = new ArrayList<>();
         for (String s3Key : s3KeyList) {
@@ -254,24 +259,31 @@ public class PlaceManager {
         review.addReviewImageList(reviewImageList);
 
         reviewRepository.save(review);
+
+        return s3KeyList;
     }
 
-    public List<String> saveReviewImageFileList(Long placeId, List<MultipartFile> imageList) {
+    private List<String> makeReviewImageS3KeyList(long placeId, int imageCount) {
         List<String> s3KeyList = new ArrayList<>();
+        for (int i = 0; i < imageCount; i++) {
+            String s3Key = S3Manager.REVIEW_IMAGE_S3_PREFIX + placeId + "/"
+                + FileUtils.generateUniqueFilename();
+            s3KeyList.add(s3Key);
+        }
+        return s3KeyList;
+    }
+
+    public void saveReviewImageFileList(List<MultipartFile> imageList, List<String> s3KeyList) {
         try {
-            for (MultipartFile image : imageList) {
-                String s3Key = S3Manager.REVIEW_IMAGE_S3_PREFIX + placeId + "/"
-                    + FileUtils.generateUniqueFilename();
+            for (int i = 0; i < imageList.size(); i++) {
+                String s3Key = s3KeyList.get(i);
+                MultipartFile image = imageList.get(i);
 
                 s3Manager.putObject(s3Manager.bucket, s3Key, image);
-
-                s3KeyList.add(s3Key);
             }
         } catch (SdkException | IOException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
-
-        return s3KeyList;
     }
 
     public void postReviewReply(Long reviewId, CreateReviewReplyRequestDto requestDto,
@@ -312,8 +324,12 @@ public class PlaceManager {
     }
 
     @Transactional
-    public List<String> updateReview(Review review, UpdateReviewRequestDto requestDto,
-        List<String> newS3KeyList) {
+    public UpdateReviewImageS3KeyDto updateReview(Long reviewId, Member member,
+        UpdateReviewRequestDto requestDto) {
+        Review review = getReview(reviewId, member);
+
+        List<String> newS3KeyList = makeReviewImageS3KeyList(review.getPlace().getId(),
+            requestDto.getNewImageList().size());
 
         List<ReviewImage> newReviewImageList = new ArrayList<>();
         for (String s3Key : newS3KeyList) {
@@ -335,7 +351,10 @@ public class PlaceManager {
 
         reviewRepository.save(review);
 
-        return trashReviewImageList.stream().map(ReviewImage::getS3Key).toList();
+        return UpdateReviewImageS3KeyDto.builder()
+            .newS3KeyList(newS3KeyList)
+            .trashS3KeyList(trashReviewImageList.stream().map(ReviewImage::getS3Key).toList())
+            .build();
     }
 
     public void deleteReviewImageFileList(List<String> trashS3KeyList) {
@@ -373,17 +392,16 @@ public class PlaceManager {
         return reviewImageList.stream().map(ReviewImage::getS3Key).toList();
     }
 
-    public ReviewReply deleteReviewReply(Long reviewReplyId, Member member) {
+    public Review deleteReviewReply(Long reviewReplyId, Member member) {
         ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(reviewReplyId, member);
         reviewReplyRepository.delete(reviewReply);
 
-        return reviewReply;
+        return reviewReply.getReview();
     }
 
-    public void hardDeleteReviewIfNeeded(ReviewReply reviewReply) {
-        Review review = reviewReply.getReview();
+    public void hardDeleteReviewIfNeeded(Review review) {
         long reviewReplyCount = reviewReplyRepository.countByReview(review);
-        if (review.getDeletedAt() != null && reviewReplyCount == 1) {
+        if (review.getDeletedAt() != null && reviewReplyCount == 0) {
             reviewRepository.delete(review);
         }
     }

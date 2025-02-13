@@ -3,8 +3,8 @@ package com.jigumulmi.place;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.Review;
-import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.dto.MenuDto;
+import com.jigumulmi.place.dto.UpdateReviewImageS3KeyDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
 import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
@@ -58,8 +58,8 @@ public class PlaceService {
     public void postReview(Long placeId, CreateReviewRequestDto requestDto, Member member) {
         placeManager.checkActiveReview(placeId, member);
 
-        List<String> s3KeyList = placeManager.saveReviewImageFileList(placeId, requestDto.getImageList());
-        placeManager.createReview(placeId, requestDto, member, s3KeyList);
+        List<String> s3KeyList = placeManager.createReview(placeId, requestDto, member);
+        placeManager.saveReviewImageFileList(requestDto.getImageList(), s3KeyList);
     }
 
     public void postReviewReply(Long reviewId, CreateReviewReplyRequestDto requestDto,
@@ -77,12 +77,9 @@ public class PlaceService {
     }
 
     public void updateReview(Long reviewId, UpdateReviewRequestDto requestDto, Member member) {
-        Review review = placeManager.getReview(reviewId, member);
-
-        List<String> newS3KeyList = placeManager.saveReviewImageFileList(review.getPlace().getId(),
-            requestDto.getNewImageList());
-        List<String> trashS3KeyList = placeManager.updateReview(review, requestDto, newS3KeyList);
-        placeManager.deleteReviewImageFileList(trashS3KeyList);
+        UpdateReviewImageS3KeyDto s3KeyDto = placeManager.updateReview(reviewId, member, requestDto);
+        placeManager.saveReviewImageFileList(requestDto.getNewImageList(), s3KeyDto.getNewS3KeyList());
+        placeManager.deleteReviewImageFileList(s3KeyDto.getTrashS3KeyList());
     }
 
     public void updateReviewReply(Long replyId, UpdateReviewReplyRequestDto requestDto,
@@ -97,8 +94,8 @@ public class PlaceService {
 
     @Transactional
     public void deleteReviewReply(Long reviewReplyId, Member member) {
-        ReviewReply reviewReply = placeManager.deleteReviewReply(reviewReplyId, member);
-        placeManager.hardDeleteReviewIfNeeded(reviewReply);
+        Review review = placeManager.deleteReviewReply(reviewReplyId, member);
+        placeManager.hardDeleteReviewIfNeeded(review);
     }
 
     public List<PlaceCategoryGroup> getPlaceCategoryGroupList() {
