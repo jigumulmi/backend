@@ -39,7 +39,7 @@ public class AdminBannerManager {
     private final BannerRepository bannerRepository;
     private final AdminCustomBannerRepository adminCustomBannerRepository;
 
-    public String saveBannerImage(MultipartFile image) {
+    public String saveBannerImageFile(MultipartFile image) {
         if (image == null) {
             return null;
         }
@@ -54,7 +54,7 @@ public class AdminBannerManager {
         }
     }
 
-    public void deleteBannerImage(String s3Key) {
+    public void deleteBannerImageFile(String s3Key) {
         if (s3Key == null) {
             return;
         }
@@ -66,7 +66,7 @@ public class AdminBannerManager {
         }
     }
 
-    public void deleteBannerImageList(List<String> s3KeyList) {
+    public void deleteBannerImageFileList(List<String> s3KeyList) {
         if (s3KeyList.isEmpty()) {
             return;
         }

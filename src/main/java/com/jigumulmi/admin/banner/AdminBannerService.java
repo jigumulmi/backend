@@ -22,8 +22,8 @@ public class AdminBannerService {
     private final AdminBannerManager adminBannerManager;
 
     public CreateBannerResponseDto createBanner(CreateBannerRequestDto requestDto) {
-        String outerImageS3Key = adminBannerManager.saveBannerImage(requestDto.getOuterImage());
-        String innerImageS3Key = adminBannerManager.saveBannerImage(requestDto.getOuterImage());
+        String outerImageS3Key = adminBannerManager.saveBannerImageFile(requestDto.getOuterImage());
+        String innerImageS3Key = adminBannerManager.saveBannerImageFile(requestDto.getOuterImage());
 
         return adminBannerManager.saveBanner(requestDto, outerImageS3Key, innerImageS3Key);
     }
@@ -53,20 +53,20 @@ public class AdminBannerService {
     }
 
     public void updateBannerOuterImage(Long bannerId, MultipartFile image) {
-        String newS3Key = adminBannerManager.saveBannerImage(image);
+        String newS3Key = adminBannerManager.saveBannerImageFile(image);
         String oldS3Key = adminBannerManager.updateBannerOuterImage(bannerId, newS3Key);
-        adminBannerManager.deleteBannerImage(oldS3Key);
+        adminBannerManager.deleteBannerImageFile(oldS3Key);
     }
 
     public void updateBannerInnerImage(Long bannerId, MultipartFile image) {
-        String newS3Key = adminBannerManager.saveBannerImage(image);
+        String newS3Key = adminBannerManager.saveBannerImageFile(image);
         String oldS3Key = adminBannerManager.updateBannerInnerImage(bannerId, newS3Key);
-        adminBannerManager.deleteBannerImage(oldS3Key);
+        adminBannerManager.deleteBannerImageFile(oldS3Key);
     }
 
     public void deleteBanner(Long bannerId) {
         List<String> s3KeyList = adminBannerManager.deleteBanner(bannerId);
-        adminBannerManager.deleteBannerImageList(s3KeyList);
+        adminBannerManager.deleteBannerImageFileList(s3KeyList);
     }
 
     public PagedResponseDto<BannerPlaceDto> getCandidatePlaceList(Pageable pageable,
