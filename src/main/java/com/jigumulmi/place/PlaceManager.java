@@ -56,7 +56,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,9 +68,6 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 @Component
 @RequiredArgsConstructor
 public class PlaceManager {
-
-    public final static String REVIEW_IMAGE_S3_PREFIX = "reviewImage/";
-    public final static String MENU_IMAGE_S3_PREFIX = "menuImage/";
 
     private final S3Manager s3Manager;
 
@@ -264,8 +260,8 @@ public class PlaceManager {
         List<String> s3KeyList = new ArrayList<>();
         try {
             for (MultipartFile image : imageList) {
-                String s3Key = REVIEW_IMAGE_S3_PREFIX + placeId + "/"
-                    + FileUtils.generateUniqueFilename(image);
+                String s3Key = S3Manager.REVIEW_IMAGE_S3_PREFIX + placeId + "/"
+                    + FileUtils.generateUniqueFilename();
 
                 s3Manager.putObject(s3Manager.bucket, s3Key, image);
 
@@ -393,8 +389,8 @@ public class PlaceManager {
     }
 
     public S3PutPresignedUrlResponseDto createMenuImageS3PutPresignedUrl(long placeId) {
-        String filename = UUID.randomUUID().toString();
-        String s3Key = MENU_IMAGE_S3_PREFIX + placeId + "/" + filename;
+        String filename = FileUtils.generateUniqueFilename();
+        String s3Key = S3Manager.MENU_IMAGE_S3_PREFIX + placeId + "/" + filename;
 
         String url = s3Manager.generatePutObjectPresignedUrl(s3Manager.bucket, s3Key);
         return S3PutPresignedUrlResponseDto.builder()

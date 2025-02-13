@@ -33,7 +33,6 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 @RequiredArgsConstructor
 public class AdminBannerManager {
 
-    private final String BANNER_S3_PREFIX = "banner/";
     private final S3Manager s3Manager;
 
     private final BannerRepository bannerRepository;
@@ -45,7 +44,7 @@ public class AdminBannerManager {
         }
 
         try {
-            String s3Key = BANNER_S3_PREFIX + FileUtils.generateUniqueFilename(image);
+            String s3Key = S3Manager.BANNER_IMAGE_S3_PREFIX + FileUtils.generateUniqueFilename();
             s3Manager.putObject(s3Manager.bucket, s3Key, image);
 
             return s3Key;
