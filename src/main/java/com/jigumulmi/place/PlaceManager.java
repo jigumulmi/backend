@@ -260,7 +260,7 @@ public class PlaceManager {
         reviewRepository.save(review);
     }
 
-    public List<String> saveReviewImage(Long placeId, List<MultipartFile> imageList) {
+    public List<String> saveReviewImageFileList(Long placeId, List<MultipartFile> imageList) {
         List<String> s3KeyList = new ArrayList<>();
         try {
             for (MultipartFile image : imageList) {
@@ -342,7 +342,7 @@ public class PlaceManager {
         return trashReviewImageList.stream().map(ReviewImage::getS3Key).toList();
     }
 
-    public void deleteReviewImage(List<String> trashS3KeyList) {
+    public void deleteReviewImageFileList(List<String> trashS3KeyList) {
         try {
             List<ObjectIdentifier> objectIdentifierList = trashS3KeyList.stream().map(
                 key -> ObjectIdentifier.builder().key(key).build()
