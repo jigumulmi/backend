@@ -92,7 +92,7 @@ public class AdminPlaceService {
 
     public void deletePlace(Long placeId) {
         adminPlaceManager.deletePlace(placeId);
-        adminPlaceManager.deleteMenuAndReviewImageFileList(placeId);
+        adminPlaceManager.deleteMenuImageFileList(placeId);
     }
 
     public List<Region> getRegionList() {

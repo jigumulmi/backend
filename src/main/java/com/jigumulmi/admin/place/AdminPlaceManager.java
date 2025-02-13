@@ -20,7 +20,6 @@ import com.jigumulmi.place.domain.Menu;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.PlaceCategoryMapping;
 import com.jigumulmi.place.domain.PlaceImage;
-import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.SubwayStation;
 import com.jigumulmi.place.domain.SubwayStationPlace;
 import com.jigumulmi.place.domain.TemporaryBusinessHour;
@@ -34,7 +33,6 @@ import com.jigumulmi.place.repository.FixedBusinessHourRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
-import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.repository.TemporaryBusinessHourRepository;
 import com.jigumulmi.place.vo.District;
@@ -46,7 +44,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -65,7 +62,6 @@ public class AdminPlaceManager {
     private final PlaceRepository placeRepository;
     private final SubwayStationRepository subwayStationRepository;
     private final MenuRepository menuRepository;
-    private final ReviewImageRepository reviewImageRepository;
     private final PlaceImageRepository placeImageRepository;
     private final FixedBusinessHourRepository fixedBusinessHourRepository;
     private final TemporaryBusinessHourRepository temporaryBusinessHourRepository;
@@ -324,20 +320,12 @@ public class AdminPlaceManager {
         placeRepository.deleteById(placeId);
     }
 
-    public void deleteMenuAndReviewImageFileList(Long placeId) {
-        List<Menu> menuList = menuRepository.findAllByPlaceId(placeId);
-        List<ReviewImage> reviewImageList = reviewImageRepository.findAllByReview_Place_IdOrderByCreatedAtDesc(
-            placeId);
+    public void deleteMenuImageFileList(Long placeId) {
         try {
-            Stream<ObjectIdentifier> menuImageObjectIdentifierList = menuList.stream().map(
+            List<Menu> menuList = menuRepository.findAllByPlaceId(placeId);
+            List<ObjectIdentifier> objectIdentifierList = menuList.stream().map(
                 m -> ObjectIdentifier.builder().key(m.getImageS3Key()).build()
-            );
-            Stream<ObjectIdentifier> reviewImageObjectIdentifierList = reviewImageList.stream().map(
-                ri -> ObjectIdentifier.builder().key(ri.getS3Key()).build()
-            );
-
-            List<ObjectIdentifier> objectIdentifierList = Stream.concat(
-                menuImageObjectIdentifierList, reviewImageObjectIdentifierList).toList();
+            ).toList();
 
             s3Manager.deleteObjects(s3Manager.bucket, objectIdentifierList);
         } catch (SdkException e) {
