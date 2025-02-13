@@ -51,7 +51,8 @@ public class MenuDto {
     public static Menu toMenu(MenuDto menuDto, Place place) {
         String imageS3Key = null;
         if (menuDto.getFullFilename() != null) {
-            imageS3Key = PlaceManager.MENU_IMAGE_S3_PREFIX + menuDto.getFullFilename();
+            imageS3Key =
+                PlaceManager.MENU_IMAGE_S3_PREFIX + place.getId() + "/" + menuDto.getFullFilename();
         }
 
         return Menu.builder()

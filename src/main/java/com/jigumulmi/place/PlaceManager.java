@@ -392,10 +392,9 @@ public class PlaceManager {
         }
     }
 
-    public S3PutPresignedUrlResponseDto createMenuImageS3PutPresignedUrl(
-        @NotBlank String fileExtension) {
+    public S3PutPresignedUrlResponseDto createMenuImageS3PutPresignedUrl(long placeId) {
         String filename = UUID.randomUUID().toString();
-        String s3Key = MENU_IMAGE_S3_PREFIX + filename + "." + fileExtension;
+        String s3Key = MENU_IMAGE_S3_PREFIX + placeId + "/" + filename;
 
         String url = s3Manager.generatePutObjectPresignedUrl(s3Manager.bucket, s3Key);
         return S3PutPresignedUrlResponseDto.builder()

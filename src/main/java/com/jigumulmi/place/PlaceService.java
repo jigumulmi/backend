@@ -111,7 +111,7 @@ public class PlaceService {
 
     public S3PutPresignedUrlResponseDto createMenuImageS3PutPresignedUrl(
         MenuImageS3PutPresignedUrlRequestDto requestDto) {
-        return placeManager.createMenuImageS3PutPresignedUrl(requestDto.getFileExtension());
+        return placeManager.createMenuImageS3PutPresignedUrl(requestDto.getPlaceId());
     }
 
     public S3DeletePresignedUrlResponseDto createMenuImageS3DeletePresignedUrl(
