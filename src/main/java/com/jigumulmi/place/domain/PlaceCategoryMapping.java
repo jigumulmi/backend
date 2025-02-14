@@ -22,6 +22,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.proxy.HibernateProxy;
 
 @Entity
 @Getter
@@ -56,23 +57,31 @@ public class PlaceCategoryMapping {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null) {
             return false;
         }
-
-        PlaceCategoryMapping that = (PlaceCategoryMapping) o;
-        return getCategory() == that.getCategory() && getCategoryGroup() == that.getCategoryGroup();
+        Class<?> oEffectiveClass = o instanceof HibernateProxy
+            ? ((HibernateProxy) o).getHibernateLazyInitializer()
+            .getPersistentClass() : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy
+            ? ((HibernateProxy) this).getHibernateLazyInitializer()
+            .getPersistentClass() : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) {
+            return false;
+        }
+        PlaceCategoryMapping mapping = (PlaceCategoryMapping) o;
+        return getId() != null && Objects.equals(getId(), mapping.getId());
     }
 
     @Override
-    public int hashCode() {
-        int result = Objects.hashCode(getCategory());
-        result = 31 * result + Objects.hashCode(getCategoryGroup());
-        return result;
+    public final int hashCode() {
+        return this instanceof HibernateProxy
+            ? ((HibernateProxy) this).getHibernateLazyInitializer()
+            .getPersistentClass().hashCode() : getClass().hashCode();
     }
 
     // TODO 일반적으로 사용할 수 있는 공통 클래스 생성
