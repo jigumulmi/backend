@@ -37,7 +37,7 @@ public class ReviewResponseDto {
             .id(review.getId())
             .rating(review.getRating())
             .content(review.getContent())
-            .isEditable(reviewAuthor == requestMember)
+            .isEditable(reviewAuthor.equals(requestMember))
             .member(MemberDetailResponseDto.from(reviewAuthor))
             .isEdited(review.getModifiedAt().isAfter(review.getCreatedAt()))
             .imageList(
