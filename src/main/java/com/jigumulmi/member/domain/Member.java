@@ -62,10 +62,19 @@ public class Member extends Timestamped {
      * 스웨거 또는 포스트맨으로 인증된 테스트 사용자
      */
     @Builder(builderMethodName = "testMemberBuilder", builderClassName="TestMemberBuilder")
-    public Member(Long id) {
+    public Member(Long id, Boolean isAdmin) {
         this.id = id;
         this.nickname = "testMember";
         this.isAdmin = true;
+    }
+
+    /**
+     * 게스트 사용자
+     */
+    @Builder(builderMethodName = "guestMemberBuilder", builderClassName="GuestMemberBuilder")
+    public Member(long id) {
+        this.id = id;
+        this.isAdmin = false;
     }
 
     @Override
