@@ -68,6 +68,10 @@ public class PlaceService {
         return placeManager.getReviewList(requestMember, pageable, placeId);
     }
 
+    public Review getReview(Member member, Long reviewId) {
+        return placeManager.getReview(reviewId, member);
+    }
+
     public List<ReviewReplyResponseDto> getReviewReplyList(Member member, Long reviewId) {
         return placeManager.getReviewReplyList(member, reviewId);
     }

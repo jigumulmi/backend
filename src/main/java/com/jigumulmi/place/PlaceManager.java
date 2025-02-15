@@ -300,7 +300,8 @@ public class PlaceManager {
     public PagedResponseDto<ReviewResponseDto> getReviewList(Member requestMember,
         Pageable pageable, Long placeId) {
         Page<ReviewResponseDto> reviewList = customPlaceRepository.getReviewListByPlaceId(
-            placeId, pageable).map(review -> ReviewResponseDto.from(review, requestMember));
+                placeId, pageable)
+            .map(review -> ReviewResponseDto.fromRequestMember(review, requestMember));
 
         Map<Long, Long> reviewReplyCount = customPlaceRepository.getReviewReplyCount(placeId);
 
@@ -317,7 +318,8 @@ public class PlaceManager {
     }
 
     public Review getReview(Long reviewId, Member member) {
-        return reviewRepository.findByIdAndMember(reviewId, member);
+        return reviewRepository.findByIdAndMember(reviewId, member)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
     }
 
     @Transactional
