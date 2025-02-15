@@ -19,10 +19,10 @@ public class FileUtils {
 
     /**
      * 
-     * @param absolutePath 파일 이름이 포함된 전체 경로
+     * @param path 파일 이름이 포함된 전체 경로
      * @return 경로가 제거된 파일 이름
      */
-    public static String getFilenameFromAbsolutePath(String absolutePath) {
-        return StringUtils.substringAfterLast(absolutePath, "/");
+    public static String getFilenameFromPath(String path) {
+        return StringUtils.substringAfterLast(path, "/");
     }
 }
