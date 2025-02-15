@@ -1,5 +1,7 @@
 package com.jigumulmi.admin.banner;
 
+import com.jigumulmi.admin.banner.dto.AdminCreateBannerImageS3KeyDto;
+import com.jigumulmi.admin.banner.dto.AdminUpdateBannerImageS3KeyDto;
 import com.jigumulmi.admin.banner.dto.request.CreateBannerRequestDto;
 import com.jigumulmi.admin.banner.dto.request.GetCandidatePlaceListRequestDto;
 import com.jigumulmi.admin.banner.dto.request.UpdateBannerRequestDto;
@@ -33,22 +35,22 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 @RequiredArgsConstructor
 public class AdminBannerManager {
 
-    private final String BANNER_S3_PREFIX = "banner/";
     private final S3Manager s3Manager;
 
     private final BannerRepository bannerRepository;
     private final AdminCustomBannerRepository adminCustomBannerRepository;
 
-    public String saveBannerImageFile(MultipartFile image) {
+    private static String makeBannerImageS3Key() {
+        return S3Manager.BANNER_IMAGE_S3_PREFIX + FileUtils.generateUniqueFilename();
+    }
+
+    public void saveBannerImageFile(MultipartFile image, String s3Key) {
         if (image == null) {
-            return null;
+            return;
         }
 
         try {
-            String s3Key = BANNER_S3_PREFIX + FileUtils.generateUniqueFilename(image);
             s3Manager.putObject(s3Manager.bucket, s3Key, image);
-
-            return s3Key;
         } catch (IOException | SdkException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
@@ -83,7 +85,10 @@ public class AdminBannerManager {
         }
     }
 
-    public CreateBannerResponseDto saveBanner(CreateBannerRequestDto requestDto, String outerImageS3Key, String innerImageS3Key) {
+    public CreateBannerResponseDto saveBanner(CreateBannerRequestDto requestDto) {
+        String outerImageS3Key = requestDto.getOuterImage() != null ? makeBannerImageS3Key() : null;
+        String innerImageS3Key = requestDto.getInnerImage() != null ? makeBannerImageS3Key() : null;
+
         Banner banner = Banner.builder()
             .title(requestDto.getTitle())
             .outerImageS3Key(outerImageS3Key)
@@ -92,7 +97,16 @@ public class AdminBannerManager {
             .build();
 
         bannerRepository.save(banner);
-        return CreateBannerResponseDto.builder().bannerId(banner.getId()).build();
+
+        return CreateBannerResponseDto.builder()
+            .bannerId(banner.getId())
+            .s3KeyDto(
+                AdminCreateBannerImageS3KeyDto.builder()
+                    .outerImage(outerImageS3Key)
+                    .innerImage(innerImageS3Key)
+                    .build()
+            )
+            .build();
     }
 
     public List<AdminBannerResponseDto> getBannerList() {
@@ -135,23 +149,31 @@ public class AdminBannerManager {
     }
 
     @Transactional
-    public String updateBannerOuterImage(Long bannerId, String newS3Key) {
+    public AdminUpdateBannerImageS3KeyDto updateBannerOuterImage(Long bannerId) {
         Banner banner = getBannerEntity(bannerId);
         String oldS3Key = banner.getOuterImageS3Key();
 
+        String newS3Key = makeBannerImageS3Key();
         banner.updateOuterS3ImageKey(newS3Key);
 
-        return oldS3Key;
+        return AdminUpdateBannerImageS3KeyDto.builder()
+            .newKey(newS3Key)
+            .oldKey(oldS3Key)
+            .build();
     }
 
     @Transactional
-    public String updateBannerInnerImage(Long bannerId, String newS3Key) {
+    public AdminUpdateBannerImageS3KeyDto updateBannerInnerImage(Long bannerId) {
         Banner banner = getBannerEntity(bannerId);
         String oldS3Key = banner.getInnerImageS3Key();
 
+        String newS3Key = makeBannerImageS3Key();
         banner.updateInnerS3ImageKey(newS3Key);
 
-        return oldS3Key;
+        return AdminUpdateBannerImageS3KeyDto.builder()
+            .newKey(newS3Key)
+            .oldKey(oldS3Key)
+            .build();
     }
 
     @Transactional

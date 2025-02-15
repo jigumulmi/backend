@@ -5,15 +5,19 @@ import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.place.dto.response.AdminCreatePlaceResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto.TemporaryBusinessHourDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
-import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminS3DeletePresignedUrlResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminS3PutPresignedUrlResponseDto;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
+import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
+import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.vo.Region;
 import java.util.Arrays;
@@ -85,7 +89,7 @@ public class AdminPlaceService {
             tempBusinessHourResponseDto);
     }
 
-    public CreatePlaceResponseDto createPlace(AdminCreatePlaceRequestDto requestDto,
+    public AdminCreatePlaceResponseDto createPlace(AdminCreatePlaceRequestDto requestDto,
         Member member) {
         return adminPlaceManager.createPlace(requestDto, member);
     }
@@ -101,5 +105,15 @@ public class AdminPlaceService {
 
     public List<DistrictResponseDto> getDistrictList(Region region) {
         return adminPlaceManager.getDistrictListOrderByName(region);
+    }
+
+    public AdminS3PutPresignedUrlResponseDto createMenuImageS3PutPresignedUrl(
+        MenuImageS3PutPresignedUrlRequestDto requestDto) {
+        return adminPlaceManager.createMenuImageS3PutPresignedUrl(requestDto.getPlaceId());
+    }
+
+    public AdminS3DeletePresignedUrlResponseDto createMenuImageS3DeletePresignedUrl(
+        MenuImageS3DeletePresignedUrlRequestDto requestDto) {
+        return adminPlaceManager.createMenuImageS3DeletePresignedUrl(requestDto.getS3Key());
     }
 }

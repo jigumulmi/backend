@@ -17,6 +17,7 @@ import com.jigumulmi.place.domain.ReviewReply;
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
+import com.jigumulmi.place.dto.UpdateReviewImageS3KeyDto;
 import com.jigumulmi.place.dto.repository.BusinessHourQueryDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
@@ -30,8 +31,6 @@ import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
-import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
-import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
@@ -45,7 +44,6 @@ import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.CurrentOpeningStatus;
 import com.jigumulmi.place.vo.NextOpeningStatus;
-import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -56,7 +54,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,9 +66,6 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 @Component
 @RequiredArgsConstructor
 public class PlaceManager {
-
-    public final static String REVIEW_IMAGE_S3_PREFIX = "reviewImage/";
-    public final static String MENU_IMAGE_S3_PREFIX = "menuImage/";
 
     private final S3Manager s3Manager;
 
@@ -177,7 +171,8 @@ public class PlaceManager {
             DayOfWeek dayOfWeek = businessHourQueryDto.getDayOfWeek();
             BusinessHour businessHour = buildBusinessHour(businessHourQueryDto);
 
-            weeklyBusinessHourDto.updateBusinessHour(Objects.requireNonNull(dayOfWeek), businessHour);
+            weeklyBusinessHourDto.updateBusinessHour(Objects.requireNonNull(dayOfWeek),
+                businessHour);
         }
 
         DayOfWeek todayDayOfWeek = today.getDayOfWeek();
@@ -234,8 +229,8 @@ public class PlaceManager {
     }
 
     @Transactional
-    public void createReview(Long placeId, CreateReviewRequestDto requestDto, Member member,
-        List<String> s3KeyList) {
+    public List<String> createReview(Long placeId, CreateReviewRequestDto requestDto,
+        Member member) {
         Place place = placeRepository.findById(placeId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
         Review review = Review.builder()
@@ -244,6 +239,9 @@ public class PlaceManager {
             .rating(requestDto.getRating())
             .member(member)
             .build();
+
+        List<String> s3KeyList = makeReviewImageS3KeyList(placeId,
+            requestDto.getImageList().size());
 
         List<ReviewImage> reviewImageList = new ArrayList<>();
         for (String s3Key : s3KeyList) {
@@ -258,24 +256,31 @@ public class PlaceManager {
         review.addReviewImageList(reviewImageList);
 
         reviewRepository.save(review);
+
+        return s3KeyList;
     }
 
-    public List<String> saveReviewImage(Long placeId, List<MultipartFile> imageList) {
+    private List<String> makeReviewImageS3KeyList(long placeId, int imageCount) {
         List<String> s3KeyList = new ArrayList<>();
+        for (int i = 0; i < imageCount; i++) {
+            String s3Key = S3Manager.REVIEW_IMAGE_S3_PREFIX + placeId + "/"
+                + FileUtils.generateUniqueFilename();
+            s3KeyList.add(s3Key);
+        }
+        return s3KeyList;
+    }
+
+    public void saveReviewImageFileList(List<MultipartFile> imageList, List<String> s3KeyList) {
         try {
-            for (MultipartFile image : imageList) {
-                String s3Key = REVIEW_IMAGE_S3_PREFIX + placeId + "/"
-                    + FileUtils.generateUniqueFilename(image);
+            for (int i = 0; i < imageList.size(); i++) {
+                String s3Key = s3KeyList.get(i);
+                MultipartFile image = imageList.get(i);
 
                 s3Manager.putObject(s3Manager.bucket, s3Key, image);
-
-                s3KeyList.add(s3Key);
             }
         } catch (SdkException | IOException e) {
             throw new CustomException(CommonErrorCode.INTERNAL_SERVER_ERROR);
         }
-
-        return s3KeyList;
     }
 
     public void postReviewReply(Long reviewId, CreateReviewReplyRequestDto requestDto,
@@ -316,8 +321,12 @@ public class PlaceManager {
     }
 
     @Transactional
-    public List<String> updateReview(Review review, UpdateReviewRequestDto requestDto,
-        List<String> newS3KeyList) {
+    public UpdateReviewImageS3KeyDto updateReview(Long reviewId, Member member,
+        UpdateReviewRequestDto requestDto) {
+        Review review = getReview(reviewId, member);
+
+        List<String> newS3KeyList = makeReviewImageS3KeyList(review.getPlace().getId(),
+            requestDto.getNewImageList().size());
 
         List<ReviewImage> newReviewImageList = new ArrayList<>();
         for (String s3Key : newS3KeyList) {
@@ -339,10 +348,13 @@ public class PlaceManager {
 
         reviewRepository.save(review);
 
-        return trashReviewImageList.stream().map(ReviewImage::getS3Key).toList();
+        return UpdateReviewImageS3KeyDto.builder()
+            .newS3KeyList(newS3KeyList)
+            .trashS3KeyList(trashReviewImageList.stream().map(ReviewImage::getS3Key).toList())
+            .build();
     }
 
-    public void deleteReviewImage(List<String> trashS3KeyList) {
+    public void deleteReviewImageFileList(List<String> trashS3KeyList) {
         try {
             List<ObjectIdentifier> objectIdentifierList = trashS3KeyList.stream().map(
                 key -> ObjectIdentifier.builder().key(key).build()
@@ -377,38 +389,17 @@ public class PlaceManager {
         return reviewImageList.stream().map(ReviewImage::getS3Key).toList();
     }
 
-    public ReviewReply deleteReviewReply(Long reviewReplyId, Member member) {
+    public Review deleteReviewReply(Long reviewReplyId, Member member) {
         ReviewReply reviewReply = reviewReplyRepository.findByIdAndMember(reviewReplyId, member);
         reviewReplyRepository.delete(reviewReply);
 
-        return reviewReply;
+        return reviewReply.getReview();
     }
 
-    public void hardDeleteReviewIfNeeded(ReviewReply reviewReply) {
-        Review review = reviewReply.getReview();
+    public void hardDeleteReviewIfNeeded(Review review) {
         long reviewReplyCount = reviewReplyRepository.countByReview(review);
-        if (review.getDeletedAt() != null && reviewReplyCount == 1) {
+        if (review.getDeletedAt() != null && reviewReplyCount == 0) {
             reviewRepository.delete(review);
         }
-    }
-
-    public S3PutPresignedUrlResponseDto createMenuImageS3PutPresignedUrl(
-        @NotBlank String fileExtension) {
-        String filename = UUID.randomUUID().toString();
-        String s3Key = MENU_IMAGE_S3_PREFIX + filename + "." + fileExtension;
-
-        String url = s3Manager.generatePutObjectPresignedUrl(s3Manager.bucket, s3Key);
-        return S3PutPresignedUrlResponseDto.builder()
-            .url(url)
-            .filename(filename)
-            .build();
-    }
-
-    public S3DeletePresignedUrlResponseDto createMenuImageS3DeletePresignedUrl(
-        @NotBlank String s3Key) {
-        String url = s3Manager.generateDeleteObjectPresignedUrl(s3Manager.bucket, s3Key);
-        return S3DeletePresignedUrlResponseDto.builder()
-            .url(url)
-            .build();
     }
 }

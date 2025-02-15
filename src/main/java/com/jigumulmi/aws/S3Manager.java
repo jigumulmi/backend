@@ -25,6 +25,10 @@ public class S3Manager {
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
+    public final static String REVIEW_IMAGE_S3_PREFIX = "reviewImage/";
+    public final static String MENU_IMAGE_S3_PREFIX = "menuImage/";
+    public final static String BANNER_IMAGE_S3_PREFIX = "banner/";
+
     private final Duration DEFAULT_DURATION = Duration.ofMinutes(60);
 
     private final S3Client s3Client;

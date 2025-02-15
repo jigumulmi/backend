@@ -7,8 +7,6 @@ import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
-import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
-import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
@@ -16,8 +14,6 @@ import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
-import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
-import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
@@ -201,29 +197,5 @@ public class PlaceController {
         @RequiredAuthUser Member member) {
         placeService.deleteReviewReply(reviewReplyId, member);
         return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "메뉴 이미지 S3 Put Presigned Url 요청")
-    @ApiResponse(responseCode = "201", content = {
-        @Content(schema = @Schema(implementation = S3PutPresignedUrlResponseDto.class))})
-    @PostMapping("/menu/s3-put-presigned-url")
-    public ResponseEntity<?> createMenuImageS3PutPresignedUrl(
-        @RequestBody MenuImageS3PutPresignedUrlRequestDto requestDto,
-        @RequiredAuthUser Member Member) {
-        S3PutPresignedUrlResponseDto responseDto = placeService.createMenuImageS3PutPresignedUrl(
-            requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
-    }
-
-    @Operation(summary = "메뉴 이미지 S3 Delete Presigned Url 요청")
-    @ApiResponse(responseCode = "201", content = {
-        @Content(schema = @Schema(implementation = S3DeletePresignedUrlResponseDto.class))})
-    @PostMapping("/menu/s3-delete-presigned-url")
-    public ResponseEntity<?> createMenuImageS3DeletePresignedUrl(
-        @RequestBody MenuImageS3DeletePresignedUrlRequestDto requestDto,
-        @RequiredAuthUser Member Member) {
-        S3DeletePresignedUrlResponseDto responseDto = placeService.createMenuImageS3DeletePresignedUrl(
-            requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 }
