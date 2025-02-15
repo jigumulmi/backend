@@ -4,6 +4,7 @@ import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.security.OptionalAuthUser;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.place.domain.Review;
 import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
@@ -149,6 +150,14 @@ public class PlaceController {
         PagedResponseDto<ReviewResponseDto> reviewList = placeService.getReviewList(member,
             pageable, placeId);
         return ResponseEntity.ok().body(reviewList);
+    }
+
+    @Operation(summary = "리뷰 조회", description = "리뷰 수정 시 사용")
+    @GetMapping("/review/{reviewId}")
+    public ResponseEntity<ReviewResponseDto> getReview(
+        @RequiredAuthUser Member member, @PathVariable Long reviewId) {
+        Review review = placeService.getReview(member, reviewId);
+        return ResponseEntity.ok().body(ReviewResponseDto.fromAuthor(review, member));
     }
 
     @Operation(summary = "답글 목록 조회")
