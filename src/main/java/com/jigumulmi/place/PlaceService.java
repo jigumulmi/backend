@@ -7,8 +7,6 @@ import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.UpdateReviewImageS3KeyDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
-import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
-import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
@@ -16,8 +14,6 @@ import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
-import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
-import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
@@ -104,15 +100,5 @@ public class PlaceService {
 
     public List<PlaceCategory> getPlaceCategoryList(PlaceCategoryGroup placeCategoryGroup) {
         return placeCategoryGroup.getPlaceCategoryList();
-    }
-
-    public S3PutPresignedUrlResponseDto createMenuImageS3PutPresignedUrl(
-        MenuImageS3PutPresignedUrlRequestDto requestDto) {
-        return placeManager.createMenuImageS3PutPresignedUrl(requestDto.getPlaceId());
-    }
-
-    public S3DeletePresignedUrlResponseDto createMenuImageS3DeletePresignedUrl(
-        MenuImageS3DeletePresignedUrlRequestDto requestDto) {
-        return placeManager.createMenuImageS3DeletePresignedUrl(requestDto.getS3Key());
     }
 }

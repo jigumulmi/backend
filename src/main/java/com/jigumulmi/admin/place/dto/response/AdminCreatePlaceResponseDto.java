@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class CreatePlaceResponseDto {
+public class AdminCreatePlaceResponseDto {
 
     private Long placeId;
 }

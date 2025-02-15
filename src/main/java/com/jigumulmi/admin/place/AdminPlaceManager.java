@@ -4,12 +4,15 @@ import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.place.dto.response.AdminCreatePlaceResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto.TemporaryBusinessHourDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
-import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminS3DeletePresignedUrlResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminS3PutPresignedUrlResponseDto;
 import com.jigumulmi.aws.S3Manager;
+import com.jigumulmi.common.FileUtils;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.config.exception.CustomException;
@@ -37,6 +40,7 @@ import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.repository.TemporaryBusinessHourRepository;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
+import jakarta.validation.constraints.NotBlank;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -260,7 +264,7 @@ public class AdminPlaceManager {
     }
 
     @Transactional
-    public CreatePlaceResponseDto createPlace(AdminCreatePlaceRequestDto requestDto,
+    public AdminCreatePlaceResponseDto createPlace(AdminCreatePlaceRequestDto requestDto,
         Member member) {
         PositionDto position = requestDto.getPosition();
 
@@ -313,7 +317,7 @@ public class AdminPlaceManager {
         place.addCategoryAndSubwayStation(categoryMappingList, subwayStationPlaceList);
 
         placeRepository.save(place);
-        return CreatePlaceResponseDto.builder().placeId(place.getId()).build();
+        return AdminCreatePlaceResponseDto.builder().placeId(place.getId()).build();
     }
 
     public void deletePlace(Long placeId) {
@@ -336,5 +340,24 @@ public class AdminPlaceManager {
     public List<DistrictResponseDto> getDistrictListOrderByName(Region region) {
         return region.getDistrictList().stream().sorted(Comparator.comparing(District::getTitle))
             .map(DistrictResponseDto::fromDistrict).toList();
+    }
+
+    public AdminS3PutPresignedUrlResponseDto createMenuImageS3PutPresignedUrl(long placeId) {
+        String filename = FileUtils.generateUniqueFilename();
+        String s3Key = S3Manager.MENU_IMAGE_S3_PREFIX + placeId + "/" + filename;
+
+        String url = s3Manager.generatePutObjectPresignedUrl(s3Manager.bucket, s3Key);
+        return AdminS3PutPresignedUrlResponseDto.builder()
+            .url(url)
+            .filename(filename)
+            .build();
+    }
+
+    public AdminS3DeletePresignedUrlResponseDto createMenuImageS3DeletePresignedUrl(
+        @NotBlank String s3Key) {
+        String url = s3Manager.generateDeleteObjectPresignedUrl(s3Manager.bucket, s3Key);
+        return AdminS3DeletePresignedUrlResponseDto.builder()
+            .url(url)
+            .build();
     }
 }

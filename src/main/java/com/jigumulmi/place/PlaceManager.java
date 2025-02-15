@@ -31,8 +31,6 @@ import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
-import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
-import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
@@ -46,7 +44,6 @@ import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
 import com.jigumulmi.place.vo.CurrentOpeningStatus;
 import com.jigumulmi.place.vo.NextOpeningStatus;
-import jakarta.validation.constraints.NotBlank;
 import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -404,24 +401,5 @@ public class PlaceManager {
         if (review.getDeletedAt() != null && reviewReplyCount == 0) {
             reviewRepository.delete(review);
         }
-    }
-
-    public S3PutPresignedUrlResponseDto createMenuImageS3PutPresignedUrl(long placeId) {
-        String filename = FileUtils.generateUniqueFilename();
-        String s3Key = S3Manager.MENU_IMAGE_S3_PREFIX + placeId + "/" + filename;
-
-        String url = s3Manager.generatePutObjectPresignedUrl(s3Manager.bucket, s3Key);
-        return S3PutPresignedUrlResponseDto.builder()
-            .url(url)
-            .filename(filename)
-            .build();
-    }
-
-    public S3DeletePresignedUrlResponseDto createMenuImageS3DeletePresignedUrl(
-        @NotBlank String s3Key) {
-        String url = s3Manager.generateDeleteObjectPresignedUrl(s3Manager.bucket, s3Key);
-        return S3DeletePresignedUrlResponseDto.builder()
-            .url(url)
-            .build();
     }
 }
