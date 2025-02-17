@@ -1,52 +1,30 @@
 package com.jigumulmi.banner;
 
-import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto;
 import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.banner.dto.response.BannerResponseDto;
-import com.jigumulmi.banner.repository.BannerRepository;
-import com.jigumulmi.banner.repository.CustomBannerRepository;
 import com.jigumulmi.common.PagedResponseDto;
-import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import com.jigumulmi.place.PlaceManager;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class BannerService {
 
-    private final BannerRepository bannerRepository;
-    private final CustomBannerRepository customBannerRepository;
+    private final BannerManager bannerManager;
+    private final PlaceManager placeManager;
 
     public List<BannerResponseDto> getBannerList() {
-        return bannerRepository.findAllByIsActiveTrue().stream()
-            .map(BannerResponseDto::from).toList();
+        return bannerManager.getBannerList();
     }
 
-    @Transactional(readOnly = true)
+    public BannerResponseDto getBanner(Long bannerId) {
+        return bannerManager.getBanner(bannerId);
+    }
+
     public PagedResponseDto<BannerPlaceDto> getMappedPlaceList(Pageable pageable, Long bannerId) {
-        Page<BannerPlaceDto> placePage = customBannerRepository.getAllMappedPlaceByBannerId(pageable,
-            bannerId).map(BannerPlaceDto::from);
-
-        List<BannerPlaceDto> placeDtoList = placePage.getContent();
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalTime localTime = now.toLocalTime();
-        LocalDate localDate = now.toLocalDate();
-
-        List<Long> placeIdList = placeDtoList.stream().map(BannerPlaceDto::getId).toList();
-        Map<Long, SurroundingDateBusinessHour> surroundingBusinessHourMap = customBannerRepository.getSurroundingBusinessHourByPlaceIdIn(
-            placeIdList, localDate);
-        placeDtoList.forEach(
-            place -> place.setCurrentOpeningStatus(surroundingBusinessHourMap.get(place.getId()), localTime));
-
-        return BannerPlaceListResponseDto.of(placeDtoList, placePage, pageable);
+        return placeManager.getMappedPlaceList(pageable, bannerId);
     }
 }

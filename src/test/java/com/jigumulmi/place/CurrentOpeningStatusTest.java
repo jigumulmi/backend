@@ -1,4 +1,4 @@
-package com.jigumulmi.banner;
+package com.jigumulmi.place;
 
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
@@ -21,77 +21,77 @@ class CurrentOpeningStatusTest {
             // 어제의 영업시간이 자정을 넘기는 경우
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(22, 0)).closeTime(LocalTime.of(2, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 LocalTime.of(1, 30),
                 CurrentOpeningStatus.OPEN
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(22, 0)).closeTime(LocalTime.of(2, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 LocalTime.of(3, 0),
                 CurrentOpeningStatus.BEFORE_OPEN
             ),
             //
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 BusinessHour.builder().isDayOff(true).build(),
                 LocalTime.of(14, 30),
                 CurrentOpeningStatus.DAY_OFF
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 BusinessHour.builder().openTime(LocalTime.of(15, 0)).closeTime(LocalTime.of(22, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 LocalTime.of(14, 30),
                 CurrentOpeningStatus.BEFORE_OPEN
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 BusinessHour.builder()
                     .openTime(LocalTime.of(10, 0))
                     .closeTime(LocalTime.of(20, 0))
                     .breakStart(LocalTime.of(14, 0))
                     .breakEnd(LocalTime.of(15, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 LocalTime.of(11, 30),
                 CurrentOpeningStatus.OPEN
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 BusinessHour.builder()
                     .openTime(LocalTime.of(10, 0))
                     .closeTime(LocalTime.of(20, 0))
                     .breakStart(LocalTime.of(14, 0))
                     .breakEnd(LocalTime.of(15, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 LocalTime.of(14, 30),
                 CurrentOpeningStatus.BREAK
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 BusinessHour.builder()
                     .openTime(LocalTime.of(10, 0))
                     .closeTime(LocalTime.of(20, 0))
                     .breakStart(LocalTime.of(14, 0))
                     .breakEnd(LocalTime.of(15, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 LocalTime.of(16, 30),
                 CurrentOpeningStatus.OPEN
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 BusinessHour.builder().openTime(LocalTime.of(10, 0)).closeTime(LocalTime.of(14, 0))
-                    .build(),
+                    .isDayOff(false).build(),
                 LocalTime.of(14, 30),
                 CurrentOpeningStatus.CLOSED
             )
@@ -101,7 +101,8 @@ class CurrentOpeningStatusTest {
     @ParameterizedTest
     @MethodSource("provideBusinessHours")
     @DisplayName("실시간 영업 정보")
-    public void testGetLiveOpeningStatus(BusinessHour yesterday, BusinessHour today, LocalTime currentTime,
+    public void testGetLiveOpeningStatus(BusinessHour yesterday, BusinessHour today,
+        LocalTime currentTime,
         CurrentOpeningStatus expectedStatus) {
         // given
         SurroundingDateBusinessHour surroundingDateBusinessHour = SurroundingDateBusinessHour.builder()
@@ -110,7 +111,8 @@ class CurrentOpeningStatusTest {
             .build();
 
         // when
-        CurrentOpeningStatus actualStatus = CurrentOpeningStatus.getLiveOpeningStatus(surroundingDateBusinessHour,
+        CurrentOpeningStatus actualStatus = CurrentOpeningStatus.getLiveOpeningStatus(
+            surroundingDateBusinessHour,
             currentTime);
 
         // then

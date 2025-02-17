@@ -1,12 +1,11 @@
 package com.jigumulmi.place.repository;
 
 
-import static com.jigumulmi.config.querydsl.Utils.nullSafeBuilder;
+import static com.jigumulmi.banner.domain.QBannerPlaceMapping.bannerPlaceMapping;
+import static com.jigumulmi.config.querydsl.Utils.getOrderSpecifier;
 import static com.jigumulmi.member.domain.QMember.member;
 import static com.jigumulmi.place.domain.QFixedBusinessHour.fixedBusinessHour;
 import static com.jigumulmi.place.domain.QPlace.place;
-import static com.jigumulmi.place.domain.QPlaceCategoryMapping.placeCategoryMapping;
-import static com.jigumulmi.place.domain.QPlaceLike.placeLike;
 import static com.jigumulmi.place.domain.QReview.review;
 import static com.jigumulmi.place.domain.QReviewReply.reviewReply;
 import static com.jigumulmi.place.domain.QSubwayStation.subwayStation;
@@ -20,32 +19,28 @@ import static com.querydsl.core.types.dsl.Expressions.FALSE;
 import static com.querydsl.core.types.dsl.Expressions.TRUE;
 import static com.querydsl.core.types.dsl.Expressions.stringTemplate;
 
-import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
-import com.jigumulmi.banner.repository.CustomBannerRepository;
+import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
+import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.Review;
 import com.jigumulmi.place.dto.BusinessHour;
+import com.jigumulmi.place.dto.repository.BusinessHourQueryDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto.SubwayStationLineDto;
-import com.jigumulmi.place.vo.PlaceCategoryGroup;
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstantImpl;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.WeekFields;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -57,36 +52,62 @@ import org.springframework.stereotype.Repository;
 public class CustomPlaceRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final CustomBannerRepository customBannerRepository;
 
-    public BooleanExpression subwayStationCondition(Long subwayStationId) {
-        if (subwayStationId == null) {
-            return null;
-        } else {
-            return place.id.in(
-                JPAExpressions
-                    .select(subwayStationPlace.place.id)
-                    .from(subwayStationPlace)
-                    .where(subwayStationPlace.subwayStation.id.eq(subwayStationId))
-            );
-        }
+    public Page<Place> getAllMappedPlaceByBannerId(Pageable pageable, Long bannerId) {
+        List<Place> content = queryFactory
+            .selectFrom(place)
+            .join(place.bannerPlaceMappingList, bannerPlaceMapping)
+            .where(bannerPlaceMapping.banner.id.eq(bannerId))
+            .orderBy(getOrderSpecifier(pageable.getSort(), Expressions.path(Place.class, "place")))
+            .offset(pageable.getOffset())
+            .limit(pageable.getPageSize())
+            .fetch();
+
+        JPAQuery<Long> totalCountQuery = queryFactory
+            .select(place.count())
+            .from(place)
+            .join(place.bannerPlaceMappingList, bannerPlaceMapping)
+            .where(bannerPlaceMapping.banner.id.eq(bannerId));
+
+        return PageableExecutionUtils.getPage(content, pageable, totalCountQuery::fetchOne);
     }
 
-    public BooleanBuilder placeNameContains(String name) {
-        return nullSafeBuilder(() -> place.name.contains(name));
-    }
+    public List<BusinessHourQueryDto> getSurroundingBusinessHourByPlaceIdIn(
+        List<Long> idList, LocalDate today) {
+        LocalDate yesterday = today.minusDays(1);
 
-    public BooleanExpression categoryGroupCondition(PlaceCategoryGroup categoryGroup) {
-        if (categoryGroup == null) {
-            return null;
-        } else {
-            return place.id.in(
-                JPAExpressions
-                    .select(placeCategoryMapping.place.id)
-                    .from(placeCategoryMapping)
-                    .where(placeCategoryMapping.categoryGroup.eq(categoryGroup))
-            );
-        }
+        DayOfWeek todayDayOfWeek = today.getDayOfWeek();
+        DayOfWeek yesterdayDayOfWeek = yesterday.getDayOfWeek();
+
+        return queryFactory
+            .select(
+                Projections.fields(BusinessHourQueryDto.class,
+                    fixedBusinessHour.place.id.as("placeId"),
+                    fixedBusinessHour.dayOfWeek,
+                    Projections.fields(BusinessHour.class,
+                        fixedBusinessHour.openTime,
+                        fixedBusinessHour.closeTime,
+                        fixedBusinessHour.breakStart,
+                        fixedBusinessHour.breakEnd,
+                        fixedBusinessHour.isDayOff
+                    ).as("fixedBusinessHour"),
+                    Projections.fields(BusinessHour.class,
+                        temporaryBusinessHour.openTime,
+                        temporaryBusinessHour.closeTime,
+                        temporaryBusinessHour.breakStart,
+                        temporaryBusinessHour.breakEnd,
+                        temporaryBusinessHour.isDayOff
+                    ).as("temporaryBusinessHour")
+                )
+            )
+            .from(fixedBusinessHour)
+            .leftJoin(temporaryBusinessHour)
+            .on(fixedBusinessHour.place.id.eq(temporaryBusinessHour.place.id)
+                .and(temporaryBusinessHour.date.in(yesterday, today))
+                .and(fixedBusinessHour.dayOfWeek.eq(temporaryBusinessHour.dayOfWeek)))
+            .where(fixedBusinessHour.place.id.in(idList)
+                .and(fixedBusinessHour.dayOfWeek.in(yesterdayDayOfWeek, todayDayOfWeek)))
+            .fetch();
     }
 
     public PlaceBasicResponseDto getPlaceById(Long placeId) {
@@ -125,24 +146,31 @@ public class CustomPlaceRepository {
             ).get(placeId);
     }
 
-    public WeeklyBusinessHourDto getWeeklyBusinessHourByPlaceId(
+    public List<BusinessHourQueryDto> getWeeklyBusinessHourByPlaceId(
         Long placeId, LocalDate today) {
         int year = today.getYear();
-        int weekOfYear = today.get(WeekFields.SUNDAY_START.weekOfYear());
+        int weekOfYear = WeekUtils.getWeekOfYear(today);
 
-        List<Tuple> results = queryFactory
-            .select(fixedBusinessHour.place.id,
-                fixedBusinessHour.openTime,
-                fixedBusinessHour.closeTime,
-                fixedBusinessHour.breakStart,
-                fixedBusinessHour.breakEnd,
-                fixedBusinessHour.isDayOff,
-                fixedBusinessHour.dayOfWeek,
-                temporaryBusinessHour.openTime,
-                temporaryBusinessHour.closeTime,
-                temporaryBusinessHour.breakStart,
-                temporaryBusinessHour.breakEnd,
-                temporaryBusinessHour.isDayOff
+        return queryFactory
+            .select(
+                Projections.fields(BusinessHourQueryDto.class,
+                    fixedBusinessHour.place.id.as("placeId"),
+                    fixedBusinessHour.dayOfWeek,
+                    Projections.fields(BusinessHour.class,
+                        fixedBusinessHour.openTime,
+                        fixedBusinessHour.closeTime,
+                        fixedBusinessHour.breakStart,
+                        fixedBusinessHour.breakEnd,
+                        fixedBusinessHour.isDayOff
+                    ).as("fixedBusinessHour"),
+                    Projections.fields(BusinessHour.class,
+                        temporaryBusinessHour.openTime,
+                        temporaryBusinessHour.closeTime,
+                        temporaryBusinessHour.breakStart,
+                        temporaryBusinessHour.breakEnd,
+                        temporaryBusinessHour.isDayOff
+                    ).as("temporaryBusinessHour")
+                )
             )
             .from(fixedBusinessHour)
             .leftJoin(temporaryBusinessHour)
@@ -152,28 +180,9 @@ public class CustomPlaceRepository {
                 .and(fixedBusinessHour.dayOfWeek.eq(temporaryBusinessHour.dayOfWeek)))
             .where(fixedBusinessHour.place.id.eq(placeId))
             .fetch();
-
-        WeeklyBusinessHourDto fixedBusinessHourResponseDto = new WeeklyBusinessHourDto();
-        for (Tuple row : results) {
-            DayOfWeek dayOfWeek = row.get(fixedBusinessHour.dayOfWeek);
-            BusinessHour businessHour = customBannerRepository.buildBusinessHour(row);
-            fixedBusinessHourResponseDto.updateBusinessHour(Objects.requireNonNull(dayOfWeek), businessHour);
-        }
-
-        return fixedBusinessHourResponseDto;
     }
-
-    public Long getPlaceLikeCount(Long placeId) {
-        return queryFactory
-            .select(placeLike.id.count())
-            .from(placeLike)
-            .where(placeLike.place.id.eq(placeId))
-            .fetchOne();
-    }
-
 
     public Map<Integer, Long> getReviewRatingStatsByPlaceId(Long placeId) {
-
         return queryFactory
             .from(review)
             .where(review.place.id.eq(placeId).and(review.deletedAt.isNull()))
@@ -199,16 +208,7 @@ public class CustomPlaceRepository {
         return PageableExecutionUtils.getPage(reviewList, pageable, totalCountQuery::fetchOne);
     }
 
-    private BooleanExpression memberEq(Member requestMember) {
-        if (requestMember == null) {
-            return FALSE;
-        } else {
-            return member.eq(requestMember);
-        }
-    }
-
     public Map<Long, Long> getReviewReplyCount(Long placeId) {
-
         return queryFactory
             .selectFrom(review)
             .join(review.reviewReplyList, reviewReply)
@@ -251,4 +251,13 @@ public class CustomPlaceRepository {
             .orderBy(reviewReply.createdAt.asc())
             .fetch();
     }
+
+    private BooleanExpression memberEq(Member requestMember) {
+        if (requestMember == null) {
+            return FALSE;
+        } else {
+            return member.eq(requestMember);
+        }
+    }
+
 }

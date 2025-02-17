@@ -5,7 +5,7 @@ import java.time.Duration;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -19,12 +19,16 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.DeleteObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class S3Service {
+public class S3Manager {
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
+    public final static String REVIEW_IMAGE_S3_PREFIX = "reviewImage/";
+    public final static String MENU_IMAGE_S3_PREFIX = "menuImage/";
+    public final static String BANNER_IMAGE_S3_PREFIX = "banner/";
+
     private final Duration DEFAULT_DURATION = Duration.ofMinutes(60);
 
     private final S3Client s3Client;

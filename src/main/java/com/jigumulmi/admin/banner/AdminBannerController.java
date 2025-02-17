@@ -66,7 +66,7 @@ public class AdminBannerController {
     @ApiResponse(responseCode = "201")
     @PostMapping(path = "/{bannerId}/place")
     public ResponseEntity<?> createBannerPlace(@PathVariable Long bannerId,
-        @RequestBody BannerPlaceMappingRequestDto requestDto) {
+        @Valid @RequestBody BannerPlaceMappingRequestDto requestDto) {
         adminBannerService.addBannerPlace(bannerId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -75,7 +75,7 @@ public class AdminBannerController {
     @ApiResponse(responseCode = "204")
     @DeleteMapping(path = "/{bannerId}/place")
     public ResponseEntity<?> deleteBannerPlace(@PathVariable Long bannerId,
-        @RequestBody BannerPlaceMappingRequestDto requestDto) {
+        @Valid @RequestBody BannerPlaceMappingRequestDto requestDto) {
         adminBannerService.removeBannerPlace(bannerId, requestDto);
         return ResponseEntity.noContent().build();
     }
@@ -99,12 +99,12 @@ public class AdminBannerController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @Operation(summary = "배너 정보 수정", description = "이미지 제외한 정보 수정")
+    @Operation(summary = "배너 기본 정보 수정", description = "이미지 제외한 정보 수정")
     @ApiResponse(responseCode = "201")
     @PutMapping("/{bannerId}")
-    public ResponseEntity<?> updateBanner(@PathVariable Long bannerId,
+    public ResponseEntity<?> updateBannerBasic(@PathVariable Long bannerId,
         @Valid @RequestBody UpdateBannerRequestDto requestDto) {
-        adminBannerService.updateBanner(bannerId, requestDto);
+        adminBannerService.updateBannerBasic(bannerId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

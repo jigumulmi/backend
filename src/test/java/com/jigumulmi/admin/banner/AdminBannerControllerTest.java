@@ -315,7 +315,7 @@ class AdminBannerControllerTest {
     @Test
     @DisplayName("배너 정보 수정")
     @MockMember(isAdmin = true)
-    public void testUpdateBanner() throws Exception {
+    public void testUpdateBannerBasic() throws Exception {
         // given
         Long bannerId = 1L;
 
@@ -323,7 +323,7 @@ class AdminBannerControllerTest {
         ReflectionTestUtils.setField(updateBannerRequestDto, "title", "testTitle");
         ReflectionTestUtils.setField(updateBannerRequestDto, "isActive", false);
 
-        willDoNothing().given(adminBannerService).updateBanner(bannerId, updateBannerRequestDto);
+        willDoNothing().given(adminBannerService).updateBannerBasic(bannerId, updateBannerRequestDto);
 
         // when
         ResultActions perform = mockMvc.perform(

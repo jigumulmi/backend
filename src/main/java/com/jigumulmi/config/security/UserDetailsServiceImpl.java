@@ -45,4 +45,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
             securityContext);
     }
+
+    public static void clearSecurityContextAndSession(HttpSession session) {
+        session.invalidate();
+        SecurityContextHolder.clearContext();
+    }
 }

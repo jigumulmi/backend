@@ -21,7 +21,7 @@ public class SecurityUtils {
 
     public static Member checkOptionalAuthenticationPrincipal(Object principal) {
         if (ANONYMOUS_USER.equals(principal)) {
-            return null;
+            return Member.guestMemberBuilder().id(-1).build();
         } else {
             UserDetailsImpl userDetails = (UserDetailsImpl) principal;
             return userDetails.getMember();

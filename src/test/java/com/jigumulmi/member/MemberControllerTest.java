@@ -13,18 +13,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jigumulmi.common.annotation.ControllerTest;
 import com.jigumulmi.common.MemberTestUtils;
+import com.jigumulmi.common.annotation.ControllerTest;
 import com.jigumulmi.config.security.MockMember;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.request.KakaoAuthorizationRequestDto;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
 import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
-import com.jigumulmi.member.service.KakaoService;
-import com.jigumulmi.member.service.MemberService;
 import jakarta.servlet.http.HttpSession;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +44,9 @@ public class MemberControllerTest {
     @MockBean
     private MemberService memberService;
 
-    @MockBean
-    private KakaoService kakaoService;
-
     @Test
     @DisplayName("카카오 인증")
-    public void testKakaoAuthorization() throws Exception {
+    public void testKakaoAuthorize() throws Exception {
         // given
         KakaoAuthorizationRequestDto kakaoAuthorizationRequestDto = new KakaoAuthorizationRequestDto();
         ReflectionTestUtils.setField(kakaoAuthorizationRequestDto, "code", "testCode");
@@ -62,8 +56,7 @@ public class MemberControllerTest {
             .hasRegistered(false)
             .nickname("testNickname")
             .build();
-
-        given(kakaoService.authorize(any(KakaoAuthorizationRequestDto.class),
+        given(memberService.kakaoAuthorize(any(KakaoAuthorizationRequestDto.class),
             any(HttpSession.class))).willReturn(responseDto);
 
         // when
@@ -99,8 +92,6 @@ public class MemberControllerTest {
         perform
             .andExpect(status().isCreated())
             .andDo(print());
-
-        Assertions.assertTrue(session.isInvalid());
     }
 
     @Test
@@ -111,8 +102,7 @@ public class MemberControllerTest {
         MockHttpSession session = new MockHttpSession();
         Member member = MemberTestUtils.getMemberFromSecurityContext();
 
-        willDoNothing().given(memberService).removeMember(member);
-        willDoNothing().given(kakaoService).unlink(member);
+        willDoNothing().given(memberService).deregister(session, member);
 
         // when
         ResultActions perform = mockMvc.perform(
@@ -125,8 +115,6 @@ public class MemberControllerTest {
         perform
             .andExpect(status().isCreated())
             .andDo(print());
-
-        Assertions.assertTrue(session.isInvalid());
     }
 
 
@@ -138,10 +126,10 @@ public class MemberControllerTest {
         Member member = MemberTestUtils.getMemberFromSecurityContext();
 
         SetNicknameRequestDto setNicknameRequestDto = new SetNicknameRequestDto();
-        ReflectionTestUtils.setField(setNicknameRequestDto, "nickname", "testNickname");
+        ReflectionTestUtils.setField(setNicknameRequestDto, "nickname", "newNickname");
 
         willDoNothing().given(memberService)
-            .createNickname(any(HttpSession.class), eq(member), any(SetNicknameRequestDto.class));
+            .setNickname(any(HttpSession.class), eq(member), any(SetNicknameRequestDto.class));
 
         // when
         ResultActions perform = mockMvc.perform(
@@ -165,14 +153,7 @@ public class MemberControllerTest {
         // given
         Member member = MemberTestUtils.getMemberFromSecurityContext();
 
-        MemberDetailResponseDto responseDto = MemberDetailResponseDto.builder()
-            .id(member.getId())
-            .email(member.getEmail())
-            .nickname(member.getNickname())
-            .isAdmin(member.getIsAdmin())
-            .createdAt(member.getCreatedAt())
-            .deregisteredAt(member.getDeregisteredAt())
-            .build();
+        MemberDetailResponseDto responseDto = MemberDetailResponseDto.from(member);
         given(memberService.getUserDetail(member)).willReturn(responseDto);
 
         // when

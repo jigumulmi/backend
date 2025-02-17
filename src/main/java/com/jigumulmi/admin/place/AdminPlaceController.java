@@ -4,15 +4,19 @@ import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.place.dto.response.AdminCreatePlaceResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
-import com.jigumulmi.admin.place.dto.response.CreatePlaceResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminS3DeletePresignedUrlResponseDto;
+import com.jigumulmi.admin.place.dto.response.AdminS3PutPresignedUrlResponseDto;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
+import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
+import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.vo.Region;
 import io.swagger.v3.oas.annotations.Operation;
@@ -157,11 +161,11 @@ public class AdminPlaceController {
     @Operation(summary = "장소 생성")
     @ApiResponse(responseCode = "201")
     @PostMapping("")
-    public ResponseEntity<CreatePlaceResponseDto> createPlace(
+    public ResponseEntity<AdminCreatePlaceResponseDto> createPlace(
         @RequestBody AdminCreatePlaceRequestDto requestDto,
         @RequiredAuthUser Member member
     ) {
-        CreatePlaceResponseDto responseDto = adminPlaceService.createPlace(requestDto, member);
+        AdminCreatePlaceResponseDto responseDto = adminPlaceService.createPlace(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 
@@ -193,5 +197,29 @@ public class AdminPlaceController {
     public ResponseEntity<?> getDistrictList(@RequestParam Region region) {
         List<DistrictResponseDto> districtList = adminPlaceService.getDistrictList(region);
         return ResponseEntity.ok().body(districtList);
+    }
+
+    @Operation(summary = "메뉴 이미지 S3 Put Presigned Url 요청")
+    @ApiResponse(responseCode = "201", content = {
+        @Content(schema = @Schema(implementation = AdminS3PutPresignedUrlResponseDto.class))})
+    @PostMapping("/menu/s3-put-presigned-url")
+    public ResponseEntity<?> createMenuImageS3PutPresignedUrl(
+        @Valid @RequestBody MenuImageS3PutPresignedUrlRequestDto requestDto,
+        @RequiredAuthUser Member Member) {
+        AdminS3PutPresignedUrlResponseDto responseDto = adminPlaceService.createMenuImageS3PutPresignedUrl(
+            requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    }
+
+    @Operation(summary = "메뉴 이미지 S3 Delete Presigned Url 요청")
+    @ApiResponse(responseCode = "201", content = {
+        @Content(schema = @Schema(implementation = AdminS3DeletePresignedUrlResponseDto.class))})
+    @PostMapping("/menu/s3-delete-presigned-url")
+    public ResponseEntity<?> createMenuImageS3DeletePresignedUrl(
+        @Valid @RequestBody MenuImageS3DeletePresignedUrlRequestDto requestDto,
+        @RequiredAuthUser Member Member) {
+        AdminS3DeletePresignedUrlResponseDto responseDto = adminPlaceService.createMenuImageS3DeletePresignedUrl(
+            requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 }

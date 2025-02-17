@@ -31,6 +31,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Getter
@@ -103,6 +105,7 @@ public class Place extends Timestamped {
     private List<Menu> menuList = new ArrayList<>();
 
     @OneToMany(mappedBy = "place")
+    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JsonManagedReference
     private List<Review> reviewList = new ArrayList<>();
 
@@ -127,6 +130,7 @@ public class Place extends Timestamped {
     private Member member;
 
     @OneToMany(mappedBy = "place")
+    @OnDelete(action = OnDeleteAction.RESTRICT)
     @JsonManagedReference
     private List<PlaceLike> placeLikeList = new ArrayList<>();
 
@@ -188,10 +192,6 @@ public class Place extends Timestamped {
         List<SubwayStationPlace> subwayStationPlaceList) {
         this.categoryMappingList.addAll(categoryMappingList);
         this.subwayStationPlaceList.addAll(subwayStationPlaceList);
-    }
-
-    public void addMenu(List<Menu> menuList) {
-        this.menuList.addAll(menuList);
     }
 
     public void adminBasicUpdate(AdminCreatePlaceRequestDto requestDto,

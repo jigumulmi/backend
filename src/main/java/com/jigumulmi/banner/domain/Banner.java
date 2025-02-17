@@ -49,7 +49,7 @@ public class Banner extends Timestamped {
             bannerPlaceMappingList == null ? new ArrayList<>() : bannerPlaceMappingList;
     }
 
-    public void updateDetail(String title, Boolean isActive) {
+    public void updateBasic(String title, Boolean isActive) {
         this.title = title;
         this.isActive = isActive;
     }

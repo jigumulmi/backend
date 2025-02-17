@@ -1,4 +1,4 @@
-package com.jigumulmi.place.dto.response;
+package com.jigumulmi.admin.place.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class S3PutPresignedUrlResponseDto {
+public class AdminS3PutPresignedUrlResponseDto {
 
     @Schema(description = "presigned url")
     private String url;

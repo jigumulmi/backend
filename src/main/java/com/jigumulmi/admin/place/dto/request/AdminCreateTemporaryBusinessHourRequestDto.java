@@ -17,7 +17,6 @@ public class AdminCreateTemporaryBusinessHourRequestDto {
     @NotNull
     @FutureOrPresent
     private LocalDate date;
-    @NotNull
     @ValidBusinessHour
     private BusinessHour businessHour;
 }

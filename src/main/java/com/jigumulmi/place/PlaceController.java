@@ -4,12 +4,10 @@ import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.config.security.OptionalAuthUser;
 import com.jigumulmi.config.security.RequiredAuthUser;
 import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.place.domain.Review;
 import com.jigumulmi.place.dto.MenuDto;
-import com.jigumulmi.place.dto.request.CreatePlaceRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.CreateReviewRequestDto;
-import com.jigumulmi.place.dto.request.MenuImageS3DeletePresignedUrlRequestDto;
-import com.jigumulmi.place.dto.request.MenuImageS3PutPresignedUrlRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewReplyRequestDto;
 import com.jigumulmi.place.dto.request.UpdateReviewRequestDto;
 import com.jigumulmi.place.dto.response.PlaceBasicResponseDto;
@@ -17,8 +15,6 @@ import com.jigumulmi.place.dto.response.ReviewImageResponseDto;
 import com.jigumulmi.place.dto.response.ReviewReplyResponseDto;
 import com.jigumulmi.place.dto.response.ReviewResponseDto;
 import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
-import com.jigumulmi.place.dto.response.S3DeletePresignedUrlResponseDto;
-import com.jigumulmi.place.dto.response.S3PutPresignedUrlResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
@@ -65,17 +61,6 @@ public class PlaceController {
         List<SubwayStationResponseDto> subwayStationList = placeService.getSubwayStationList(
             stationName);
         return ResponseEntity.ok().body(subwayStationList);
-    }
-
-    @Operation(summary = "장소 등록 신청")
-    @ApiResponse(responseCode = "201")
-    @PostMapping("")
-    public ResponseEntity<?> registerPlace(
-        @Valid @RequestBody CreatePlaceRequestDto requestDto,
-        @OptionalAuthUser Member member
-    ) {
-        placeService.registerPlace(requestDto, member);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Register success");
     }
 
     @Operation(summary = "장소 상위 카테고리 조회")
@@ -140,7 +125,7 @@ public class PlaceController {
     @ApiResponse(responseCode = "201")
     @PostMapping(path = "/{placeId}/review", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> postReview(@PathVariable Long placeId,
-        @Valid @ModelAttribute CreateReviewRequestDto requestDto,
+        @ModelAttribute CreateReviewRequestDto requestDto,
         @RequiredAuthUser Member member) {
         placeService.postReview(placeId, requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Post review success");
@@ -167,6 +152,14 @@ public class PlaceController {
         return ResponseEntity.ok().body(reviewList);
     }
 
+    @Operation(summary = "리뷰 조회", description = "리뷰 수정 시 사용")
+    @GetMapping("/review/{reviewId}")
+    public ResponseEntity<ReviewResponseDto> getReview(
+        @RequiredAuthUser Member member, @PathVariable Long reviewId) {
+        Review review = placeService.getReview(member, reviewId);
+        return ResponseEntity.ok().body(ReviewResponseDto.fromAuthor(review, member));
+    }
+
     @Operation(summary = "답글 목록 조회")
     @GetMapping("/review/{reviewId}/reply")
     public ResponseEntity<List<ReviewReplyResponseDto>> getReviewReplyList(
@@ -181,7 +174,7 @@ public class PlaceController {
     @ApiResponse(responseCode = "204")
     @PutMapping(path = "/review/{reviewId}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<?> updateReview(@PathVariable Long reviewId,
-        @Valid @ModelAttribute UpdateReviewRequestDto requestDto,
+        @ModelAttribute UpdateReviewRequestDto requestDto,
         @RequiredAuthUser Member member) {
         placeService.updateReview(reviewId, requestDto, member);
         return ResponseEntity.noContent().build();
@@ -213,41 +206,5 @@ public class PlaceController {
         @RequiredAuthUser Member member) {
         placeService.deleteReviewReply(reviewReplyId, member);
         return ResponseEntity.noContent().build();
-    }
-
-    @Operation(summary = "장소 좋아요 등록/삭제 토글")
-    @ApiResponse(responseCode = "204")
-    @PostMapping("/{placeId}/like")
-    public ResponseEntity<?> togglePlaceLike(
-        @PathVariable(name = "placeId") Long placeId,
-        @RequestParam(name = "toggleOn") Boolean toggleOn,
-        @RequiredAuthUser Member member) {
-        placeService.togglePlaceLike(placeId, toggleOn, member);
-        return ResponseEntity.noContent().build();
-    }
-
-
-    @Operation(summary = "메뉴 이미지 S3 Put Presigned Url 요청")
-    @ApiResponse(responseCode = "201", content = {
-        @Content(schema = @Schema(implementation = S3PutPresignedUrlResponseDto.class))})
-    @PostMapping("/menu/s3-put-presigned-url")
-    public ResponseEntity<?> createMenuImageS3PutPresignedUrl(
-        @RequestBody MenuImageS3PutPresignedUrlRequestDto requestDto,
-        @RequiredAuthUser Member Member) {
-        S3PutPresignedUrlResponseDto responseDto = placeService.createMenuImageS3PutPresignedUrl(
-            requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
-    }
-
-    @Operation(summary = "메뉴 이미지 S3 Delete Presigned Url 요청")
-    @ApiResponse(responseCode = "201", content = {
-        @Content(schema = @Schema(implementation = S3DeletePresignedUrlResponseDto.class))})
-    @PostMapping("/menu/s3-delete-presigned-url")
-    public ResponseEntity<?> createMenuImageS3DeletePresignedUrl(
-        @RequestBody MenuImageS3DeletePresignedUrlRequestDto requestDto,
-        @RequiredAuthUser Member Member) {
-        S3DeletePresignedUrlResponseDto responseDto = placeService.createMenuImageS3DeletePresignedUrl(
-            requestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
 }

@@ -7,8 +7,6 @@ import com.jigumulmi.member.dto.request.KakaoAuthorizationRequestDto;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
 import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
-import com.jigumulmi.member.service.KakaoService;
-import com.jigumulmi.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,7 +17,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,7 +30,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class MemberController {
 
     private final MemberService memberService;
-    private final KakaoService kakaoService;
 
     @Operation(summary = "카카오 인증(로그인 및 회원가입)")
     @ApiResponses(
@@ -41,10 +37,10 @@ public class MemberController {
             @Content(schema = @Schema(implementation = KakaoAuthResponseDto.class))})}
     )
     @PostMapping("/oauth/kakao/login")
-    public ResponseEntity<?> kakaoAuthorization(
+    public ResponseEntity<?> kakaoAuthorize(
         @Valid @RequestBody KakaoAuthorizationRequestDto requestDto, HttpSession session)
         throws JsonProcessingException {
-        KakaoAuthResponseDto response = kakaoService.authorize(requestDto, session);
+        KakaoAuthResponseDto response = memberService.kakaoAuthorize(requestDto, session);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -52,8 +48,7 @@ public class MemberController {
     @ApiResponse(responseCode = "201")
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpSession session, @RequiredAuthUser Member member) {
-        session.invalidate();
-        SecurityContextHolder.clearContext();
+        memberService.logout(session);
         return ResponseEntity.status(HttpStatus.CREATED).body("Logout success");
     }
 
@@ -61,9 +56,7 @@ public class MemberController {
     @ApiResponse(responseCode = "201")
     @PostMapping("/deregister")
     public ResponseEntity<?> deregister(HttpSession session, @RequiredAuthUser Member member) {
-        session.invalidate();
-        kakaoService.unlink(member);
-        memberService.removeMember(member);
+        memberService.deregister(session, member);
         return ResponseEntity.status(HttpStatus.CREATED).body("Deregister success");
     }
 
@@ -72,7 +65,7 @@ public class MemberController {
     @PutMapping("/nickname")
     public ResponseEntity<?> setNickname(HttpSession session, @RequiredAuthUser Member member,
         @Valid @RequestBody SetNicknameRequestDto requestDto) {
-        memberService.createNickname(session, member, requestDto);
+        memberService.setNickname(session, member, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("Set nickname success");
     }
 
