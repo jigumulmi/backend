@@ -165,6 +165,7 @@ public class AdminPlaceController {
         @RequestBody AdminCreatePlaceRequestDto requestDto,
         @RequiredAuthUser Member member
     ) {
+        requestDto.validate();
         AdminCreatePlaceResponseDto responseDto = adminPlaceService.createPlace(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
     }
