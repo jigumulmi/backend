@@ -75,6 +75,7 @@ public class AdminPlaceController {
     @PutMapping("/{placeId}/basic")
     public ResponseEntity<?> updatePlaceBasic(@PathVariable Long placeId,
         @RequestBody AdminCreatePlaceRequestDto requestDto) {
+        requestDto.validate();
         adminPlaceService.updatePlaceBasic(placeId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

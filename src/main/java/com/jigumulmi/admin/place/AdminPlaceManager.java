@@ -11,6 +11,7 @@ import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.AdminS3DeletePresignedUrlResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminS3PutPresignedUrlResponseDto;
+import com.jigumulmi.admin.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.aws.S3Manager;
 import com.jigumulmi.common.FileUtils;
 import com.jigumulmi.common.PagedResponseDto;
@@ -34,6 +35,7 @@ import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.repository.FixedBusinessHourRepository;
 import com.jigumulmi.place.repository.MenuRepository;
+import com.jigumulmi.place.repository.PlaceCategoryMappingRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
@@ -69,6 +71,8 @@ public class AdminPlaceManager {
     private final PlaceImageRepository placeImageRepository;
     private final FixedBusinessHourRepository fixedBusinessHourRepository;
     private final TemporaryBusinessHourRepository temporaryBusinessHourRepository;
+    private final SubwayStationPlaceRepository subwayStationPlaceRepository;
+    private final PlaceCategoryMappingRepository placeCategoryMappingRepository;
 
     @Transactional(readOnly = true)
     public PagedResponseDto<PlaceDto> getPlaceList(Pageable pageable,
@@ -89,6 +93,11 @@ public class AdminPlaceManager {
     public void updatePlaceBasic(Long placeId, AdminCreatePlaceRequestDto requestDto) {
         Place place = placeRepository.findById(placeId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        place.adminBasicUpdate(requestDto);
+
+        subwayStationPlaceRepository.deleteAllByPlace(place);
+        placeCategoryMappingRepository.deleteAllInBatch(place.getCategoryMappingList());
 
         List<Long> subwayStationIdList = requestDto.getSubwayStationIdList();
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(
@@ -119,9 +128,8 @@ public class AdminPlaceManager {
             );
         }
 
-        place.adminBasicUpdate(requestDto, categoryMappingList, subwayStationPlaceList);
-
-        placeRepository.save(place);
+        subwayStationPlaceRepository.saveAll(subwayStationPlaceList);
+        placeCategoryMappingRepository.saveAll(categoryMappingList);
     }
 
     public List<ImageDto> getPlaceImage(Long placeId) {
