@@ -194,9 +194,7 @@ public class Place extends Timestamped {
         this.subwayStationPlaceList.addAll(subwayStationPlaceList);
     }
 
-    public void adminBasicUpdate(AdminCreatePlaceRequestDto requestDto,
-        List<PlaceCategoryMapping> categoryMappingList,
-        List<SubwayStationPlace> subwayStationPlaceList) {
+    public void adminBasicUpdate(AdminCreatePlaceRequestDto requestDto) {
         PositionDto position = requestDto.getPosition();
 
         this.name = requestDto.getName();
@@ -211,13 +209,5 @@ public class Place extends Timestamped {
         this.registrantComment = requestDto.getRegistrantComment();
         this.isApproved = requestDto.getIsApproved();
         this.kakaoPlaceId = requestDto.getKakaoPlaceId();
-
-        List<PlaceCategoryMapping> categoryMappingListToOverwrite = PlaceCategoryMapping.getCategoryMappingListToOverwrite(
-            this.categoryMappingList, categoryMappingList);
-
-        this.categoryMappingList.clear();
-        this.subwayStationPlaceList.clear();
-
-        addCategoryAndSubwayStation(categoryMappingListToOverwrite, subwayStationPlaceList);
     }
 }
