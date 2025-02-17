@@ -287,7 +287,7 @@ public class AdminPlaceManager {
             .longitude(position.getLongitude())
             .latitude(position.getLatitude())
             .registrantComment(requestDto.getRegistrantComment())
-            .isApproved(requestDto.getIsApproved())
+            .isApproved(false)
             .kakaoPlaceId(requestDto.getKakaoPlaceId())
             .isFromAdmin(true)
             .member(member)

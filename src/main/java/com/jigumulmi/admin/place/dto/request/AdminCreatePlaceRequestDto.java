@@ -8,7 +8,6 @@ import com.jigumulmi.place.dto.response.PlaceCategoryDto;
 import com.jigumulmi.place.vo.District;
 import com.jigumulmi.place.vo.Region;
 import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
@@ -30,18 +29,12 @@ public class AdminCreatePlaceRequestDto {
     private PositionDto position;
     private String additionalInfo;
     private String registrantComment;
-    @Schema(requiredMode = RequiredMode.REQUIRED)
-    private Boolean isApproved;
     @Schema(description = "첫 ID가 메인 지하철이 됩니다")
     private List<Long> subwayStationIdList = new ArrayList<>();
     @Schema(description = "값이 없으면 null")
     private String kakaoPlaceId;
 
     public void validate() {
-        if (isApproved == null) {
-            throw new CustomException(CommonErrorCode.UNPROCESSABLE_ENTITY, "isApproved 누락");
-        }
-
         if (kakaoPlaceId != null && kakaoPlaceId.trim().isEmpty()) {
             throw new CustomException(CommonErrorCode.UNPROCESSABLE_ENTITY, "kakaoPlaceId 오류");
         }
