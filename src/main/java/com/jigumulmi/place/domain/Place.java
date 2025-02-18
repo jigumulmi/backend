@@ -207,7 +207,10 @@ public class Place extends Timestamped {
         this.longitude = position.getLongitude();
         this.latitude = position.getLatitude();
         this.registrantComment = requestDto.getRegistrantComment();
-        this.isApproved = requestDto.getIsApproved();
         this.kakaoPlaceId = requestDto.getKakaoPlaceId();
+    }
+
+    public void adminUpdateIsApproved(Boolean isApproved) {
+        this.isApproved = isApproved;
     }
 }
