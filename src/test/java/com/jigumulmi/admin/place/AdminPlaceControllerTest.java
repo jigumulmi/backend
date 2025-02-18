@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
+import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.common.annotation.ControllerTest;
 import com.jigumulmi.config.security.MockMember;
@@ -210,6 +211,40 @@ class AdminPlaceControllerTest {
         // when
         ResultActions perform = mockMvc.perform(
             post("/admin/place/{placeId}/business-hour/temporary", placeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(requestDto))
+                .with(csrf())
+        );
+
+        // then
+        perform
+            .andExpect(status().is(expectedStatus.value()))
+            .andDo(print());
+
+    }
+
+    private static Stream<Arguments> getKakaoPlaceId() {
+        return Stream.of(
+            Arguments.of(null, HttpStatus.CREATED),
+            Arguments.of("1234", HttpStatus.CREATED),
+            Arguments.of("", HttpStatus.UNPROCESSABLE_ENTITY),
+            Arguments.of(" ", HttpStatus.UNPROCESSABLE_ENTITY)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("getKakaoPlaceId")
+    @DisplayName("장소 생성 - 요청 검증")
+    @MockMember(isAdmin = true)
+    public void testCreatedPlaceValidation(String kakaoPlaceId, HttpStatus expectedStatus)
+        throws Exception {
+        // given
+        AdminCreatePlaceRequestDto requestDto = new AdminCreatePlaceRequestDto();
+        ReflectionTestUtils.setField(requestDto, "kakaoPlaceId", kakaoPlaceId);
+
+        // when
+        ResultActions perform = mockMvc.perform(
+            post("/admin/place")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(requestDto))
                 .with(csrf())

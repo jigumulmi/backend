@@ -4,6 +4,7 @@ import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.place.dto.request.TogglePlaceApproveRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminCreatePlaceResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
@@ -75,6 +76,7 @@ public class AdminPlaceController {
     @PutMapping("/{placeId}/basic")
     public ResponseEntity<?> updatePlaceBasic(@PathVariable Long placeId,
         @RequestBody AdminCreatePlaceRequestDto requestDto) {
+        requestDto.validate();
         adminPlaceService.updatePlaceBasic(placeId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -165,8 +167,23 @@ public class AdminPlaceController {
         @RequestBody AdminCreatePlaceRequestDto requestDto,
         @RequiredAuthUser Member member
     ) {
+        requestDto.validate();
         AdminCreatePlaceResponseDto responseDto = adminPlaceService.createPlace(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    }
+
+    @Operation(summary = "장소 승인/미승인")
+    @ApiResponses(
+        {
+            @ApiResponse(responseCode = "201", description = "장소 승인 여부 업데이트 성공"),
+            @ApiResponse(responseCode = "400", description = "장소 승인 검증 실패")
+        }
+    )
+    @PostMapping("/{placeId}/approval")
+    public ResponseEntity<?> togglePlaceApprove(@PathVariable Long placeId,
+        @Valid @RequestBody TogglePlaceApproveRequestDto requestDto) {
+        adminPlaceService.togglePlaceApprove(placeId, requestDto.getIsApproved());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(summary = "장소 삭제")

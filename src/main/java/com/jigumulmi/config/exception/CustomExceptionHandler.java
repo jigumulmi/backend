@@ -81,9 +81,15 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<Object> handleCustomException(CustomException e) {
-        log.error("handleCustomException: " + e.getErrorCode());
         ErrorCode errorCode = e.getErrorCode();
-        return handleExceptionInternal(errorCode);
+        log.error("handleCustomException: " + errorCode);
+
+        String message = e.getMessage();
+        if (message == null) {
+            return handleExceptionInternal(errorCode);
+        } else {
+            return handleExceptionInternal(errorCode, message);
+        }
     }
 
     @ExceptionHandler({Exception.class})

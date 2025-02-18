@@ -11,11 +11,13 @@ import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.AdminS3DeletePresignedUrlResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminS3PutPresignedUrlResponseDto;
+import com.jigumulmi.admin.place.repository.SubwayStationPlaceRepository;
 import com.jigumulmi.aws.S3Manager;
 import com.jigumulmi.common.FileUtils;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.config.exception.CustomException;
+import com.jigumulmi.config.exception.errorCode.AdminErrorCode;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.FixedBusinessHour;
@@ -32,8 +34,10 @@ import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
+import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.repository.FixedBusinessHourRepository;
 import com.jigumulmi.place.repository.MenuRepository;
+import com.jigumulmi.place.repository.PlaceCategoryMappingRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
 import com.jigumulmi.place.repository.PlaceRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
@@ -69,6 +73,8 @@ public class AdminPlaceManager {
     private final PlaceImageRepository placeImageRepository;
     private final FixedBusinessHourRepository fixedBusinessHourRepository;
     private final TemporaryBusinessHourRepository temporaryBusinessHourRepository;
+    private final SubwayStationPlaceRepository subwayStationPlaceRepository;
+    private final PlaceCategoryMappingRepository placeCategoryMappingRepository;
 
     @Transactional(readOnly = true)
     public PagedResponseDto<PlaceDto> getPlaceList(Pageable pageable,
@@ -89,6 +95,11 @@ public class AdminPlaceManager {
     public void updatePlaceBasic(Long placeId, AdminCreatePlaceRequestDto requestDto) {
         Place place = placeRepository.findById(placeId)
             .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        place.adminBasicUpdate(requestDto);
+
+        subwayStationPlaceRepository.deleteAllByPlace(place);
+        placeCategoryMappingRepository.deleteAllInBatch(place.getCategoryMappingList());
 
         List<Long> subwayStationIdList = requestDto.getSubwayStationIdList();
         List<SubwayStation> subwayStationList = subwayStationRepository.findAllById(
@@ -119,9 +130,8 @@ public class AdminPlaceManager {
             );
         }
 
-        place.adminBasicUpdate(requestDto, categoryMappingList, subwayStationPlaceList);
-
-        placeRepository.save(place);
+        subwayStationPlaceRepository.saveAll(subwayStationPlaceList);
+        placeCategoryMappingRepository.saveAll(categoryMappingList);
     }
 
     public List<ImageDto> getPlaceImage(Long placeId) {
@@ -279,7 +289,7 @@ public class AdminPlaceManager {
             .longitude(position.getLongitude())
             .latitude(position.getLatitude())
             .registrantComment(requestDto.getRegistrantComment())
-            .isApproved(requestDto.getIsApproved())
+            .isApproved(false)
             .kakaoPlaceId(requestDto.getKakaoPlaceId())
             .isFromAdmin(true)
             .member(member)
@@ -318,6 +328,62 @@ public class AdminPlaceManager {
 
         placeRepository.save(place);
         return AdminCreatePlaceResponseDto.builder().placeId(place.getId()).build();
+    }
+
+    @Transactional(readOnly = true)
+    public void validatePlaceApprovalIfNeeded(Long placeId, boolean isApproved) {
+        if (!isApproved) {
+            return;
+        }
+
+        AdminPlaceBasicResponseDto placeBasic = getPlaceBasic(placeId);
+        if (placeBasic.getName().isBlank() || placeBasic.getAddress().isBlank()
+            || placeBasic.getRegion() == null || placeBasic.getDistrict() == null) {
+            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "기본 정보 누락");
+        }
+
+        PositionDto position = placeBasic.getPosition();
+        if (position.getLatitude() == null || (position.getLatitude() < 33
+            || position.getLatitude() > 39)
+            || position.getLongitude() == null || (position.getLongitude() < 124
+            || position.getLongitude() > 132)) {
+            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "좌표 오류");
+        }
+
+        List<SubwayStationResponseDto> subwayStationList = placeBasic.getSubwayStationList();
+        if (subwayStationList == null || subwayStationList.isEmpty()) {
+            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "지하철 누락");
+        }
+
+        List<PlaceCategoryDto> categoryList = placeBasic.getCategoryList();
+        if (categoryList == null || categoryList.isEmpty()) {
+            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "카테고리 누락");
+        }
+
+        List<ImageDto> placeImage = getPlaceImage(placeId);
+        if (placeImage.isEmpty()) {
+            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "이미지 누락");
+        }
+
+        List<MenuDto> menuDtoList = getMenu(placeId);
+        if (menuDtoList.isEmpty()) {
+            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "메뉴 누락");
+        }
+
+        WeeklyBusinessHourDto fixedBusinessHour = getFixedBusinessHour(placeId);
+        for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
+            if (fixedBusinessHour.getBusinessHour(dayOfWeek) == null) {
+                throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "영업 시간 누락");
+            }
+        }
+    }
+
+    @Transactional
+    public void togglePlaceApprove(Long placeId, boolean isApproved) {
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new CustomException((CommonErrorCode.RESOURCE_NOT_FOUND)));
+
+        place.adminUpdateIsApproved(isApproved);
     }
 
     public void deletePlace(Long placeId) {
