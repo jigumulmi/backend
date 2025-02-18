@@ -223,23 +223,23 @@ class AdminPlaceControllerTest {
 
     }
 
-    private static Stream<Arguments> getWrongKakaoPlaceId() {
+    private static Stream<Arguments> getKakaoPlaceId() {
         return Stream.of(
-            Arguments.of("", false),
-            Arguments.of(" ", false),
-            Arguments.of("1234", null)
+            Arguments.of(null, HttpStatus.CREATED),
+            Arguments.of("1234", HttpStatus.CREATED),
+            Arguments.of("", HttpStatus.UNPROCESSABLE_ENTITY),
+            Arguments.of(" ", HttpStatus.UNPROCESSABLE_ENTITY)
         );
     }
 
     @ParameterizedTest
-    @MethodSource("getWrongKakaoPlaceId")
+    @MethodSource("getKakaoPlaceId")
     @DisplayName("장소 생성 - 요청 검증")
     @MockMember(isAdmin = true)
-    public void testCreatedPlaceValidation(String kakaoPlaceId, Boolean isApproved)
+    public void testCreatedPlaceValidation(String kakaoPlaceId, HttpStatus expectedStatus)
         throws Exception {
         // given
         AdminCreatePlaceRequestDto requestDto = new AdminCreatePlaceRequestDto();
-        ReflectionTestUtils.setField(requestDto, "isApproved", isApproved);
         ReflectionTestUtils.setField(requestDto, "kakaoPlaceId", kakaoPlaceId);
 
         // when
@@ -252,7 +252,7 @@ class AdminPlaceControllerTest {
 
         // then
         perform
-            .andExpect(status().isUnprocessableEntity())
+            .andExpect(status().is(expectedStatus.value()))
             .andDo(print());
 
     }
