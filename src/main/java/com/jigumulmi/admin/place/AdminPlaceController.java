@@ -173,7 +173,12 @@ public class AdminPlaceController {
     }
 
     @Operation(summary = "장소 승인/미승인")
-    @ApiResponse(responseCode = "201")
+    @ApiResponses(
+        {
+            @ApiResponse(responseCode = "201", description = "장소 승인 여부 업데이트 성공"),
+            @ApiResponse(responseCode = "400", description = "장소 승인 검증 실패")
+        }
+    )
     @PostMapping("/{placeId}/approval")
     public ResponseEntity<?> togglePlaceApprove(@PathVariable Long placeId,
         @Valid @RequestBody TogglePlaceApproveRequestDto requestDto) {
