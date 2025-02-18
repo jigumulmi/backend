@@ -25,6 +25,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -92,6 +93,12 @@ public class AdminPlaceService {
     public AdminCreatePlaceResponseDto createPlace(AdminCreatePlaceRequestDto requestDto,
         Member member) {
         return adminPlaceManager.createPlace(requestDto, member);
+    }
+
+    @Transactional
+    public void togglePlaceApprove(Long placeId, boolean isApproved) {
+        adminPlaceManager.validatePlaceApprovalIfNeeded(placeId, isApproved);
+        adminPlaceManager.togglePlaceApprove(placeId, isApproved);
     }
 
     public void deletePlace(Long placeId) {

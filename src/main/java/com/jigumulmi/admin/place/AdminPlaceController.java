@@ -4,6 +4,7 @@ import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminGetPlaceListRequestDto;
+import com.jigumulmi.admin.place.dto.request.TogglePlaceApproveRequestDto;
 import com.jigumulmi.admin.place.dto.response.AdminCreatePlaceResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBasicResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto;
@@ -169,6 +170,15 @@ public class AdminPlaceController {
         requestDto.validate();
         AdminCreatePlaceResponseDto responseDto = adminPlaceService.createPlace(requestDto, member);
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+    }
+
+    @Operation(summary = "장소 승인/미승인")
+    @ApiResponse(responseCode = "201")
+    @PostMapping("/{placeId}/approval")
+    public ResponseEntity<?> togglePlaceApprove(@PathVariable Long placeId,
+        @Valid @RequestBody TogglePlaceApproveRequestDto requestDto) {
+        adminPlaceService.togglePlaceApprove(placeId, requestDto.getIsApproved());
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @Operation(summary = "장소 삭제")

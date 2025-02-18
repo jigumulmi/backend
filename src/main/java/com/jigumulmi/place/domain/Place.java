@@ -209,4 +209,8 @@ public class Place extends Timestamped {
         this.registrantComment = requestDto.getRegistrantComment();
         this.kakaoPlaceId = requestDto.getKakaoPlaceId();
     }
+
+    public void adminUpdateIsApproved(Boolean isApproved) {
+        this.isApproved = isApproved;
+    }
 }
