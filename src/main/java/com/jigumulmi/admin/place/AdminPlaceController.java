@@ -175,7 +175,7 @@ public class AdminPlaceController {
     @Operation(summary = "장소 승인/미승인")
     @ApiResponses(
         {
-            @ApiResponse(responseCode = "201", description = "장소 승인 여부 업데이트 성공"),
+            @ApiResponse(responseCode = "204", description = "장소 승인 여부 업데이트 성공"),
             @ApiResponse(responseCode = "400", description = "장소 승인 검증 실패")
         }
     )
@@ -183,7 +183,7 @@ public class AdminPlaceController {
     public ResponseEntity<?> togglePlaceApprove(@PathVariable Long placeId,
         @Valid @RequestBody TogglePlaceApproveRequestDto requestDto) {
         adminPlaceService.togglePlaceApprove(placeId, requestDto.getIsApproved());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @Operation(summary = "장소 삭제")
