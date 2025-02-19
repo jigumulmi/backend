@@ -85,10 +85,9 @@ public class PlaceManager {
     }
 
     @Transactional(readOnly = true)
-    public PagedResponseDto<BannerPlaceDto> getMappedPlaceList(Pageable pageable, Long bannerId) {
-        Page<BannerPlaceDto> placePage = customPlaceRepository.getAllMappedPlaceByBannerId(
-            pageable,
-            bannerId).map(BannerPlaceDto::from);
+    public PagedResponseDto<BannerPlaceDto> getApprovedMappedPlaceList(Pageable pageable, Long bannerId) {
+        Page<BannerPlaceDto> placePage = customPlaceRepository.getAllApprovedMappedPlaceByBannerId(
+            pageable, bannerId).map(BannerPlaceDto::from);
 
         List<BannerPlaceDto> placeDtoList = placePage.getContent();
 

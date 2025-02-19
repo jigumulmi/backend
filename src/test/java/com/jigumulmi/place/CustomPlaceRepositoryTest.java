@@ -52,13 +52,13 @@ class CustomPlaceRepositoryTest {
 
     @Test
     @DisplayName("할당된 장소 목록 조회")
-    public void testGetAllMappedPlaceByBannerId() {
+    public void testGetAllApprovedMappedPlaceByBannerId() {
         // given
         Banner banner = Banner.builder().build();
         bannerRepository.save(banner);
 
-        Place place1 = Place.builder().build();
-        Place place2 = Place.builder().build();
+        Place place1 = Place.builder().isApproved(true).build();
+        Place place2 = Place.builder().isApproved(false).build();
         placeRepository.saveAll(List.of(place1, place2));
 
         BannerPlaceMapping bannerPlaceMapping1 = BannerPlaceMapping.builder().banner(banner)
@@ -71,11 +71,11 @@ class CustomPlaceRepositoryTest {
 
         // when
         PageRequest pageRequest = PageRequest.ofSize(1);
-        Page<Place> placePage = customPlaceRepository.getAllMappedPlaceByBannerId(
+        Page<Place> placePage = customPlaceRepository.getAllApprovedMappedPlaceByBannerId(
             pageRequest, banner.getId());
 
         // then
-        Assertions.assertEquals(placePage.getTotalPages(), 2L);
+        Assertions.assertEquals(placePage.getTotalElements(), 1);
 
     }
 
