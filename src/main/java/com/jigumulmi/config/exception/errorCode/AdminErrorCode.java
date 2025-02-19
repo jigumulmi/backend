@@ -11,7 +11,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 public enum AdminErrorCode implements ErrorCode {
-    INVALID_PLACE_APPROVAL(HttpStatus.BAD_REQUEST, "Check place data")
+    INVALID_PLACE_APPROVAL(HttpStatus.BAD_REQUEST, "Check place data"),
+    INVALID_PLACE_MODIFICATION(HttpStatus.BAD_REQUEST, "Check place approval")
     ;
 
     private final HttpStatus httpStatus;

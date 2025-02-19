@@ -426,4 +426,13 @@ public class AdminPlaceManager {
             .url(url)
             .build();
     }
+
+    public void validatePlaceModification(Long placeId) {
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        if (place.getIsApproved()) {
+            throw new CustomException(AdminErrorCode.INVALID_PLACE_MODIFICATION);
+        }
+    }
 }

@@ -42,7 +42,9 @@ public class AdminPlaceService {
         return adminPlaceManager.getPlaceBasic(placeId);
     }
 
+    @Transactional
     public void updatePlaceBasic(Long placeId, AdminCreatePlaceRequestDto requestDto) {
+        adminPlaceManager.validatePlaceModification(placeId);
         adminPlaceManager.updatePlaceBasic(placeId, requestDto);
     }
 
@@ -50,7 +52,9 @@ public class AdminPlaceService {
         return adminPlaceManager.getPlaceImage(placeId);
     }
 
+    @Transactional
     public void updatePlaceImage(Long placeId, List<ImageDto> imageDtoList) {
+        adminPlaceManager.validatePlaceModification(placeId);
         adminPlaceManager.updatePlaceImage(placeId, imageDtoList);
     }
 
@@ -58,11 +62,15 @@ public class AdminPlaceService {
         return adminPlaceManager.getMenu(placeId);
     }
 
+    @Transactional
     public void updateMenu(Long placeId, List<MenuDto> menuDtoList) {
+        adminPlaceManager.validatePlaceModification(placeId);
         adminPlaceManager.updateMenu(placeId, menuDtoList);
     }
 
+    @Transactional
     public void updateFixedBusinessHour(Long placeId, WeeklyBusinessHourDto requestDto) {
+        adminPlaceManager.validatePlaceModification(placeId);
         adminPlaceManager.updateFixedBusinessHour(placeId, requestDto);
     }
 
@@ -102,6 +110,7 @@ public class AdminPlaceService {
     }
 
     public void deletePlace(Long placeId) {
+        adminPlaceManager.validatePlaceModification(placeId);
         adminPlaceManager.deletePlace(placeId);
         adminPlaceManager.deleteMenuImageFileList(placeId);
     }
