@@ -53,11 +53,11 @@ public class CustomPlaceRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public Page<Place> getAllMappedPlaceByBannerId(Pageable pageable, Long bannerId) {
+    public Page<Place> getAllApprovedMappedPlaceByBannerId(Pageable pageable, Long bannerId) {
         List<Place> content = queryFactory
             .selectFrom(place)
             .join(place.bannerPlaceMappingList, bannerPlaceMapping)
-            .where(bannerPlaceMapping.banner.id.eq(bannerId))
+            .where(bannerPlaceMapping.banner.id.eq(bannerId).and(place.isApproved.eq(true)))
             .orderBy(getOrderSpecifier(pageable.getSort(), Expressions.path(Place.class, "place")))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
@@ -67,7 +67,7 @@ public class CustomPlaceRepository {
             .select(place.count())
             .from(place)
             .join(place.bannerPlaceMappingList, bannerPlaceMapping)
-            .where(bannerPlaceMapping.banner.id.eq(bannerId));
+            .where(bannerPlaceMapping.banner.id.eq(bannerId).and(place.isApproved.eq(true)));
 
         return PageableExecutionUtils.getPage(content, pageable, totalCountQuery::fetchOne);
     }

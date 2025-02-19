@@ -25,6 +25,6 @@ public class BannerService {
     }
 
     public PagedResponseDto<BannerPlaceDto> getMappedPlaceList(Pageable pageable, Long bannerId) {
-        return placeManager.getMappedPlaceList(pageable, bannerId);
+        return placeManager.getApprovedMappedPlaceList(pageable, bannerId);
     }
 }
