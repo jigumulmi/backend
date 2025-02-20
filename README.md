@@ -38,21 +38,19 @@
 - main 브랜치
   - Push -> 상용 환경의 백엔드 애플리케이션 혹은 모니터링 시스템 배포
 
+## 개발 일지
+> 트러블 슈팅 및 학습 기록
+### [노션 페이지](https://developerjoseph.notion.site/6aec3d72c3d641c4a98ba4a55d069536?v=f9513eb4d2644809927f5ab0ca5236ff)
+
 ## 기술 스택
-- `Java21`
-- `SpringBoot3, Spring Security, Springdoc`
+- `Java21, SpringBoot3, Spring Security, Springdoc`
 - `JPA, QueryDSL`
 - `JUnit5, Mockito`
 - `Docker, FluentBit, Loki, Prometheus, Grafana`
 - `AWS`
-  - `EC2, RDS MySQL`
-  - `Route53, Cloudfront, S3`
+  - `EC2, Lambda, RDS MySQL, S3`
+  - `Route53, Cloudfront`
 - `Github Actions, Doppler`
-
-## 기술 노트
-> 트러블 슈팅 및 학습 기록
-
-[노션 페이지](https://developerjoseph.notion.site/6aec3d72c3d641c4a98ba4a55d069536?v=f9513eb4d2644809927f5ab0ca5236ff)
 
 ## 주요 기능
 ### 일반 사용자
