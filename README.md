@@ -8,6 +8,18 @@
 ## 인프라 아키텍처
 ![jigumulmi architecture.png](..%2F..%2FDownloads%2Fjigumulmi%20architecture.png)
 
+## 코드 아키텍처
+> [Manager 계층 도입 배경](https://developerjoseph.notion.site/19c519c54f54803fbc94eecba5d173da?pvs=74)
+- **Controller**: 클라이언트 요청 및 응답 핸들링
+  - 요청 데이터 검증 및 적절한 형태로 서비스 계층에 전달
+  - Swagger 문서화
+- **Service**: 비즈니스 로직 수행
+  - 서비스가 수행하고자 하는 "주 관심사"의 흐름을 이해하기 쉽게 표현하는 계층
+- **Manager**: 비즈니스 로직의 세부 구현
+  - 서비스 계층의 부품이 되어 여러 도메인의 비즈니스 로직에 재사용되는 계층
+- **Repository**: Data Access Object (DAO)
+  - 다양한 데이터 자원(주로 RDB)에 접근하여 처리하는 계층
+
 ## 브랜치 전략
 ![gitflow drawio](https://github.com/user-attachments/assets/985708a6-f7dd-4d7b-be58-7db9d65e710c)
 
