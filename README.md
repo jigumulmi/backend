@@ -6,7 +6,7 @@
 더 자세한 내용은 [지구멀미 소개 페이지](https://developerjoseph.notion.site/dfea728380654c84b4b898b63e411707)에서 확인하실 수 있습니다.
 
 ## 인프라 아키텍처
-![jigumulmi architecture](https://github.com/user-attachments/assets/0d4ff86a-5c90-46f6-9b5e-c304cd25349b)
+![jigumulmi architecture.png](..%2F..%2FDownloads%2Fjigumulmi%20architecture.png)
 
 ## 브랜치 전략
 ![gitflow drawio](https://github.com/user-attachments/assets/985708a6-f7dd-4d7b-be58-7db9d65e710c)
