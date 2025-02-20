@@ -45,7 +45,9 @@ public class AdminPlaceService {
         return adminPlaceManager.getPlaceBasic(placeId);
     }
 
+    @Transactional
     public void updatePlaceBasic(Long placeId, AdminCreatePlaceRequestDto requestDto) {
+        adminPlaceValidator.validatePlaceBasicUpdate(placeId, requestDto);
         adminPlaceManager.updatePlaceBasic(placeId, requestDto);
     }
 
