@@ -72,7 +72,12 @@ public class AdminPlaceController {
     }
 
     @Operation(summary = "장소 기본 정보 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
-    @ApiResponse(responseCode = "201")
+    @ApiResponses(
+        {
+            @ApiResponse(responseCode = "201"),
+            @ApiResponse(responseCode = "400", description = "승인된 장소 수정 시 데이터 누락")
+        }
+    )
     @PutMapping("/{placeId}/basic")
     public ResponseEntity<?> updatePlaceBasic(@PathVariable Long placeId,
         @RequestBody AdminCreatePlaceRequestDto requestDto) {
@@ -89,7 +94,12 @@ public class AdminPlaceController {
     }
 
     @Operation(summary = "장소 이미지 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
-    @ApiResponse(responseCode = "201")
+    @ApiResponses(
+        {
+            @ApiResponse(responseCode = "201"),
+            @ApiResponse(responseCode = "400", description = "승인된 장소 수정 시 데이터 누락")
+        }
+    )
     @PutMapping("/{placeId}/image")
     public ResponseEntity<?> updatePlaceImage(@PathVariable Long placeId,
         @RequestBody List<ImageDto> requestDto) {
@@ -105,7 +115,12 @@ public class AdminPlaceController {
     }
 
     @Operation(summary = "장소 메뉴 수정", description = "덮어쓰는 로직이므로 수정되지 않은 기존 데이터도 필요")
-    @ApiResponse(responseCode = "201")
+    @ApiResponses(
+        {
+            @ApiResponse(responseCode = "201"),
+            @ApiResponse(responseCode = "400", description = "승인된 장소 수정 시 데이터 누락")
+        }
+    )
     @PutMapping("/{placeId}/menu")
     public ResponseEntity<?> updateMenu(@PathVariable Long placeId,
         @RequestBody List<MenuDto> requestDto) {
@@ -175,15 +190,15 @@ public class AdminPlaceController {
     @Operation(summary = "장소 승인/미승인")
     @ApiResponses(
         {
-            @ApiResponse(responseCode = "201", description = "장소 승인 여부 업데이트 성공"),
+            @ApiResponse(responseCode = "204", description = "장소 승인 여부 업데이트 성공"),
             @ApiResponse(responseCode = "400", description = "장소 승인 검증 실패")
         }
     )
     @PostMapping("/{placeId}/approval")
     public ResponseEntity<?> togglePlaceApprove(@PathVariable Long placeId,
         @Valid @RequestBody TogglePlaceApproveRequestDto requestDto) {
-        adminPlaceService.togglePlaceApprove(placeId, requestDto.getIsApproved());
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        adminPlaceService.togglePlaceApprove(placeId, requestDto.getApprove());
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "장소 삭제")

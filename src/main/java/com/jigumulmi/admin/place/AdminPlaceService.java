@@ -12,6 +12,8 @@ import com.jigumulmi.admin.place.dto.response.AdminPlaceBusinessHourResponseDto.
 import com.jigumulmi.admin.place.dto.response.AdminPlaceListResponseDto.PlaceDto;
 import com.jigumulmi.admin.place.dto.response.AdminS3DeletePresignedUrlResponseDto;
 import com.jigumulmi.admin.place.dto.response.AdminS3PutPresignedUrlResponseDto;
+import com.jigumulmi.admin.place.manager.AdminPlaceManager;
+import com.jigumulmi.admin.place.manager.AdminPlaceValidator;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.dto.ImageDto;
@@ -32,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminPlaceService {
 
     private final AdminPlaceManager adminPlaceManager;
+    private final AdminPlaceValidator adminPlaceValidator;
 
     public PagedResponseDto<PlaceDto> getPlaceList(Pageable pageable,
         AdminGetPlaceListRequestDto requestDto) {
@@ -42,7 +45,9 @@ public class AdminPlaceService {
         return adminPlaceManager.getPlaceBasic(placeId);
     }
 
+    @Transactional
     public void updatePlaceBasic(Long placeId, AdminCreatePlaceRequestDto requestDto) {
+        adminPlaceValidator.validatePlaceBasicUpdate(placeId, requestDto);
         adminPlaceManager.updatePlaceBasic(placeId, requestDto);
     }
 
@@ -50,7 +55,9 @@ public class AdminPlaceService {
         return adminPlaceManager.getPlaceImage(placeId);
     }
 
+    @Transactional
     public void updatePlaceImage(Long placeId, List<ImageDto> imageDtoList) {
+        adminPlaceValidator.validatePlaceImageUpdate(placeId, imageDtoList);
         adminPlaceManager.updatePlaceImage(placeId, imageDtoList);
     }
 
@@ -58,7 +65,9 @@ public class AdminPlaceService {
         return adminPlaceManager.getMenu(placeId);
     }
 
+    @Transactional
     public void updateMenu(Long placeId, List<MenuDto> menuDtoList) {
+        adminPlaceValidator.validateMenuUpdate(placeId, menuDtoList);
         adminPlaceManager.updateMenu(placeId, menuDtoList);
     }
 
@@ -96,12 +105,13 @@ public class AdminPlaceService {
     }
 
     @Transactional
-    public void togglePlaceApprove(Long placeId, boolean isApproved) {
-        adminPlaceManager.validatePlaceApprovalIfNeeded(placeId, isApproved);
-        adminPlaceManager.togglePlaceApprove(placeId, isApproved);
+    public void togglePlaceApprove(Long placeId, boolean approve) {
+        adminPlaceValidator.validatePlaceApprovalIfNeeded(placeId, approve);
+        adminPlaceManager.togglePlaceApprove(placeId, approve);
     }
 
     public void deletePlace(Long placeId) {
+        adminPlaceValidator.validatePlaceRemoval(placeId);
         adminPlaceManager.deletePlace(placeId);
         adminPlaceManager.deleteMenuImageFileList(placeId);
     }
