@@ -18,7 +18,6 @@ import com.jigumulmi.common.FileUtils;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.config.exception.CustomException;
-import com.jigumulmi.config.exception.errorCode.AdminErrorCode;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.place.domain.FixedBusinessHour;
@@ -35,7 +34,6 @@ import com.jigumulmi.place.dto.MenuDto;
 import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.repository.FixedBusinessHourRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceCategoryMappingRepository;
@@ -329,54 +327,6 @@ public class AdminPlaceManager {
 
         placeRepository.save(place);
         return AdminCreatePlaceResponseDto.builder().placeId(place.getId()).build();
-    }
-
-    @Transactional(readOnly = true)
-    public void validatePlaceApprovalIfNeeded(Long placeId, boolean approve) {
-        if (!approve) {
-            return;
-        }
-
-        AdminPlaceBasicResponseDto placeBasic = getPlaceBasic(placeId);
-        if (placeBasic.getName().isBlank() || placeBasic.getAddress().isBlank()
-            || placeBasic.getRegion() == null || placeBasic.getDistrict() == null) {
-            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "기본 정보 누락");
-        }
-
-        PositionDto position = placeBasic.getPosition();
-        if (position.getLatitude() == null || (position.getLatitude() < 33
-            || position.getLatitude() > 39)
-            || position.getLongitude() == null || (position.getLongitude() < 124
-            || position.getLongitude() > 132)) {
-            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "좌표 오류");
-        }
-
-        List<SubwayStationResponseDto> subwayStationList = placeBasic.getSubwayStationList();
-        if (subwayStationList == null || subwayStationList.isEmpty()) {
-            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "지하철 누락");
-        }
-
-        List<PlaceCategoryDto> categoryList = placeBasic.getCategoryList();
-        if (categoryList == null || categoryList.isEmpty()) {
-            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "카테고리 누락");
-        }
-
-        List<ImageDto> placeImage = getPlaceImage(placeId);
-        if (placeImage.isEmpty()) {
-            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "이미지 누락");
-        }
-
-        List<MenuDto> menuDtoList = getMenu(placeId);
-        if (menuDtoList.isEmpty()) {
-            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "메뉴 누락");
-        }
-
-        WeeklyBusinessHourDto fixedBusinessHour = getFixedBusinessHour(placeId);
-        for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
-            if (fixedBusinessHour.getBusinessHour(dayOfWeek) == null) {
-                throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "영업 시간 누락");
-            }
-        }
     }
 
     @Transactional

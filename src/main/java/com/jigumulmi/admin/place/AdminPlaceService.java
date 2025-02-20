@@ -100,7 +100,7 @@ public class AdminPlaceService {
 
     @Transactional
     public void togglePlaceApprove(Long placeId, boolean approve) {
-        adminPlaceManager.validatePlaceApprovalIfNeeded(placeId, approve);
+        adminPlaceValidator.validatePlaceApprovalIfNeeded(placeId, approve);
         adminPlaceManager.togglePlaceApprove(placeId, approve);
     }
 
