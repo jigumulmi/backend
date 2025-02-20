@@ -55,7 +55,9 @@ public class AdminPlaceService {
         return adminPlaceManager.getPlaceImage(placeId);
     }
 
+    @Transactional
     public void updatePlaceImage(Long placeId, List<ImageDto> imageDtoList) {
+        adminPlaceValidator.validatePlaceImageUpdate(placeId, imageDtoList);
         adminPlaceManager.updatePlaceImage(placeId, imageDtoList);
     }
 

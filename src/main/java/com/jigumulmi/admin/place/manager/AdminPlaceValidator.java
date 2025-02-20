@@ -128,4 +128,17 @@ public class AdminPlaceValidator {
         validateCategory(requestDto.getCategoryList());
     }
 
+    public void validatePlaceImageUpdate(Long placeId, List<ImageDto> imageDtoList) {
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        if (!place.getIsApproved()) {
+            return;
+        }
+
+        if (imageDtoList == null || imageDtoList.isEmpty()) {
+            throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "이미지 누락");
+        }
+    }
+
 }
