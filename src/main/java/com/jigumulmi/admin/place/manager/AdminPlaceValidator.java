@@ -47,8 +47,7 @@ public class AdminPlaceValidator {
 
         AdminPlaceBasicResponseDto placeBasic = adminPlaceManager.getPlaceBasic(placeId);
         checkPlaceEssential(placeBasic.getName(), placeBasic.getAddress(),
-            placeBasic.getRegion(),
-            DistrictResponseDto.toDistrict(placeBasic.getDistrict()));
+            placeBasic.getRegion(), DistrictResponseDto.toDistrict(placeBasic.getDistrict()));
 
         PositionDto position = placeBasic.getPosition();
         checkPlacePosition(position);
