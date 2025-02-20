@@ -6,7 +6,7 @@
 더 자세한 내용은 [지구멀미 소개 페이지](https://developerjoseph.notion.site/dfea728380654c84b4b898b63e411707)에서 확인하실 수 있습니다.
 
 ## 인프라 아키텍처
-![jigumulmi architecture](https://github.com/user-attachments/assets/86931577-5121-485e-9ef0-9ee12b02b687)
+![jigumulmi architecture](https://github.com/user-attachments/assets/b487d00b-a19b-4a7e-945a-f108164da081)
 
 ## 코드 아키텍처
 > [Manager 계층 도입 배경](https://developerjoseph.notion.site/19c519c54f54803fbc94eecba5d173da?pvs=74)
