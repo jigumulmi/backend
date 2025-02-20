@@ -210,7 +210,7 @@ public class Place extends Timestamped {
         this.kakaoPlaceId = requestDto.getKakaoPlaceId();
     }
 
-    public void adminUpdateIsApproved(Boolean isApproved) {
-        this.isApproved = isApproved;
+    public void adminUpdateIsApproved(boolean approve) {
+        this.isApproved = approve;
     }
 }

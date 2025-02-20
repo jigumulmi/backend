@@ -182,8 +182,8 @@ public class AdminPlaceController {
     @PostMapping("/{placeId}/approval")
     public ResponseEntity<?> togglePlaceApprove(@PathVariable Long placeId,
         @Valid @RequestBody TogglePlaceApproveRequestDto requestDto) {
-        adminPlaceService.togglePlaceApprove(placeId, requestDto.getIsApproved());
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        adminPlaceService.togglePlaceApprove(placeId, requestDto.getApprove());
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "장소 삭제")

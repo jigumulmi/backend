@@ -331,8 +331,8 @@ public class AdminPlaceManager {
     }
 
     @Transactional(readOnly = true)
-    public void validatePlaceApprovalIfNeeded(Long placeId, boolean isApproved) {
-        if (!isApproved) {
+    public void validatePlaceApprovalIfNeeded(Long placeId, boolean approve) {
+        if (!approve) {
             return;
         }
 
@@ -379,11 +379,11 @@ public class AdminPlaceManager {
     }
 
     @Transactional
-    public void togglePlaceApprove(Long placeId, boolean isApproved) {
+    public void togglePlaceApprove(Long placeId, boolean approve) {
         Place place = placeRepository.findById(placeId)
             .orElseThrow(() -> new CustomException((CommonErrorCode.RESOURCE_NOT_FOUND)));
 
-        place.adminUpdateIsApproved(isApproved);
+        place.adminUpdateIsApproved(approve);
     }
 
     public void deletePlace(Long placeId) {
