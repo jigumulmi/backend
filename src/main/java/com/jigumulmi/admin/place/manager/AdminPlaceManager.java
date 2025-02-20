@@ -1,5 +1,6 @@
-package com.jigumulmi.admin.place;
+package com.jigumulmi.admin.place.manager;
 
+import com.jigumulmi.admin.place.AdminCustomPlaceRepository;
 import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
@@ -425,14 +426,5 @@ public class AdminPlaceManager {
         return AdminS3DeletePresignedUrlResponseDto.builder()
             .url(url)
             .build();
-    }
-
-    public void validatePlaceModification(Long placeId) {
-        Place place = placeRepository.findById(placeId)
-            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
-
-        if (place.getIsApproved()) {
-            throw new CustomException(AdminErrorCode.INVALID_PLACE_MODIFICATION);
-        }
     }
 }
