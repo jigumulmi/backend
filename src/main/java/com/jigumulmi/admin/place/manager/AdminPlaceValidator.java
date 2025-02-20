@@ -141,4 +141,15 @@ public class AdminPlaceValidator {
         }
     }
 
+    public void validateMenuUpdate(Long placeId, List<MenuDto> menuDtoList) {
+        Place place = placeRepository.findById(placeId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
+
+        if (!place.getIsApproved()) {
+            return;
+        }
+
+        validateMenu(menuDtoList);
+    }
+
 }

@@ -65,7 +65,9 @@ public class AdminPlaceService {
         return adminPlaceManager.getMenu(placeId);
     }
 
+    @Transactional
     public void updateMenu(Long placeId, List<MenuDto> menuDtoList) {
+        adminPlaceValidator.validateMenuUpdate(placeId, menuDtoList);
         adminPlaceManager.updateMenu(placeId, menuDtoList);
     }
 
