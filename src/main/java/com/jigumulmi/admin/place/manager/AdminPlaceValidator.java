@@ -46,12 +46,12 @@ public class AdminPlaceValidator {
         }
 
         AdminPlaceBasicResponseDto placeBasic = adminPlaceManager.getPlaceBasic(placeId);
-        validatePlaceEssential(placeBasic.getName(), placeBasic.getAddress(),
+        checkPlaceEssential(placeBasic.getName(), placeBasic.getAddress(),
             placeBasic.getRegion(),
             DistrictResponseDto.toDistrict(placeBasic.getDistrict()));
 
         PositionDto position = placeBasic.getPosition();
-        validatePlacePosition(position);
+        checkPlacePosition(position);
 
         List<SubwayStationResponseDto> subwayStationList = placeBasic.getSubwayStationList();
         if (subwayStationList == null || subwayStationList.isEmpty()) {
@@ -59,7 +59,7 @@ public class AdminPlaceValidator {
         }
 
         List<PlaceCategoryDto> categoryList = placeBasic.getCategoryList();
-        validateCategory(categoryList);
+        checkCategory(categoryList);
 
         List<ImageDto> placeImage = adminPlaceManager.getPlaceImage(placeId);
         if (placeImage.isEmpty()) {
@@ -67,7 +67,7 @@ public class AdminPlaceValidator {
         }
 
         List<MenuDto> menuDtoList = adminPlaceManager.getMenu(placeId);
-        validateMenu(menuDtoList);
+        checkMenu(menuDtoList);
 
         WeeklyBusinessHourDto fixedBusinessHour = adminPlaceManager.getFixedBusinessHour(placeId);
         for (DayOfWeek dayOfWeek : DayOfWeek.values()) {
@@ -77,21 +77,21 @@ public class AdminPlaceValidator {
         }
     }
 
-    private void validateMenu(List<MenuDto> menuList) {
+    private void checkMenu(List<MenuDto> menuList) {
         if (menuList == null || menuList.isEmpty() || menuList.stream()
             .allMatch(menu -> menu.getName().isBlank())) {
             throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "메뉴 누락");
         }
     }
 
-    private void validateCategory(List<PlaceCategoryDto> categoryList) {
+    private void checkCategory(List<PlaceCategoryDto> categoryList) {
         if (categoryList == null || categoryList.isEmpty() || categoryList.stream()
             .allMatch(dto -> dto.getCategoryGroup() == null)) {
             throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "카테고리 누락");
         }
     }
 
-    private void validatePlacePosition(PositionDto position) {
+    private void checkPlacePosition(PositionDto position) {
         if (position.getLatitude() == null || (position.getLatitude() < 33
             || position.getLatitude() > 39)
             || position.getLongitude() == null || (position.getLongitude() < 124
@@ -100,7 +100,7 @@ public class AdminPlaceValidator {
         }
     }
 
-    private void validatePlaceEssential(String name, String address, Region region,
+    private void checkPlaceEssential(String name, String address, Region region,
         District district) {
         if (name.isBlank() || address.isBlank() || region == null || district == null) {
             throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "기본 정보 누락");
@@ -115,7 +115,7 @@ public class AdminPlaceValidator {
             return;
         }
 
-        validatePlaceEssential(requestDto.getName(), requestDto.getAddress(),
+        checkPlaceEssential(requestDto.getName(), requestDto.getAddress(),
             requestDto.getRegion(), requestDto.getDistrict());
 
         if (requestDto.getSubwayStationIdList() == null || requestDto.getSubwayStationIdList()
@@ -123,9 +123,9 @@ public class AdminPlaceValidator {
             throw new CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "지하철 누락");
         }
 
-        validatePlacePosition(requestDto.getPosition());
+        checkPlacePosition(requestDto.getPosition());
 
-        validateCategory(requestDto.getCategoryList());
+        checkCategory(requestDto.getCategoryList());
     }
 
     public void validatePlaceImageUpdate(Long placeId, List<ImageDto> imageDtoList) {
@@ -149,7 +149,7 @@ public class AdminPlaceValidator {
             return;
         }
 
-        validateMenu(menuDtoList);
+        checkMenu(menuDtoList);
     }
 
 }
