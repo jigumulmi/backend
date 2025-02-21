@@ -22,4 +22,8 @@ public class DistrictResponseDto {
             .build();
     }
 
+    public static District toDistrict(DistrictResponseDto dto) {
+        return District.ofId(dto.getId());
+    }
+
 }

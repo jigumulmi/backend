@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TogglePlaceApproveRequestDto {
 
-    @Schema(title = "승인 여부", requiredMode = RequiredMode.REQUIRED)
+    @Schema(description = "승인 요청 -> true, 미승인 요청 -> false", requiredMode = RequiredMode.REQUIRED)
     @NotNull
-    private Boolean isApproved;
+    private Boolean approve;
 }
