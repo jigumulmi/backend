@@ -1,19 +1,21 @@
 package com.jigumulmi.place;
 
-import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
 import com.jigumulmi.aws.S3Manager;
 import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto;
 import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto.BannerPlaceDto;
 import com.jigumulmi.common.FileUtils;
 import com.jigumulmi.common.PagedResponseDto;
+import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.config.exception.CustomException;
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode;
 import com.jigumulmi.config.exception.errorCode.PlaceErrorCode;
 import com.jigumulmi.member.domain.Member;
+import com.jigumulmi.place.domain.FixedBusinessHour;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.Review;
 import com.jigumulmi.place.domain.ReviewImage;
 import com.jigumulmi.place.domain.ReviewReply;
+import com.jigumulmi.place.domain.TemporaryBusinessHour;
 import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.MenuDto;
@@ -34,6 +36,7 @@ import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.dto.response.SurroundingDateBusinessHour;
 import com.jigumulmi.place.repository.CustomPlaceRepository;
+import com.jigumulmi.place.repository.FixedBusinessHourRepository;
 import com.jigumulmi.place.repository.MenuRepository;
 import com.jigumulmi.place.repository.PlaceCategoryMappingRepository;
 import com.jigumulmi.place.repository.PlaceImageRepository;
@@ -42,6 +45,7 @@ import com.jigumulmi.place.repository.ReviewImageRepository;
 import com.jigumulmi.place.repository.ReviewReplyRepository;
 import com.jigumulmi.place.repository.ReviewRepository;
 import com.jigumulmi.place.repository.SubwayStationRepository;
+import com.jigumulmi.place.repository.TemporaryBusinessHourRepository;
 import com.jigumulmi.place.vo.CurrentOpeningStatus;
 import com.jigumulmi.place.vo.NextOpeningStatus;
 import java.io.IOException;
@@ -54,6 +58,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -78,6 +84,8 @@ public class PlaceManager {
     private final PlaceImageRepository placeImageRepository;
     private final ReviewImageRepository reviewImageRepository;
     private final PlaceCategoryMappingRepository placeCategoryMappingRepository;
+    private final FixedBusinessHourRepository fixedBusinessHourRepository;
+    private final TemporaryBusinessHourRepository temporaryBusinessHourRepository;
 
     public List<SubwayStationResponseDto> getSubwayStationListByName(String stationName) {
         return subwayStationRepository.findAllByStationNameStartsWith(stationName)
@@ -85,7 +93,8 @@ public class PlaceManager {
     }
 
     @Transactional(readOnly = true)
-    public PagedResponseDto<BannerPlaceDto> getApprovedMappedPlaceList(Pageable pageable, Long bannerId) {
+    public PagedResponseDto<BannerPlaceDto> getApprovedMappedPlaceList(Pageable pageable,
+        Long bannerId) {
         Page<BannerPlaceDto> placePage = customPlaceRepository.getAllApprovedMappedPlaceByBannerId(
             pageable, bannerId).map(BannerPlaceDto::from);
 
@@ -105,7 +114,10 @@ public class PlaceManager {
                 placeId, SurroundingDateBusinessHour.builder().build());
 
             DayOfWeek dayOfWeek = businessHourQueryDto.getDayOfWeek();
-            BusinessHour businessHour = adjustBusinessHour(businessHourQueryDto);
+            BusinessHour businessHour = adjustBusinessHour(
+                businessHourQueryDto.getTemporaryBusinessHour(),
+                businessHourQueryDto.getFixedBusinessHour()
+            );
             if (Objects.equals(dayOfWeek, today.getDayOfWeek())) {
                 surroundingDateBusinessHour.setToday(businessHour);
             } else {
@@ -122,8 +134,8 @@ public class PlaceManager {
         return BannerPlaceListResponseDto.of(placePage, pageable);
     }
 
-    public BusinessHour adjustBusinessHour(BusinessHourQueryDto businessHourQueryDto) {
-        BusinessHour temporaryBusinessHour = businessHourQueryDto.getTemporaryBusinessHour();
+    public BusinessHour adjustBusinessHour(BusinessHour temporaryBusinessHour,
+        BusinessHour fixedBusinessHour) {
         if ((temporaryBusinessHour.getOpenTime() != null
             && temporaryBusinessHour.getCloseTime() != null)
             || temporaryBusinessHour.getIsDayOff() != null) {
@@ -133,16 +145,17 @@ public class PlaceManager {
                 .breakStart(temporaryBusinessHour.getBreakStart())
                 .breakEnd(temporaryBusinessHour.getBreakEnd())
                 .isDayOff(temporaryBusinessHour.getIsDayOff())
+                .dayOfWeek(temporaryBusinessHour.getDayOfWeek())
                 .temporaryDate(temporaryBusinessHour.getTemporaryDate())
                 .build();
         } else {
-            BusinessHour fixedBusinessHour = businessHourQueryDto.getFixedBusinessHour();
             return BusinessHour.builder()
                 .openTime(fixedBusinessHour.getOpenTime())
                 .closeTime(fixedBusinessHour.getCloseTime())
                 .breakStart(fixedBusinessHour.getBreakStart())
                 .breakEnd(fixedBusinessHour.getBreakEnd())
                 .isDayOff(fixedBusinessHour.getIsDayOff())
+                .dayOfWeek(fixedBusinessHour.getDayOfWeek())
                 .build();
         }
     }
@@ -161,25 +174,34 @@ public class PlaceManager {
             .map(ImageDto::from).toList();
         place.setImageList(imageList);
 
+        Map<DayOfWeek, FixedBusinessHour> weeklyFixedBusinessHourMap = fixedBusinessHourRepository.findAllByPlaceId(
+                placeId).stream()
+            .collect(Collectors.toMap(FixedBusinessHour::getDayOfWeek, Function.identity()));
+
         LocalDateTime now = LocalDateTime.now();
         LocalDate today = now.toLocalDate();
-        List<BusinessHourQueryDto> businessHourQueryDtoList = customPlaceRepository.getWeeklyBusinessHourByPlaceId(
+        Map<LocalDate, TemporaryBusinessHour> weeklyTemporaryBusinessHourDateMap = customPlaceRepository.getWeeklyTemporaryBusinessHourByPlaceId(
             placeId, today);
 
-        WeeklyBusinessHourDto weeklyBusinessHourDto = new WeeklyBusinessHourDto();
-        for (BusinessHourQueryDto businessHourQueryDto : businessHourQueryDtoList) {
-            DayOfWeek dayOfWeek = businessHourQueryDto.getDayOfWeek();
-            BusinessHour businessHour = adjustBusinessHour(businessHourQueryDto);
-
-            weeklyBusinessHourDto.updateBusinessHour(Objects.requireNonNull(dayOfWeek),
-                businessHour);
-        }
-
         DayOfWeek todayDayOfWeek = today.getDayOfWeek();
-        DayOfWeek yesterdayDayOfWeek = today.minusDays(1).getDayOfWeek();
+        DayOfWeek yesterdayDayOfWeek = todayDayOfWeek.minus(1);
         SurroundingDateBusinessHour surroundingDateBusinessHour = SurroundingDateBusinessHour.builder()
-            .today(weeklyBusinessHourDto.getBusinessHour(todayDayOfWeek))
-            .yesterday(weeklyBusinessHourDto.getBusinessHour(yesterdayDayOfWeek))
+            .today(
+                adjustBusinessHour(
+                    BusinessHour.fromTemporaryBusinessHour(
+                        weeklyTemporaryBusinessHourDateMap.get(today)),
+                    BusinessHour.fromFixedBusinessHour(
+                        weeklyFixedBusinessHourMap.get(todayDayOfWeek))
+                )
+            )
+            .yesterday(
+                adjustBusinessHour(
+                    BusinessHour.fromTemporaryBusinessHour(
+                        weeklyTemporaryBusinessHourDateMap.get(today.minusDays(1))),
+                    BusinessHour.fromFixedBusinessHour(
+                        weeklyFixedBusinessHourMap.get(yesterdayDayOfWeek))
+                )
+            )
             .build();
 
         LocalTime currentTime = now.toLocalTime();
@@ -188,12 +210,31 @@ public class PlaceManager {
         NextOpeningInfo nextOpeningInfo = NextOpeningStatus.getNextOpeningInfo(
             surroundingDateBusinessHour, currentTime);
 
-        weeklyBusinessHourDto.highlightDayOfWeek(currentOpeningStatus, todayDayOfWeek);
+        List<DayOfWeek> liveDayOfWeekList;
+        if (currentOpeningStatus == CurrentOpeningStatus.OVERNIGHT_OPEN) {
+            weeklyTemporaryBusinessHourDateMap.remove(today.plusDays(6));
+            liveDayOfWeekList = WeekUtils.getWeekStartingFrom(yesterdayDayOfWeek);
+        } else {
+            weeklyTemporaryBusinessHourDateMap.remove(today.minusDays(1));
+            liveDayOfWeekList = WeekUtils.getWeekStartingFrom(todayDayOfWeek);
+        }
+        Map<DayOfWeek, TemporaryBusinessHour> weeklyTemporaryBusinessHourDayOfWeekMap = weeklyTemporaryBusinessHourDateMap.values()
+            .stream()
+            .collect(Collectors.toMap(TemporaryBusinessHour::getDayOfWeek, Function.identity()));
+
+        List<BusinessHour> weeklyBusinessHour = new ArrayList<>();
+        for (DayOfWeek dayOfWeek : liveDayOfWeekList) {
+            weeklyBusinessHour.add(
+                adjustBusinessHour(BusinessHour.fromTemporaryBusinessHour(
+                        weeklyTemporaryBusinessHourDayOfWeekMap.get(dayOfWeek)),
+                    BusinessHour.fromFixedBusinessHour(weeklyFixedBusinessHourMap.get(dayOfWeek)))
+            );
+        }
 
         LiveOpeningInfoDto liveOpeningInfoDto = LiveOpeningInfoDto.builder()
             .currentOpeningStatus(currentOpeningStatus)
             .nextOpeningInfo(nextOpeningInfo)
-            .weeklyBusinessHour(weeklyBusinessHourDto)
+            .weeklyBusinessHour(weeklyBusinessHour)
             .build();
         place.setLiveOpeningInfo(liveOpeningInfoDto);
 

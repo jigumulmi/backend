@@ -2,7 +2,6 @@ package com.jigumulmi.admin.place.dto;
 
 import com.jigumulmi.admin.place.dto.validator.ValidBusinessHour;
 import com.jigumulmi.place.dto.BusinessHour;
-import com.jigumulmi.place.vo.CurrentOpeningStatus;
 import java.time.DayOfWeek;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,19 +46,6 @@ public class WeeklyBusinessHourDto {
             case THURSDAY -> this.thursday = businessHour;
             case FRIDAY -> this.friday = businessHour;
             case SATURDAY -> this.saturday = businessHour;
-        }
-    }
-
-    public void highlightDayOfWeek(CurrentOpeningStatus currentOpeningStatus, DayOfWeek todayDayOfWeek) {
-        if (currentOpeningStatus == CurrentOpeningStatus.OVERNIGHT_OPEN) {
-            DayOfWeek yesterdayDayOfWeek = todayDayOfWeek.minus(1);
-            BusinessHour businessHour = getBusinessHour(yesterdayDayOfWeek);
-            businessHour.setHighlightTrue();
-            updateBusinessHour(yesterdayDayOfWeek, businessHour);
-        } else {
-            BusinessHour businessHour = getBusinessHour(todayDayOfWeek);
-            businessHour.setHighlightTrue();
-            updateBusinessHour(todayDayOfWeek, businessHour);
         }
     }
 
