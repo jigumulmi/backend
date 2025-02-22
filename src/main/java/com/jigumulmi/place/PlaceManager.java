@@ -162,17 +162,18 @@ public class PlaceManager {
 
     @Transactional(readOnly = true)
     public PlaceBasicResponseDto getPlaceBasic(Long placeId) {
-        PlaceBasicResponseDto place = customPlaceRepository.getPlaceById(placeId);
+        PlaceBasicResponseDto placeBasicResponseDto = customPlaceRepository.getPlaceById(placeId)
+            .orElseThrow(() -> new CustomException(CommonErrorCode.RESOURCE_NOT_FOUND));
 
         List<PlaceCategoryDto> categoryDtoList = placeCategoryMappingRepository.findByPlace_Id(
                 placeId)
             .stream()
             .map(PlaceCategoryDto::fromPlaceCategoryMapping).toList();
-        place.setCategoryList(categoryDtoList);
+        placeBasicResponseDto.setCategoryList(categoryDtoList);
 
         List<ImageDto> imageList = placeImageRepository.findByPlace_Id(placeId).stream()
             .map(ImageDto::from).toList();
-        place.setImageList(imageList);
+        placeBasicResponseDto.setImageList(imageList);
 
         Map<DayOfWeek, FixedBusinessHour> weeklyFixedBusinessHourMap = fixedBusinessHourRepository.findAllByPlaceId(
                 placeId).stream()
@@ -236,9 +237,9 @@ public class PlaceManager {
             .nextOpeningInfo(nextOpeningInfo)
             .weeklyBusinessHour(weeklyBusinessHour)
             .build();
-        place.setLiveOpeningInfo(liveOpeningInfoDto);
+        placeBasicResponseDto.setLiveOpeningInfo(liveOpeningInfoDto);
 
-        return place;
+        return placeBasicResponseDto;
     }
 
     public PagedResponseDto<MenuDto> getPlaceMenu(Pageable pageable, Long placeId) {

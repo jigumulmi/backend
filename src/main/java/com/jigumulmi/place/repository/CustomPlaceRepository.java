@@ -41,6 +41,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -110,10 +111,10 @@ public class CustomPlaceRepository {
             .fetch();
     }
 
-    public PlaceBasicResponseDto getPlaceById(Long placeId) {
+    public Optional<PlaceBasicResponseDto> getPlaceById(Long placeId) {
         // 중첩 리스트 프로젝션 안되는 듯...
 
-        return queryFactory
+        PlaceBasicResponseDto result = queryFactory
             .from(place)
             .join(place.subwayStationPlaceList, subwayStationPlace)
             .on(subwayStationPlace.isMain.eq(true))
@@ -144,6 +145,8 @@ public class CustomPlaceRepository {
                     )
                 )
             ).get(placeId);
+
+        return Optional.ofNullable(result);
     }
 
     public Map<LocalDate, TemporaryBusinessHour> getWeeklyTemporaryBusinessHourByPlaceId(
