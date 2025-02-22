@@ -168,7 +168,8 @@ public class CustomPlaceRepository {
                         temporaryBusinessHour.closeTime,
                         temporaryBusinessHour.breakStart,
                         temporaryBusinessHour.breakEnd,
-                        temporaryBusinessHour.isDayOff
+                        temporaryBusinessHour.isDayOff,
+                        temporaryBusinessHour.date.as("temporaryDate")
                     ).as("temporaryBusinessHour")
                 )
             )

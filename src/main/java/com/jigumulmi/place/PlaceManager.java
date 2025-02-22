@@ -105,7 +105,7 @@ public class PlaceManager {
                 placeId, SurroundingDateBusinessHour.builder().build());
 
             DayOfWeek dayOfWeek = businessHourQueryDto.getDayOfWeek();
-            BusinessHour businessHour = buildBusinessHour(businessHourQueryDto);
+            BusinessHour businessHour = adjustBusinessHour(businessHourQueryDto);
             if (Objects.equals(dayOfWeek, today.getDayOfWeek())) {
                 surroundingDateBusinessHour.setToday(businessHour);
             } else {
@@ -122,7 +122,7 @@ public class PlaceManager {
         return BannerPlaceListResponseDto.of(placePage, pageable);
     }
 
-    public BusinessHour buildBusinessHour(BusinessHourQueryDto businessHourQueryDto) {
+    public BusinessHour adjustBusinessHour(BusinessHourQueryDto businessHourQueryDto) {
         BusinessHour temporaryBusinessHour = businessHourQueryDto.getTemporaryBusinessHour();
         if ((temporaryBusinessHour.getOpenTime() != null
             && temporaryBusinessHour.getCloseTime() != null)
@@ -133,6 +133,7 @@ public class PlaceManager {
                 .breakStart(temporaryBusinessHour.getBreakStart())
                 .breakEnd(temporaryBusinessHour.getBreakEnd())
                 .isDayOff(temporaryBusinessHour.getIsDayOff())
+                .temporaryDate(temporaryBusinessHour.getTemporaryDate())
                 .build();
         } else {
             BusinessHour fixedBusinessHour = businessHourQueryDto.getFixedBusinessHour();
@@ -168,7 +169,7 @@ public class PlaceManager {
         WeeklyBusinessHourDto weeklyBusinessHourDto = new WeeklyBusinessHourDto();
         for (BusinessHourQueryDto businessHourQueryDto : businessHourQueryDtoList) {
             DayOfWeek dayOfWeek = businessHourQueryDto.getDayOfWeek();
-            BusinessHour businessHour = buildBusinessHour(businessHourQueryDto);
+            BusinessHour businessHour = adjustBusinessHour(businessHourQueryDto);
 
             weeklyBusinessHourDto.updateBusinessHour(Objects.requireNonNull(dayOfWeek),
                 businessHour);
@@ -186,6 +187,8 @@ public class PlaceManager {
             surroundingDateBusinessHour, currentTime);
         NextOpeningInfo nextOpeningInfo = NextOpeningStatus.getNextOpeningInfo(
             surroundingDateBusinessHour, currentTime);
+
+        weeklyBusinessHourDto.highlightDayOfWeek(currentOpeningStatus, todayDayOfWeek);
 
         LiveOpeningInfoDto liveOpeningInfoDto = LiveOpeningInfoDto.builder()
             .currentOpeningStatus(currentOpeningStatus)
