@@ -132,9 +132,7 @@ public class MemberManager {
             hasRegistered = false;
 
             Long kakaoUserId = getKakaoUserId(accessToken);
-
-            String localPart = kakaoEmail.split("@")[0];
-            String tempNickname = localPart + "-" + kakaoUserId;
+            String tempNickname = "user-" + kakaoUserId;
 
             kakaoMember = Member.builder()
                 .email(kakaoEmail)
