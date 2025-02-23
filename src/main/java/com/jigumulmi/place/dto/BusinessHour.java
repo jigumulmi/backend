@@ -1,9 +1,13 @@
 package com.jigumulmi.place.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonProperty.Access;
 import com.jigumulmi.place.domain.FixedBusinessHour;
 import com.jigumulmi.place.domain.TemporaryBusinessHour;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.media.Schema.RequiredMode;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +31,12 @@ public class BusinessHour {
     private LocalTime breakEnd;
     @Schema(requiredMode = RequiredMode.REQUIRED)
     private Boolean isDayOff;
+    @Schema(title = "요일")
+    @JsonProperty(access = Access.READ_ONLY)
+    private DayOfWeek dayOfWeek;
+    @Schema(title = "변동 영업일", description = "값이 존재하는 경우 표기")
+    @JsonProperty(access = Access.READ_ONLY)
+    private LocalDate temporaryDate;
 
     public static BusinessHour fromFixedBusinessHour(FixedBusinessHour fixedBusinessHour) {
         return builder()
@@ -35,16 +45,24 @@ public class BusinessHour {
             .breakStart(fixedBusinessHour.getBreakStart())
             .breakEnd(fixedBusinessHour.getBreakEnd())
             .isDayOff(fixedBusinessHour.getIsDayOff())
+            .dayOfWeek(fixedBusinessHour.getDayOfWeek())
             .build();
     }
 
-    public static BusinessHour fromTemporaryBusinessHour(TemporaryBusinessHour temporaryBusinessHour) {
+    public static BusinessHour fromTemporaryBusinessHour(
+        TemporaryBusinessHour temporaryBusinessHour) {
+        if (temporaryBusinessHour == null) {
+            return builder().build();
+        }
+
         return builder()
             .openTime(temporaryBusinessHour.getOpenTime())
             .closeTime(temporaryBusinessHour.getCloseTime())
             .breakStart(temporaryBusinessHour.getBreakStart())
             .breakEnd(temporaryBusinessHour.getBreakEnd())
             .isDayOff(temporaryBusinessHour.getIsDayOff())
+            .dayOfWeek(temporaryBusinessHour.getDayOfWeek())
+            .temporaryDate(temporaryBusinessHour.getDate())
             .build();
     }
 }
