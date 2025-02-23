@@ -29,7 +29,7 @@ public enum CurrentOpeningStatus {
         // 어제의 영업 종료 시간이 오늘까지 이어지는 경우
         if ((yesterdayBusinessHour.getOpenTime() != null
             && yesterdayBusinessHour.getCloseTime() != null) && (
-            yesterdayBusinessHour.getCloseTime().isBefore(yesterdayBusinessHour.getOpenTime())
+            !yesterdayBusinessHour.getCloseTime().isAfter(yesterdayBusinessHour.getOpenTime())
                 && currentTime.isBefore(yesterdayBusinessHour.getCloseTime()))) {
             return CurrentOpeningStatus.OVERNIGHT_OPEN;
         }

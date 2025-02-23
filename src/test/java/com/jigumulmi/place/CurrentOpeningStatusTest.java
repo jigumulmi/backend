@@ -18,9 +18,16 @@ class CurrentOpeningStatusTest {
 
     static Stream<Arguments> provideBusinessHours() {
         return Stream.of(
-            // 어제의 영업시간이 자정을 넘기는 경우
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(22, 0)).closeTime(LocalTime.of(2, 0))
+                    .isDayOff(false).build(),
+                BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
+                    .isDayOff(false).build(),
+                LocalTime.of(1, 30),
+                CurrentOpeningStatus.OVERNIGHT_OPEN
+            ),
+            Arguments.of(
+                BusinessHour.builder().openTime(LocalTime.of(2, 0)).closeTime(LocalTime.of(2, 0))
                     .isDayOff(false).build(),
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
                     .isDayOff(false).build(),
