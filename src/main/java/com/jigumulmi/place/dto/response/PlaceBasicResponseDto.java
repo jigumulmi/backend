@@ -36,7 +36,7 @@ public class PlaceBasicResponseDto {
         private CurrentOpeningStatus currentOpeningStatus;
         @Schema(description = "현재 상태가 휴무 혹은 영업 종료인 경우 null")
         private NextOpeningInfo nextOpeningInfo;
-        @Schema(description = "순서대로 표기, 첫 요일에 하이라이트")
+        @Schema(description = "실시간 반영, 첫 요일에 하이라이트")
         private List<BusinessHour> weeklyBusinessHour;
     }
 
