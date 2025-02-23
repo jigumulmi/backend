@@ -25,7 +25,7 @@ class CurrentOpeningStatusTest {
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
                     .isDayOff(false).build(),
                 LocalTime.of(1, 30),
-                CurrentOpeningStatus.OPEN
+                CurrentOpeningStatus.OVERNIGHT_OPEN
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(22, 0)).closeTime(LocalTime.of(2, 0))
