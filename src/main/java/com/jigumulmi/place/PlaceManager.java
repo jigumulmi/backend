@@ -94,15 +94,13 @@ public class PlaceManager {
 
     @Transactional(readOnly = true)
     public PagedResponseDto<BannerPlaceDto> getApprovedMappedPlaceList(Pageable pageable,
-        Long bannerId) {
+        Long bannerId, LocalDateTime now) {
         Page<BannerPlaceDto> placePage = customPlaceRepository.getAllApprovedMappedPlaceByBannerId(
             pageable, bannerId).map(BannerPlaceDto::from);
 
         List<BannerPlaceDto> placeDtoList = placePage.getContent();
 
-        LocalDateTime now = LocalDateTime.now();
         LocalDate today = now.toLocalDate();
-
         List<Long> placeIdList = placeDtoList.stream().map(BannerPlaceDto::getId).toList();
         List<BusinessHourQueryDto> businessHourQueryDtoList = customPlaceRepository.getSurroundingBusinessHourByPlaceIdIn(
             placeIdList, today);
@@ -175,11 +173,17 @@ public class PlaceManager {
             .map(ImageDto::from).toList();
         placeBasicResponseDto.setImageList(imageList);
 
+        return placeBasicResponseDto;
+    }
+
+    public PlaceBasicResponseDto determineLiveOpeningInfo(
+        PlaceBasicResponseDto placeBasicResponseDto, LocalDateTime now) {
+        long placeId = placeBasicResponseDto.getId();
+
         Map<DayOfWeek, FixedBusinessHour> weeklyFixedBusinessHourMap = fixedBusinessHourRepository.findAllByPlaceId(
                 placeId).stream()
             .collect(Collectors.toMap(FixedBusinessHour::getDayOfWeek, Function.identity()));
 
-        LocalDateTime now = LocalDateTime.now();
         LocalDate today = now.toLocalDate();
         Map<LocalDate, FixedBusinessHour> weeklyFixedBusinessHourDateMap = new HashMap<>();
         for (int i = -1; i < 7; i++) {
@@ -209,9 +213,9 @@ public class PlaceManager {
             .build();
 
         LocalTime currentTime = now.toLocalTime();
-        CurrentOpeningStatus currentOpeningStatus = CurrentOpeningStatus.getLiveOpeningStatus(
+        CurrentOpeningStatus currentOpeningStatus = CurrentOpeningStatus.determineStatus(
             surroundingDateBusinessHour, currentTime);
-        NextOpeningInfo nextOpeningInfo = NextOpeningStatus.getNextOpeningInfo(
+        NextOpeningInfo nextOpeningInfo = NextOpeningStatus.determineNextOpeningInfo(
             surroundingDateBusinessHour, currentTime);
 
         if (currentOpeningStatus == CurrentOpeningStatus.OVERNIGHT_OPEN) {
@@ -222,12 +226,13 @@ public class PlaceManager {
         List<BusinessHour> weeklyBusinessHour = adjustedWeeklyBusinessHourMap.values().stream()
             .toList();
 
-        LiveOpeningInfoDto liveOpeningInfoDto = LiveOpeningInfoDto.builder()
-            .currentOpeningStatus(currentOpeningStatus)
-            .nextOpeningInfo(nextOpeningInfo)
-            .weeklyBusinessHour(weeklyBusinessHour)
-            .build();
-        placeBasicResponseDto.setLiveOpeningInfo(liveOpeningInfoDto);
+        placeBasicResponseDto.setLiveOpeningInfo(
+            LiveOpeningInfoDto.builder()
+                .currentOpeningStatus(currentOpeningStatus)
+                .nextOpeningInfo(nextOpeningInfo)
+                .weeklyBusinessHour(weeklyBusinessHour)
+                .build()
+        );
 
         return placeBasicResponseDto;
     }

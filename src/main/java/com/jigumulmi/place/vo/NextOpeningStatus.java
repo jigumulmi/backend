@@ -20,7 +20,7 @@ public enum NextOpeningStatus {
     @JsonValue
     private final String title;
 
-    public static NextOpeningInfo getNextOpeningInfo(
+    public static NextOpeningInfo determineNextOpeningInfo(
         SurroundingDateBusinessHour surroundingDateBusinessHour, LocalTime currentTime) {
         BusinessHour todayBusinessHour = surroundingDateBusinessHour.getToday();
         BusinessHour yesterdayBusinessHour = surroundingDateBusinessHour.getYesterday();
@@ -30,7 +30,7 @@ public enum NextOpeningStatus {
         // 어제의 영업 종료 시간이 오늘까지 이어지는 경우
         if ((yesterdayBusinessHour.getOpenTime() != null
             && yesterdayBusinessHour.getCloseTime() != null) && (
-            yesterdayBusinessHour.getCloseTime().isBefore(yesterdayBusinessHour.getOpenTime())
+            !yesterdayBusinessHour.getCloseTime().isAfter(yesterdayBusinessHour.getOpenTime())
                 && currentTime.isBefore(yesterdayBusinessHour.getCloseTime()))) {
             return nextOpeningInfoBuilder
                 .status(NextOpeningStatus.CLOSED)
@@ -42,10 +42,6 @@ public enum NextOpeningStatus {
             return null;
         }
 
-        if (currentTime.isAfter(todayBusinessHour.getCloseTime())) {
-            return null;
-        }
-
         if (currentTime.isBefore(todayBusinessHour.getOpenTime())) {
             return nextOpeningInfoBuilder
                 .status(NextOpeningStatus.OPEN)
@@ -53,28 +49,24 @@ public enum NextOpeningStatus {
                 .build();
         }
 
-        if (todayBusinessHour.getBreakStart() == null && todayBusinessHour.getBreakEnd() == null) {
-            return nextOpeningInfoBuilder
-                .status(NextOpeningStatus.CLOSED)
-                .at(todayBusinessHour.getCloseTime())
-                .build();
-        }
-
-        if (currentTime.isBefore(todayBusinessHour.getBreakStart())) {
+        if (todayBusinessHour.getBreakStart() != null && currentTime.isBefore(
+            todayBusinessHour.getBreakStart())) {
             return nextOpeningInfoBuilder
                 .status(NextOpeningStatus.BREAK)
                 .at(todayBusinessHour.getBreakStart())
                 .build();
         }
 
-        if (currentTime.isBefore(todayBusinessHour.getBreakEnd())) {
+        if (todayBusinessHour.getBreakEnd() != null && currentTime.isBefore(
+            todayBusinessHour.getBreakEnd())) {
             return nextOpeningInfoBuilder
                 .status(NextOpeningStatus.OPEN)
-                .at(todayBusinessHour.getOpenTime())
+                .at(todayBusinessHour.getBreakEnd())
                 .build();
         }
 
-        if (currentTime.isBefore(todayBusinessHour.getCloseTime())) {
+        if (currentTime.isBefore(todayBusinessHour.getCloseTime())
+            || !todayBusinessHour.getCloseTime().isAfter(todayBusinessHour.getOpenTime())) {
             return nextOpeningInfoBuilder
                 .status(NextOpeningStatus.CLOSED)
                 .at(todayBusinessHour.getCloseTime())
