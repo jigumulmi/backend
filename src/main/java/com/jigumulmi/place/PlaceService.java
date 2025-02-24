@@ -17,6 +17,7 @@ import com.jigumulmi.place.dto.response.ReviewStatisticsResponseDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.vo.PlaceCategory;
 import com.jigumulmi.place.vo.PlaceCategoryGroup;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,9 @@ public class PlaceService {
     }
 
     public PlaceBasicResponseDto getPlaceBasic(Long placeId) {
-        return placeManager.getPlaceBasic(placeId);
+        PlaceBasicResponseDto placeBasicResponseDto = placeManager.getPlaceBasic(placeId);
+        placeManager.determineLiveOpeningInfo(placeBasicResponseDto, LocalDateTime.now());
+        return placeBasicResponseDto;
     }
 
     public PagedResponseDto<MenuDto> getPlaceMenu(Pageable pageable, Long placeId) {

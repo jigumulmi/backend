@@ -1,6 +1,6 @@
 package com.jigumulmi.place.dto.response;
 
-import com.jigumulmi.admin.place.dto.WeeklyBusinessHourDto;
+import com.jigumulmi.place.dto.BusinessHour;
 import com.jigumulmi.place.dto.ImageDto;
 import com.jigumulmi.place.dto.TimeDto;
 import com.jigumulmi.place.vo.CurrentOpeningStatus;
@@ -36,8 +36,8 @@ public class PlaceBasicResponseDto {
         private CurrentOpeningStatus currentOpeningStatus;
         @Schema(description = "현재 상태가 휴무 혹은 영업 종료인 경우 null")
         private NextOpeningInfo nextOpeningInfo;
-        private WeeklyBusinessHourDto weeklyBusinessHour;
-
+        @Schema(description = "실시간 반영, 첫 요일에 하이라이트")
+        private List<BusinessHour> weeklyBusinessHour;
     }
 
     private Long id;

@@ -12,6 +12,7 @@ import lombok.Getter;
 public enum CurrentOpeningStatus {
     DAY_OFF("오늘 휴무"),
     BEFORE_OPEN("영업 전"),
+    OVERNIGHT_OPEN("영업 중"),
     OPEN("영업 중"),
     BREAK("브레이크 타임"),
     CLOSED("영업 종료"),
@@ -20,7 +21,7 @@ public enum CurrentOpeningStatus {
     @JsonValue
     private final String title;
 
-    public static CurrentOpeningStatus getLiveOpeningStatus(
+    public static CurrentOpeningStatus determineStatus(
         SurroundingDateBusinessHour surroundingDateBusinessHour, LocalTime currentTime) {
         BusinessHour todayBusinessHour = surroundingDateBusinessHour.getToday();
         BusinessHour yesterdayBusinessHour = surroundingDateBusinessHour.getYesterday();
@@ -28,9 +29,9 @@ public enum CurrentOpeningStatus {
         // 어제의 영업 종료 시간이 오늘까지 이어지는 경우
         if ((yesterdayBusinessHour.getOpenTime() != null
             && yesterdayBusinessHour.getCloseTime() != null) && (
-            yesterdayBusinessHour.getCloseTime().isBefore(yesterdayBusinessHour.getOpenTime())
+            !yesterdayBusinessHour.getCloseTime().isAfter(yesterdayBusinessHour.getOpenTime())
                 && currentTime.isBefore(yesterdayBusinessHour.getCloseTime()))) {
-            return CurrentOpeningStatus.OPEN;
+            return CurrentOpeningStatus.OVERNIGHT_OPEN;
         }
 
         if (todayBusinessHour.getIsDayOff()) {
@@ -47,8 +48,9 @@ public enum CurrentOpeningStatus {
             return CurrentOpeningStatus.BREAK;
         }
 
-        if (currentTime.isAfter(todayBusinessHour.getOpenTime()) && currentTime.isBefore(
-            todayBusinessHour.getCloseTime())) {
+        if (currentTime.isAfter(todayBusinessHour.getOpenTime())
+            && (currentTime.isBefore(todayBusinessHour.getCloseTime())
+            || !todayBusinessHour.getCloseTime().isAfter(todayBusinessHour.getOpenTime()))) {
             return CurrentOpeningStatus.OPEN;
         }
 
