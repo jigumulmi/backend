@@ -4,6 +4,7 @@ import com.jigumulmi.banner.dto.response.BannerPlaceListResponseDto.BannerPlaceD
 import com.jigumulmi.banner.dto.response.BannerResponseDto;
 import com.jigumulmi.common.PagedResponseDto;
 import com.jigumulmi.place.PlaceManager;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,6 @@ public class BannerService {
     }
 
     public PagedResponseDto<BannerPlaceDto> getMappedPlaceList(Pageable pageable, Long bannerId) {
-        return placeManager.getApprovedMappedPlaceList(pageable, bannerId);
+        return placeManager.getApprovedMappedPlaceList(pageable, bannerId, LocalDateTime.now());
     }
 }
