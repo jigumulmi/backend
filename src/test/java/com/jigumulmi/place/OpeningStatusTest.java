@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class CurrentOpeningStatusTest {
+class OpeningStatusTest {
 
     static Stream<Arguments> provideBusinessHours() {
         return Stream.of(
@@ -57,6 +57,16 @@ class CurrentOpeningStatusTest {
                     .isDayOff(false).build(),
                 LocalTime.of(14, 30),
                 CurrentOpeningStatus.BEFORE_OPEN
+            ),
+            Arguments.of(
+                BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
+                    .isDayOff(false).build(),
+                BusinessHour.builder()
+                    .openTime(LocalTime.of(15, 0))
+                    .closeTime(LocalTime.of(2, 0))
+                    .isDayOff(false).build(),
+                LocalTime.of(22, 30),
+                CurrentOpeningStatus.OPEN
             ),
             Arguments.of(
                 BusinessHour.builder().openTime(LocalTime.of(9, 0)).closeTime(LocalTime.of(18, 0))
@@ -107,10 +117,9 @@ class CurrentOpeningStatusTest {
 
     @ParameterizedTest
     @MethodSource("provideBusinessHours")
-    @DisplayName("실시간 영업 정보")
+    @DisplayName("실시간 현재 영업 정보")
     public void testGetLiveOpeningStatus(BusinessHour yesterday, BusinessHour today,
-        LocalTime currentTime,
-        CurrentOpeningStatus expectedStatus) {
+        LocalTime currentTime, CurrentOpeningStatus expectedStatus) {
         // given
         SurroundingDateBusinessHour surroundingDateBusinessHour = SurroundingDateBusinessHour.builder()
             .yesterday(yesterday)

@@ -12,7 +12,7 @@ import lombok.Getter;
 public enum CurrentOpeningStatus {
     DAY_OFF("오늘 휴무"),
     BEFORE_OPEN("영업 전"),
-    OVERNIGHT_OPEN ("영업 중"),
+    OVERNIGHT_OPEN("영업 중"),
     OPEN("영업 중"),
     BREAK("브레이크 타임"),
     CLOSED("영업 종료"),
@@ -48,8 +48,9 @@ public enum CurrentOpeningStatus {
             return CurrentOpeningStatus.BREAK;
         }
 
-        if (currentTime.isAfter(todayBusinessHour.getOpenTime()) && currentTime.isBefore(
-            todayBusinessHour.getCloseTime())) {
+        if (currentTime.isAfter(todayBusinessHour.getOpenTime())
+            && (currentTime.isBefore(todayBusinessHour.getCloseTime())
+            || !todayBusinessHour.getCloseTime().isAfter(todayBusinessHour.getOpenTime()))) {
             return CurrentOpeningStatus.OPEN;
         }
 
