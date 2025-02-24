@@ -21,13 +21,13 @@ import lombok.NoArgsConstructor;
 @Schema(description = "휴무인 경우 time 관련 필드는 모두 미포함 혹은 null")
 public class BusinessHour {
 
-    @Schema(description = "항상 오늘 기준", implementation = TimeDto.class)
+    @Schema(description = "항상 오늘 기준", implementation = TimeDto.class, name = "openTime")
     private LocalTime openTime;
-    @Schema(description = "익일로 이어질 수 있음", implementation = TimeDto.class)
+    @Schema(description = "익일로 이어질 수 있음", implementation = TimeDto.class, name = "closeTime")
     private LocalTime closeTime;
-    @Schema(description = "항상 오늘 기준", implementation = TimeDto.class)
+    @Schema(description = "항상 오늘 기준", implementation = TimeDto.class, name = "breakStart")
     private LocalTime breakStart;
-    @Schema(description = "항상 오늘 기준", implementation = TimeDto.class)
+    @Schema(description = "항상 오늘 기준", implementation = TimeDto.class, name = "breakEnd")
     private LocalTime breakEnd;
     @Schema(requiredMode = RequiredMode.REQUIRED)
     private Boolean isDayOff;
