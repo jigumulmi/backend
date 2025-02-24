@@ -52,8 +52,9 @@ public class BannerPlaceListResponseDto extends PagedResponseDto<BannerPlaceDto>
                 .build();
         }
 
-        public void setCurrentOpeningStatus(SurroundingDateBusinessHour surroundingDateBusinessHour, LocalTime currentTime) {
-            this.currentOpeningStatus = CurrentOpeningStatus.getLiveOpeningStatus(
+        public void setCurrentOpeningStatus(SurroundingDateBusinessHour surroundingDateBusinessHour,
+            LocalTime currentTime) {
+            this.currentOpeningStatus = CurrentOpeningStatus.determineStatus(
                 surroundingDateBusinessHour, currentTime);
         }
     }

@@ -21,7 +21,7 @@ public enum CurrentOpeningStatus {
     @JsonValue
     private final String title;
 
-    public static CurrentOpeningStatus getLiveOpeningStatus(
+    public static CurrentOpeningStatus determineStatus(
         SurroundingDateBusinessHour surroundingDateBusinessHour, LocalTime currentTime) {
         BusinessHour todayBusinessHour = surroundingDateBusinessHour.getToday();
         BusinessHour yesterdayBusinessHour = surroundingDateBusinessHour.getYesterday();

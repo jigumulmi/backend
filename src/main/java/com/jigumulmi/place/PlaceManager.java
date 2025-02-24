@@ -209,9 +209,9 @@ public class PlaceManager {
             .build();
 
         LocalTime currentTime = now.toLocalTime();
-        CurrentOpeningStatus currentOpeningStatus = CurrentOpeningStatus.getLiveOpeningStatus(
+        CurrentOpeningStatus currentOpeningStatus = CurrentOpeningStatus.determineStatus(
             surroundingDateBusinessHour, currentTime);
-        NextOpeningInfo nextOpeningInfo = NextOpeningStatus.getNextOpeningInfo(
+        NextOpeningInfo nextOpeningInfo = NextOpeningStatus.determineNextOpeningInfo(
             surroundingDateBusinessHour, currentTime);
 
         if (currentOpeningStatus == CurrentOpeningStatus.OVERNIGHT_OPEN) {
