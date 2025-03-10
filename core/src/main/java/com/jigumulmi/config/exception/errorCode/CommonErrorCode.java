@@ -1,11 +1,11 @@
 package com.jigumulmi.config.exception.errorCode;
 
+import static com.fasterxml.jackson.annotation.JsonFormat.Shape.OBJECT;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
-
-import static com.fasterxml.jackson.annotation.JsonFormat.Shape.OBJECT;
 
 @JsonFormat(shape = OBJECT)
 @AllArgsConstructor

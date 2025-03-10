@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### my ignore ###
-/src/**/*.properties
+*.properties
 scripts/*.sh
 
 ### Logging
@@ -46,4 +46,4 @@ scripts/*.sh
 /monitor/prometheus/password.txt
 
 ### Querydsl
-/src/main/generated
+**/src/main/generated

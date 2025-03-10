@@ -1,12 +1,11 @@
 package com.jigumulmi.config.exception;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.FieldError;
-
-import java.util.List;
 
 @Getter
 @Builder

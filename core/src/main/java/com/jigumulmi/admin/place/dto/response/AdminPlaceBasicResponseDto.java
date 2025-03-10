@@ -1,9 +1,9 @@
 package com.jigumulmi.admin.place.dto.response;
 
 import com.jigumulmi.place.domain.Place;
+import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.dto.response.DistrictResponseDto;
 import com.jigumulmi.place.dto.response.PlaceCategoryDto;
-import com.jigumulmi.place.dto.PositionDto;
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto;
 import com.jigumulmi.place.vo.Region;
 import java.time.LocalDateTime;
