@@ -27,7 +27,7 @@ public class S3Manager {
     public String bucket;
     public final static String REVIEW_IMAGE_S3_PREFIX = "reviewImage/";
     public final static String MENU_IMAGE_S3_PREFIX = "menuImage/";
-    public final static String BANNER_IMAGE_S3_PREFIX = "banner/";
+    public final static String BANNER_IMAGE_S3_PREFIX = "com/jigumulmi/banner/";
 
     private final Duration DEFAULT_DURATION = Duration.ofMinutes(60);
 

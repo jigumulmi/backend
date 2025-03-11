@@ -59,7 +59,8 @@ public class CustomPlaceRepository {
             .selectFrom(place)
             .join(place.bannerPlaceMappingList, bannerPlaceMapping)
             .where(bannerPlaceMapping.banner.id.eq(bannerId).and(place.isApproved.eq(true)))
-            .orderBy(getOrderSpecifier(pageable.getSort(), Expressions.path(Place.class, "place")))
+            .orderBy(getOrderSpecifier(pageable.getSort(), Expressions.path(Place.class,
+                "com/jigumulmi/place")))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -220,7 +221,7 @@ public class CustomPlaceRepository {
                         member.createdAt,
                         member.id,
                         member.nickname,
-                        member.email).as("member"),
+                        member.email).as("com/jigumulmi/member"),
                     new CaseBuilder()
                         .when(reviewReply.createdAt.eq(reviewReply.modifiedAt)).then(false)
                         .otherwise(true).as("isEdited")

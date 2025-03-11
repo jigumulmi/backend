@@ -1,11 +1,11 @@
 package com.jigumulmi.member;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jigumulmi.common.MemberTestUtils;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.request.KakaoAuthorizationRequestDto;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
 import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
+import com.jigumulmi.utils.MemberTestUtils;
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

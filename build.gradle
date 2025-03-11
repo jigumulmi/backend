@@ -36,16 +36,13 @@ subprojects {
         enabled = true
     }
 
-    tasks.named('test') {
+    tasks.named('test', Test) {
         useJUnitPlatform()
     }
 
     [compileJava, compileTestJava]*.options*.encoding = "UTF-8"
 
-
     dependencies {
-        runtimeOnly(project(":admin"))
-
         implementation 'org.springframework.boot:spring-boot-starter-web'
         implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
         implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -82,20 +79,20 @@ subprojects {
         runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     }
 
-// Querydsl 설정부
+    // Querydsl 설정부
     def generated = 'src/main/generated'
 
-// querydsl QClass 파일 생성 위치를 지정
+    // querydsl QClass 파일 생성 위치를 지정
     tasks.withType(JavaCompile).configureEach {
         options.getGeneratedSourceOutputDirectory().set(file(generated))
     }
 
-// java source set 에 querydsl QClass 위치 추가
+    // java source set 에 querydsl QClass 위치 추가
     sourceSets {
         main.java.srcDirs += [generated]
     }
 
-// gradle clean 시에 QClass 디렉토리 삭제
+    // gradle clean 시에 QClass 디렉토리 삭제
     clean {
         delete file(generated)
     }

@@ -1,10 +1,10 @@
 package com.jigumulmi.place;
 
-import com.jigumulmi.admin.banner.BannerPlaceMappingRepository;
+import com.jigumulmi.annotation.RepositoryTest;
+import com.jigumulmi.banner.BannerPlaceMappingRepository;
 import com.jigumulmi.banner.domain.Banner;
 import com.jigumulmi.banner.domain.BannerPlaceMapping;
 import com.jigumulmi.banner.repository.BannerRepository;
-import com.jigumulmi.common.annotation.RepositoryTest;
 import com.jigumulmi.place.domain.FixedBusinessHour;
 import com.jigumulmi.place.domain.Place;
 import com.jigumulmi.place.domain.TemporaryBusinessHour;

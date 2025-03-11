@@ -1,7 +1,6 @@
 package com.jigumulmi.place.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.jigumulmi.admin.place.dto.request.AdminCreatePlaceRequestDto;
 import com.jigumulmi.banner.domain.BannerPlaceMapping;
 import com.jigumulmi.common.Timestamped;
 import com.jigumulmi.member.domain.Member;
@@ -188,26 +187,26 @@ public class Place extends Timestamped {
             bannerPlaceMappingList != null ? bannerPlaceMappingList : new ArrayList<>();
     }
 
-    public void addCategoryAndSubwayStation(List<PlaceCategoryMapping> categoryMappingList,
+    public void adminAddCategoryAndSubwayStation(List<PlaceCategoryMapping> categoryMappingList,
         List<SubwayStationPlace> subwayStationPlaceList) {
         this.categoryMappingList.addAll(categoryMappingList);
         this.subwayStationPlaceList.addAll(subwayStationPlaceList);
     }
 
-    public void adminBasicUpdate(AdminCreatePlaceRequestDto requestDto) {
-        PositionDto position = requestDto.getPosition();
-
-        this.name = requestDto.getName();
-        this.region = requestDto.getRegion();
-        this.district = requestDto.getDistrict();
-        this.address = requestDto.getAddress();
-        this.contact = requestDto.getContact();
-        this.additionalInfo = requestDto.getAdditionalInfo();
-        this.placeUrl = requestDto.getPlaceUrl();
+    public void adminBasicUpdate(String name, Region region, District district, String address,
+        String contact, String additionalInfo, String placeUrl, String registrantComment,
+        String kakaoPlaceId, PositionDto position) {
+        this.name = name;
+        this.region = region;
+        this.district = district;
+        this.address = address;
+        this.contact = contact;
+        this.additionalInfo = additionalInfo;
+        this.placeUrl = placeUrl;
         this.longitude = position.getLongitude();
         this.latitude = position.getLatitude();
-        this.registrantComment = requestDto.getRegistrantComment();
-        this.kakaoPlaceId = requestDto.getKakaoPlaceId();
+        this.registrantComment = registrantComment;
+        this.kakaoPlaceId = kakaoPlaceId;
     }
 
     public void adminUpdateIsApproved(boolean approve) {

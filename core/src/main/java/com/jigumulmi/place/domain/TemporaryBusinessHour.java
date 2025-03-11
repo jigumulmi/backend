@@ -1,6 +1,5 @@
 package com.jigumulmi.place.domain;
 
-import com.jigumulmi.admin.place.dto.request.AdminCreateTemporaryBusinessHourRequestDto;
 import com.jigumulmi.common.WeekUtils;
 import com.jigumulmi.place.dto.BusinessHour;
 import jakarta.persistence.Entity;
@@ -67,10 +66,7 @@ public class TemporaryBusinessHour {
         this.isDayOff = isDayOff;
     }
 
-    public void adminUpdate(AdminCreateTemporaryBusinessHourRequestDto requestDto) {
-        BusinessHour businessHour = requestDto.getBusinessHour();
-
-        LocalDate date = requestDto.getDate();
+    public void adminUpdate(LocalDate date, BusinessHour businessHour) {
         int weekOfYear = WeekUtils.getWeekOfYear(date);
 
         this.year = date.getYear();

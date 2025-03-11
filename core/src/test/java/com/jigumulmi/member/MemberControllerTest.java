@@ -13,14 +13,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jigumulmi.common.MemberTestUtils;
-import com.jigumulmi.common.annotation.ControllerTest;
-import com.jigumulmi.config.security.MockMember;
+import com.jigumulmi.annotation.ControllerTest;
 import com.jigumulmi.member.domain.Member;
 import com.jigumulmi.member.dto.request.KakaoAuthorizationRequestDto;
 import com.jigumulmi.member.dto.request.SetNicknameRequestDto;
 import com.jigumulmi.member.dto.response.KakaoAuthResponseDto;
 import com.jigumulmi.member.dto.response.MemberDetailResponseDto;
+import com.jigumulmi.security.MockMember;
+import com.jigumulmi.utils.MemberTestUtils;
 import jakarta.servlet.http.HttpSession;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
