@@ -41,5 +41,63 @@ subprojects {
     }
 
     [compileJava, compileTestJava]*.options*.encoding = "UTF-8"
+
+
+    dependencies {
+        runtimeOnly(project(":admin"))
+
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.boot:spring-boot-starter-security'
+        implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+        testImplementation 'org.springframework.security:spring-security-test'
+        compileOnly 'org.projectlombok:lombok'
+        testCompileOnly 'org.projectlombok:lombok'
+        developmentOnly 'org.springframework.boot:spring-boot-devtools'
+        annotationProcessor 'org.projectlombok:lombok'
+        testAnnotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        runtimeOnly 'com.mysql:mysql-connector-j'
+
+        // https://mvnrepository.com/artifact/org.springframework.data/spring-data-commons
+        implementation group: 'org.springframework.data', name: 'spring-data-commons', version: '3.2.4'
+
+        // swagger
+        implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
+
+        // querydsl
+        implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+        annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jakarta"
+        annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+        annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+        // aws sdk
+        implementation("software.amazon.awssdk:s3:2.29.4")
+
+        // actuator
+        implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+        // micrometer
+        runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
+    }
+
+// Querydsl 설정부
+    def generated = 'src/main/generated'
+
+// querydsl QClass 파일 생성 위치를 지정
+    tasks.withType(JavaCompile).configureEach {
+        options.getGeneratedSourceOutputDirectory().set(file(generated))
+    }
+
+// java source set 에 querydsl QClass 위치 추가
+    sourceSets {
+        main.java.srcDirs += [generated]
+    }
+
+// gradle clean 시에 QClass 디렉토리 삭제
+    clean {
+        delete file(generated)
+    }
 }
 
