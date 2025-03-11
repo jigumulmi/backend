@@ -37,7 +37,7 @@ out/
 .vscode/
 
 ### my ignore ###
-*.properties
+application*.properties
 scripts/*.sh
 
 ### Logging
