@@ -1,4 +1,6 @@
 dependencies {
-    implementation(project(":core"))
+    compileOnly(project(":core"))
+
+    testImplementation(project(":core"))
     testImplementation(testFixtures(project(":core")))
 }
