@@ -64,7 +64,7 @@ jobs:
           host: ${{ secrets.PRO_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           port: ${{ secrets.EC2_SSH_PORT }}
-          source: "build/libs/jigumulmi-0.0.1-SNAPSHOT.jar,deploy.sh"
+          source: "core/build/libs/core-0.0.1-SNAPSHOT.jar,deploy.sh"
           target: /home/ubuntu/jigumulmi
 
       - name: Run scripts in server
