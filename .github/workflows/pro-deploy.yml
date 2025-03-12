@@ -25,9 +25,9 @@ jobs:
       ## properties 파일 세팅
       - name: Setup application.properties
         run: |
-          mkdir -p ./src/main/resources &&
-          touch ./src/main/resources/application.properties &&
-          echo "${{ secrets.PRO_PROPERTIES }}" > ./src/main/resources/application.properties
+          mkdir -p ./core/src/main/resources &&
+          touch ./core/src/main/resources/application.properties &&
+          echo "${{ secrets.PRO_PROPERTIES }}" > ./core/src/main/resources/application.properties
         shell: bash
 
       ## deploy.sh 생성
@@ -64,7 +64,7 @@ jobs:
           host: ${{ secrets.PRO_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           port: ${{ secrets.EC2_SSH_PORT }}
-          source: "build/libs/jigumulmi-0.0.1-SNAPSHOT.jar,deploy.sh"
+          source: "core/build/libs/core-0.0.1-SNAPSHOT.jar,deploy.sh"
           target: /home/ubuntu/jigumulmi
 
       - name: Run scripts in server
