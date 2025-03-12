@@ -30,9 +30,9 @@ jobs:
           - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=2
 
     steps:
       # 기본 체크아웃
@@ -42,9 +42,9 @@ jobs:
       ## properties 파일 세팅
       - name: Setup application.properties
         env:
-          MAIN_PROPERTY_DIR: ./src/main/resources
+          MAIN_PROPERTY_DIR: ./core/src/main/resources
           MAIN_PROPERTY_FILE: application.properties
-          TEST_PROPERTY_DIR: ./src/test/resources
+          TEST_PROPERTY_DIR: ./core/src/testFixtures/resources
           TEST_DEFAULT_PROPERTY_FILE: application-default.properties
           TEST_PROPERTY_FILE: application-test.properties
         run: |
@@ -88,4 +88,6 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ always() }}  # 테스트 실패해도 출력
         with:
-          files: build/test-results/**/*.xml
+          files: |
+            core/build/test-results/**/*.xml
+            admin/build/test-results/**/*.xml

@@ -1,0 +1,19 @@
+plugins {
+    id 'java-test-fixtures'
+}
+
+tasks.named('bootJar') {
+    enabled = true
+}
+
+tasks.named('jar') {
+    enabled = true
+}
+
+dependencies {
+    runtimeOnly(project(":admin"))
+
+    testRuntimeOnly(project(":admin"))
+    testFixturesImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testFixturesImplementation 'org.springframework.security:spring-security-test'
+}

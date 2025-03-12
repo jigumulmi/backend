@@ -25,9 +25,9 @@ jobs:
       ## properties 파일 세팅
       - name: Setup application.properties
         run: |
-          mkdir -p ./src/main/resources &&
-          touch ./src/main/resources/application.properties &&
-          echo "${{ secrets.DEV_PROPERTIES }}" > ./src/main/resources/application.properties
+          mkdir -p ./core/src/main/resources &&
+          touch ./core/src/main/resources/application.properties &&
+          echo "${{ secrets.DEV_PROPERTIES }}" > ./core/src/main/resources/application.properties
         shell: bash
 
       ## deploy.sh 생성
