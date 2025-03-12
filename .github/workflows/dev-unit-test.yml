@@ -81,11 +81,13 @@ jobs:
 
       # Gradle test 실행
       - name: Test with Gradle
-        run: ./gradlew --info test
+        run: ./gradlew --quiet test
 
       # 테스트 후 Result 출력
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: ${{ always() }}  # 테스트 실패해도 출력
         with:
-          files: build/test-results/**/*.xml
+          files: |
+            core/build/test-results/**/*.xml
+            admin/build/test-results/**/*.xml
