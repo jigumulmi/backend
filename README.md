@@ -22,7 +22,7 @@
   - 다양한 데이터 자원(주로 RDB)에 접근하여 처리하는 계층
  
 ### 모듈 구조
-> 사용자 기능(core)과 관리자 기능(admin) 모듈 분리
+> 사용자 기능(core)과 관리자 기능(admin) 모듈 분리 ([분리 과정](https://developerjoseph.notion.site/Spring-1b4519c54f54806aa8e0e01d48844e8e))
 
 ![jigumulmi multi module](https://github.com/user-attachments/assets/1f2e3bf1-fa18-424a-9b76-e9f3fa2f740c)
 - core가 admin을 런타임 의존하여 어플리케이션 하나로 구동
