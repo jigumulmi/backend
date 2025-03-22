@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -152,23 +153,24 @@ public class MemberManager {
             .build();
     }
 
+    @Transactional
     public void updateNickname(Member member, String nickname) {
         member.updateNickname(nickname);
-        memberRepository.save(member);
     }
 
+    @Transactional
     public void deleteMember(Member member) {
         member.deregister();
-        memberRepository.save(member);
     }
 
     public void unlinkKakao(Member member) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "KakaoAK " + KAKAO_ADMIN_KEY);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
         MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
         body.add("target_id_type", "user_id");
-        body.add("target_id", member.getKakaoUserId());
+        body.add("target_id", String.valueOf(member.getKakaoUserId()));
 
         HttpEntity<MultiValueMap<String, Object>> kakaoUnlinkRequest = new HttpEntity<>(body,
             headers);
