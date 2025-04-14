@@ -17,6 +17,7 @@ dependencies {
     compileOnly(project(":core"))
 
     testImplementation(testFixtures(project(":core")))
+    testImplementation("org.mockito.kotlin:mockito-kotlin:3.2.0")
 }
 
 tasks.withType<KotlinJvmCompile>().configureEach {

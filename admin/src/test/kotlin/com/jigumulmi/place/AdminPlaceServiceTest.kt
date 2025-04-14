@@ -54,7 +54,7 @@ internal class AdminPlaceServiceTest {
     @ParameterizedTest
     @MethodSource("getMenuImageFilename")
     @DisplayName("메뉴 목록 조회")
-    fun testGetMenu(imageFilename: String) {
+    fun testGetMenu(imageFilename: String?) {
         // given
         val place = Place.builder().build()
         placeRepository.save(place)
@@ -68,7 +68,7 @@ internal class AdminPlaceServiceTest {
         // when
 
         // then
-        Assertions.assertDoesNotThrow<List<MenuDto?>?> { adminPlaceService.getMenu(place.id) }
+        Assertions.assertDoesNotThrow<List<MenuDto>> { adminPlaceService.getMenu(place.id) }
     }
 
     companion object {

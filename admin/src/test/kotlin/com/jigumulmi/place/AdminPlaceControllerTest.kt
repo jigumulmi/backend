@@ -42,7 +42,7 @@ internal class AdminPlaceControllerTest {
         Exception::class
     )
     fun testUpdateFixedBusinessHourValidation(
-        businessHour: BusinessHour?,
+        businessHour: BusinessHour,
         expectedStatus: HttpStatus
     ) {
         // given
@@ -111,10 +111,6 @@ internal class AdminPlaceControllerTest {
                         .isDayOff(false)
                         .build(),
                     HttpStatus.CREATED
-                ),
-                Arguments.of(
-                    null,
-                    HttpStatus.UNPROCESSABLE_ENTITY
                 ),
                 Arguments.of(
                     BusinessHour.builder()

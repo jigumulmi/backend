@@ -32,7 +32,7 @@ class AdminBannerController(
     @ApiResponse(responseCode = "201")
     @PostMapping(path = [""], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun createBanner(
-        @ModelAttribute requestDto: @Valid CreateBannerRequestDto
+        @Valid @ModelAttribute requestDto: CreateBannerRequestDto
     ): ResponseEntity<CreateBannerResponseDto> {
         val responseDto = adminBannerService.createBanner(requestDto)
         return ResponseEntity.status(HttpStatus.CREATED).body(responseDto)
@@ -51,7 +51,7 @@ class AdminBannerController(
     @PostMapping(path = ["/{bannerId}/place"])
     fun createBannerPlace(
         @PathVariable bannerId: Long,
-        @RequestBody requestDto: @Valid BannerPlaceMappingRequestDto
+        @Valid @RequestBody requestDto: BannerPlaceMappingRequestDto
     ): ResponseEntity<*> {
         adminBannerService.addBannerPlace(bannerId, requestDto)
         return ResponseEntity.status(HttpStatus.CREATED).build<Any>()
@@ -62,7 +62,7 @@ class AdminBannerController(
     @DeleteMapping(path = ["/{bannerId}/place"])
     fun deleteBannerPlace(
         @PathVariable bannerId: Long,
-        @RequestBody requestDto: @Valid BannerPlaceMappingRequestDto
+        @Valid @RequestBody requestDto: BannerPlaceMappingRequestDto
     ): ResponseEntity<*> {
         adminBannerService.removeBannerPlace(bannerId, requestDto)
         return ResponseEntity.noContent().build<Any>()
@@ -93,7 +93,7 @@ class AdminBannerController(
     @PutMapping("/{bannerId}")
     fun updateBannerBasic(
         @PathVariable bannerId: Long,
-        @RequestBody requestDto: @Valid UpdateBannerRequestDto
+        @Valid @RequestBody requestDto: UpdateBannerRequestDto
     ): ResponseEntity<*> {
         adminBannerService.updateBannerBasic(bannerId, requestDto)
         return ResponseEntity.status(HttpStatus.CREATED).build<Any>()
@@ -133,7 +133,7 @@ class AdminBannerController(
     @GetMapping("/place")
     fun getCandidatePlaceList(
         @ParameterObject pageable: Pageable,
-        @ModelAttribute requestDto: @Valid GetCandidatePlaceListRequestDto
+        @Valid @ModelAttribute requestDto: GetCandidatePlaceListRequestDto
     ): ResponseEntity<AdminPagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto>> {
         val responseDto = adminBannerService.getCandidatePlaceList(
             pageable, requestDto

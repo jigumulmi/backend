@@ -20,8 +20,9 @@ import com.jigumulmi.security.MockMember
 import com.jigumulmi.utils.MultipartTestUtils
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.mockito.ArgumentMatchers
 import org.mockito.BDDMockito
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.data.domain.PageRequest
@@ -66,11 +67,7 @@ internal class AdminBannerControllerTest {
             CreateBannerResponseDto(bannerId = 1L, s3KeyDto = AdminCreateBannerImageS3KeyDto())
 
         BDDMockito.given(
-            adminBannerService.createBanner(
-                ArgumentMatchers.any(
-                    CreateBannerRequestDto::class.java
-                )
-            )
+            adminBannerService.createBanner(any<CreateBannerRequestDto>())
         ).willReturn(
             createBannerResponseDto
         )
@@ -254,9 +251,7 @@ internal class AdminBannerControllerTest {
 
         BDDMockito.given(
             adminBannerService.getMappedPlaceList(
-                ArgumentMatchers.any(
-                    PageRequest::class.java
-                ), ArgumentMatchers.eq<Long>(bannerId)
+                any<PageRequest>(), eq(bannerId)
             )
         )
             .willReturn(responseDto)
@@ -421,10 +416,8 @@ internal class AdminBannerControllerTest {
 
         BDDMockito.given(
             adminBannerService.getCandidatePlaceList(
-                ArgumentMatchers.any(
-                    PageRequest::class.java
-                ),
-                ArgumentMatchers.any(GetCandidatePlaceListRequestDto::class.java)
+                any<PageRequest>(),
+                any<GetCandidatePlaceListRequestDto>()
             )
         )
             .willReturn(responseDto)

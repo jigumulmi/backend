@@ -108,7 +108,7 @@ class AdminPlaceController(
     @PutMapping("/{placeId}/business-hour/fixed")
     fun updateFixedBusinessHour(
         @PathVariable placeId: Long,
-        @RequestBody requestDto: @Valid WeeklyBusinessHourDto
+        @Valid @RequestBody requestDto: WeeklyBusinessHourDto
     ): ResponseEntity<*> {
         adminPlaceService.updateFixedBusinessHour(placeId, requestDto)
         return ResponseEntity.status(HttpStatus.CREATED).build<Any>()
@@ -119,7 +119,7 @@ class AdminPlaceController(
     @PostMapping("/{placeId}/business-hour/temporary")
     fun createTemporaryBusinessHour(
         @PathVariable placeId: Long,
-        @RequestBody requestDto: @Valid AdminCreateTemporaryBusinessHourRequestDto
+        @Valid @RequestBody requestDto: AdminCreateTemporaryBusinessHourRequestDto
     ): ResponseEntity<*> {
         adminPlaceService.createTemporaryBusinessHour(placeId, requestDto)
         return ResponseEntity.status(HttpStatus.CREATED).build<Any>()
@@ -131,7 +131,7 @@ class AdminPlaceController(
     fun updateTemporaryBusinessHour(
         @PathVariable placeId: Long,
         @PathVariable temporaryBusinessHourId: Long,
-        @RequestBody requestDto: @Valid AdminCreateTemporaryBusinessHourRequestDto
+        @Valid @RequestBody requestDto: AdminCreateTemporaryBusinessHourRequestDto
     ): ResponseEntity<*> {
         adminPlaceService.updateTemporaryBusinessHour(temporaryBusinessHourId, requestDto)
         return ResponseEntity.status(HttpStatus.CREATED).build<Any>()
@@ -178,7 +178,7 @@ class AdminPlaceController(
     @PostMapping("/{placeId}/approval")
     fun togglePlaceApprove(
         @PathVariable placeId: Long,
-        @RequestBody requestDto: @Valid TogglePlaceApproveRequestDto
+        @Valid @RequestBody requestDto: TogglePlaceApproveRequestDto
     ): ResponseEntity<*> {
         adminPlaceService.togglePlaceApprove(placeId, requestDto.approve)
         return ResponseEntity.noContent().build<Any>()
@@ -212,7 +212,7 @@ class AdminPlaceController(
     @ApiResponse(responseCode = "201")
     @PostMapping("/menu/s3-put-presigned-url")
     fun createMenuImageS3PutPresignedUrl(
-        @RequestBody requestDto: @Valid MenuImageS3PutPresignedUrlRequestDto,
+        @Valid @RequestBody requestDto: MenuImageS3PutPresignedUrlRequestDto,
         @RequiredAuthUser Member: Member
     ): ResponseEntity<AdminS3PutPresignedUrlResponseDto> {
         val responseDto = adminPlaceService.createMenuImageS3PutPresignedUrl(
@@ -225,7 +225,7 @@ class AdminPlaceController(
     @ApiResponse(responseCode = "201")
     @PostMapping("/menu/s3-delete-presigned-url")
     fun createMenuImageS3DeletePresignedUrl(
-        @RequestBody requestDto: @Valid MenuImageS3DeletePresignedUrlRequestDto,
+        @Valid @RequestBody requestDto: MenuImageS3DeletePresignedUrlRequestDto,
         @RequiredAuthUser Member: Member
     ): ResponseEntity<AdminS3DeletePresignedUrlResponseDto> {
         val responseDto = adminPlaceService.createMenuImageS3DeletePresignedUrl(
