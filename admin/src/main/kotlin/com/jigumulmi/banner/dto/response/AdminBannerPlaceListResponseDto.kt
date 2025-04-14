@@ -13,10 +13,10 @@ data class AdminBannerPlaceListResponseDto(
 
     data class BannerPlaceDto(
         val id: Long,
-        val name: String?,
-        val district: District?,
-        val subwayStation: SubwayStationResponseDto?,
-        val categoryList: List<PlaceCategoryDto>?
+        val name: String? = null,
+        val district: District? = null,
+        val subwayStation: SubwayStationResponseDto? = null,
+        val categoryList: List<PlaceCategoryDto> = emptyList()
     ) {
         companion object {
             fun from(place: Place): BannerPlaceDto {

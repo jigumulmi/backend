@@ -15,10 +15,10 @@ data class GetCandidatePlaceListRequestDto(
     val bannerId: @NotNull Long,
 
     @Parameter(description = "장소 이름 검색어")
-    val placeName: String,
+    val placeName: String? = null,
 
     @Parameter(description = "광역시도")
-    val region: Region,
+    val region: Region? = null,
 
     @Parameter(
         description = "시군구 ID",
@@ -26,14 +26,14 @@ data class GetCandidatePlaceListRequestDto(
         schema = Schema(implementation = Int::class)
     )
     @JsonProperty("districtId")
-    val district: District,
+    val district: District? = null,
 
     @Parameter(description = "상위 카테고리")
-    val placeCategoryGroup: PlaceCategoryGroup,
+    val placeCategoryGroup: PlaceCategoryGroup? = null,
 
     @Parameter(description = "지하철 ID")
-    val subwayStationId: Long,
+    val subwayStationId: Long? = null,
 
     @Parameter(description = "메뉴 이름 검색어")
-    val menuName: String
+    val menuName: String? = null
 )

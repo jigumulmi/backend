@@ -109,7 +109,7 @@ open class AdminBannerManager (
         adminCustomBannerRepository.batchInsertBannerPlace(bannerId, placeIdList)
     }
 
-    fun removeBannerPlace(bannerId: Long, placeIdList: @NotEmpty MutableList<Long>) {
+    fun removeBannerPlace(bannerId: Long, placeIdList: @NotEmpty List<Long>) {
         adminCustomBannerRepository.deleteBannerPlaceByBannerIdAndPlaceIdList(
             bannerId,
             placeIdList
