@@ -3,7 +3,7 @@ package com.jigumulmi.common
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
-open class PagedResponseDto<T>(
+open class AdminPagedResponseDto<T>(
     open val page: PageDto,
     open val data: List<T>
 ) {
@@ -24,8 +24,8 @@ open class PagedResponseDto<T>(
     }
 
     companion object {
-        fun <T> of(pageData: Page<T>, pageable: Pageable): PagedResponseDto<T> {
-            return PagedResponseDto(
+        fun <T> of(pageData: Page<T>, pageable: Pageable): AdminPagedResponseDto<T> {
+            return AdminPagedResponseDto(
                 page = PageDto.of(pageData, pageable),
                 data = pageData.content
             )

@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional
 
 
 @Repository
-open class AdminCustomBannerRepository(
+class AdminCustomBannerRepository(
     private val jdbcTemplate: NamedParameterJdbcTemplate,
     private val queryFactory: JPAQueryFactory,
 

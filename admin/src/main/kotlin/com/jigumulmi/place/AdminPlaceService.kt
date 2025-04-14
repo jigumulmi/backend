@@ -1,6 +1,6 @@
 package com.jigumulmi.place
 
-import com.jigumulmi.common.PagedResponseDto
+import com.jigumulmi.common.AdminPagedResponseDto
 import com.jigumulmi.member.domain.Member
 import com.jigumulmi.place.dto.ImageDto
 import com.jigumulmi.place.dto.MenuDto
@@ -18,7 +18,7 @@ import java.util.*
 
 
 @Service
-open class AdminPlaceService (
+class AdminPlaceService (
     private val adminPlaceManager: AdminPlaceManager,
     private val adminPlaceValidator: AdminPlaceValidator,
 ){
@@ -26,7 +26,7 @@ open class AdminPlaceService (
     fun getPlaceList(
         pageable: Pageable,
         requestDto: AdminGetPlaceListRequestDto
-    ): PagedResponseDto<PlaceDto> {
+    ): AdminPagedResponseDto<PlaceDto> {
         return adminPlaceManager.getPlaceList(pageable, requestDto)
     }
 

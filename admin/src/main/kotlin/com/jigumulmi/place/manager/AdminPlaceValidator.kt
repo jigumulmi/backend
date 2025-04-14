@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.DayOfWeek
 
 @Component
-open class AdminPlaceValidator(
+class AdminPlaceValidator(
     private val adminPlaceManager: AdminPlaceManager,
 
     private val placeRepository: PlaceRepository

@@ -12,8 +12,8 @@ import com.jigumulmi.banner.dto.response.AdminBannerPlaceListResponseDto
 import com.jigumulmi.banner.dto.response.AdminBannerResponseDto
 import com.jigumulmi.banner.dto.response.CreateBannerResponseDto
 import com.jigumulmi.banner.repository.BannerRepository
+import com.jigumulmi.common.AdminPagedResponseDto
 import com.jigumulmi.common.FileUtils
-import com.jigumulmi.common.PagedResponseDto
 import com.jigumulmi.config.exception.CustomException
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode
 import jakarta.validation.constraints.NotEmpty
@@ -28,7 +28,7 @@ import java.util.*
 import java.util.stream.Collectors
 
 @Component
-open class AdminBannerManager (
+class AdminBannerManager (
     private val s3Manager: S3Manager,
 
     private val bannerRepository: BannerRepository,
@@ -126,13 +126,13 @@ open class AdminBannerManager (
     open fun getMappedPlaceList(
         pageable: Pageable,
         bannerId: Long
-    ): PagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto> {
+    ): AdminPagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto> {
         val placePage = adminCustomBannerRepository.getAllMappedPlaceByBannerId(
             pageable,
             bannerId
         ).map(AdminBannerPlaceListResponseDto.BannerPlaceDto::from)
 
-        return PagedResponseDto.of(placePage, pageable)
+        return AdminPagedResponseDto.of(placePage, pageable)
     }
 
     private fun getBannerEntity(bannerId: Long): Banner {
@@ -192,12 +192,12 @@ open class AdminBannerManager (
     open fun getCandidatePlaceList(
         pageable: Pageable,
         requestDto: GetCandidatePlaceListRequestDto
-    ): PagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto> {
+    ): AdminPagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto> {
         val placePage = adminCustomBannerRepository.getAllUnmappedPlaceByBannerIdAndFilters(
             pageable, requestDto
         ).map(AdminBannerPlaceListResponseDto.BannerPlaceDto::from)
 
-        return PagedResponseDto.of(placePage, pageable)
+        return AdminPagedResponseDto.of(placePage, pageable)
     }
 
     companion object {

@@ -1,6 +1,6 @@
 package com.jigumulmi.member
 
-import com.jigumulmi.common.PagedResponseDto
+import com.jigumulmi.common.AdminPagedResponseDto
 import com.jigumulmi.member.dto.AdminMemberListResponseDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -22,7 +22,7 @@ class AdminMemberController(
     @GetMapping("")
     fun getMemberList(
         @ParameterObject pageable: Pageable
-    ): ResponseEntity<PagedResponseDto<AdminMemberListResponseDto.MemberDto>> {
+    ): ResponseEntity<AdminPagedResponseDto<AdminMemberListResponseDto.MemberDto>> {
         val memberList = adminMemberService.getMemberList(pageable)
         return ResponseEntity.ok().body(memberList)
     }

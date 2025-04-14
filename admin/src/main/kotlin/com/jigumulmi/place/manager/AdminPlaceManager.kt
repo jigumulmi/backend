@@ -1,8 +1,8 @@
 package com.jigumulmi.place.manager
 
 import com.jigumulmi.aws.S3Manager
+import com.jigumulmi.common.AdminPagedResponseDto
 import com.jigumulmi.common.FileUtils
-import com.jigumulmi.common.PagedResponseDto
 import com.jigumulmi.common.WeekUtils
 import com.jigumulmi.config.exception.CustomException
 import com.jigumulmi.config.exception.errorCode.CommonErrorCode
@@ -33,7 +33,7 @@ import java.util.stream.IntStream
 
 
 @Component
-open class AdminPlaceManager(
+class AdminPlaceManager(
     private val s3Manager: S3Manager,
 
     private val adminCustomPlaceRepository: AdminCustomPlaceRepository,
@@ -51,13 +51,13 @@ open class AdminPlaceManager(
     open fun getPlaceList(
         pageable: Pageable,
         requestDto: AdminGetPlaceListRequestDto
-    ): PagedResponseDto<PlaceDto> {
+    ): AdminPagedResponseDto<PlaceDto> {
         val placePage = adminCustomPlaceRepository.getPlaceList(
             pageable,
             requestDto
         ).map(PlaceDto::from)
 
-        return PagedResponseDto.of(placePage, pageable)
+        return AdminPagedResponseDto.of(placePage, pageable)
     }
 
     @Transactional(readOnly = true)

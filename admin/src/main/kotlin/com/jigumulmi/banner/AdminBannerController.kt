@@ -8,12 +8,11 @@ import com.jigumulmi.banner.dto.response.AdminBannerDetailResponseDto
 import com.jigumulmi.banner.dto.response.AdminBannerPlaceListResponseDto
 import com.jigumulmi.banner.dto.response.AdminBannerResponseDto
 import com.jigumulmi.banner.dto.response.CreateBannerResponseDto
-import com.jigumulmi.common.PagedResponseDto
+import com.jigumulmi.common.AdminPagedResponseDto
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
-import lombok.RequiredArgsConstructor
 import org.springdoc.core.annotations.ParameterObject
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -25,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile
 @Tag(name = "배너 관리")
 @RestController
 @RequestMapping("/admin/banner")
-@RequiredArgsConstructor
 class AdminBannerController(
     private val adminBannerService: AdminBannerService
 ) {
@@ -83,7 +81,7 @@ class AdminBannerController(
     fun getMappedPlaceList(
         @ParameterObject pageable: Pageable,
         @PathVariable bannerId: Long
-    ): ResponseEntity<PagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto>> {
+    ): ResponseEntity<AdminPagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto>> {
         val responseDto = adminBannerService.getMappedPlaceList(
             pageable, bannerId
         )
@@ -136,7 +134,7 @@ class AdminBannerController(
     fun getCandidatePlaceList(
         @ParameterObject pageable: Pageable,
         @ModelAttribute requestDto: @Valid GetCandidatePlaceListRequestDto
-    ): ResponseEntity<PagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto>> {
+    ): ResponseEntity<AdminPagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto>> {
         val responseDto = adminBannerService.getCandidatePlaceList(
             pageable, requestDto
         )

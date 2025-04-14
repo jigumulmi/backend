@@ -1,6 +1,6 @@
 package com.jigumulmi.banner.dto.response
 
-import com.jigumulmi.common.PagedResponseDto
+import com.jigumulmi.common.AdminPagedResponseDto
 import com.jigumulmi.place.domain.Place
 import com.jigumulmi.place.dto.response.PlaceCategoryDto
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto
@@ -9,7 +9,7 @@ import com.jigumulmi.place.vo.District
 data class AdminBannerPlaceListResponseDto(
     override val page: PageDto,
     override val data: List<BannerPlaceDto>
-) : PagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto>(page, data) {
+) : AdminPagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto>(page, data) {
 
     data class BannerPlaceDto(
         val id: Long,

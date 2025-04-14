@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 
 @RepositoryTest
-internal open class AdminCustomBannerRepositoryTest (
+internal class AdminCustomBannerRepositoryTest (
 ) {
     @Autowired
     private lateinit var adminCustomBannerRepository: AdminCustomBannerRepository

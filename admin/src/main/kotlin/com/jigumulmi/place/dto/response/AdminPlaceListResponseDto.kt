@@ -1,6 +1,6 @@
 package com.jigumulmi.place.dto.response
 
-import com.jigumulmi.common.PagedResponseDto
+import com.jigumulmi.common.AdminPagedResponseDto
 import com.jigumulmi.place.domain.Place
 import com.jigumulmi.place.dto.ImageDto
 import com.jigumulmi.place.dto.PositionDto
@@ -9,7 +9,7 @@ import com.jigumulmi.place.dto.response.AdminPlaceListResponseDto.PlaceDto
 data class AdminPlaceListResponseDto(
     override val page: PageDto,
     override val data: List<PlaceDto>
-) : PagedResponseDto<PlaceDto>(page, data) {
+) : AdminPagedResponseDto<PlaceDto>(page, data) {
     data class PlaceDto(
         val id: Long,
         val name: String? = null,

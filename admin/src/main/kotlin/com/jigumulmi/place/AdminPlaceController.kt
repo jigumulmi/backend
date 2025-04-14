@@ -1,6 +1,6 @@
 package com.jigumulmi.place
 
-import com.jigumulmi.common.PagedResponseDto
+import com.jigumulmi.common.AdminPagedResponseDto
 import com.jigumulmi.config.security.RequiredAuthUser
 import com.jigumulmi.member.domain.Member
 import com.jigumulmi.place.dto.ImageDto
@@ -34,7 +34,7 @@ class AdminPlaceController(
     fun getPlaceList(
         @ParameterObject pageable: Pageable,
         @ModelAttribute requestDto: AdminGetPlaceListRequestDto
-    ): ResponseEntity<PagedResponseDto<PlaceDto>> {
+    ): ResponseEntity<AdminPagedResponseDto<PlaceDto>> {
         val placeList = adminPlaceService.getPlaceList(pageable, requestDto)
         return ResponseEntity.ok().body(placeList)
     }

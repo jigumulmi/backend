@@ -8,7 +8,7 @@ import com.jigumulmi.banner.dto.response.AdminBannerDetailResponseDto
 import com.jigumulmi.banner.dto.response.AdminBannerPlaceListResponseDto
 import com.jigumulmi.banner.dto.response.AdminBannerResponseDto
 import com.jigumulmi.banner.dto.response.CreateBannerResponseDto
-import com.jigumulmi.common.PagedResponseDto
+import com.jigumulmi.common.AdminPagedResponseDto
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
@@ -50,7 +50,7 @@ class AdminBannerService(
     fun getMappedPlaceList(
         pageable: Pageable,
         bannerId: Long
-    ): PagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto> {
+    ): AdminPagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto> {
         return adminBannerManager.getMappedPlaceList(pageable, bannerId)
     }
 
@@ -81,7 +81,7 @@ class AdminBannerService(
     fun getCandidatePlaceList(
         pageable: Pageable,
         requestDto: GetCandidatePlaceListRequestDto
-    ): PagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto> {
+    ): AdminPagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto> {
         return adminBannerManager.getCandidatePlaceList(pageable, requestDto)
     }
 }

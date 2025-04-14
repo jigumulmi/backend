@@ -1,6 +1,6 @@
 package com.jigumulmi.member.dto
 
-import com.jigumulmi.common.PagedResponseDto
+import com.jigumulmi.common.AdminPagedResponseDto
 import com.jigumulmi.member.domain.Member
 import java.time.LocalDateTime
 
@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 data class AdminMemberListResponseDto(
     override val page: PageDto,
     override val data: List<MemberDto>
-) : PagedResponseDto<AdminMemberListResponseDto.MemberDto>(page, data) {
+) : AdminPagedResponseDto<AdminMemberListResponseDto.MemberDto>(page, data) {
 
     data class MemberDto(
         var createdAt: LocalDateTime,

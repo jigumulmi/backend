@@ -18,7 +18,7 @@ import java.util.stream.Stream
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @Transactional
-internal open class AdminPlaceServiceTest {
+internal class AdminPlaceServiceTest {
     @Autowired
     private lateinit var adminPlaceService: AdminPlaceService
 

@@ -11,7 +11,7 @@ import com.jigumulmi.banner.dto.response.AdminBannerDetailResponseDto
 import com.jigumulmi.banner.dto.response.AdminBannerPlaceListResponseDto
 import com.jigumulmi.banner.dto.response.AdminBannerResponseDto
 import com.jigumulmi.banner.dto.response.CreateBannerResponseDto
-import com.jigumulmi.common.PagedResponseDto
+import com.jigumulmi.common.AdminPagedResponseDto
 import com.jigumulmi.place.dto.response.PlaceCategoryDto
 import com.jigumulmi.place.dto.response.SubwayStationResponseDto
 import com.jigumulmi.place.vo.PlaceCategory
@@ -245,7 +245,7 @@ internal class AdminBannerControllerTest {
         )
         val responseDto = AdminBannerPlaceListResponseDto(
             data = listOf(bannerPlaceDto),
-            page = PagedResponseDto.PageDto(
+            page = AdminPagedResponseDto.PageDto(
                 currentPage = 1,
                 totalPage = 1,
                 totalCount = 1L
@@ -412,7 +412,7 @@ internal class AdminBannerControllerTest {
         )
         val responseDto = AdminBannerPlaceListResponseDto(
             data = listOf(bannerPlaceDto),
-            page = PagedResponseDto.PageDto(
+            page = AdminPagedResponseDto.PageDto(
                 currentPage = 1,
                 totalPage = 1,
                 totalCount = 1L
