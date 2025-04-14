@@ -1,5 +1,0 @@
-dependencies {
-    compileOnly(project(":core"))
-
-    testImplementation(testFixtures(project(":core")))
-}
