@@ -37,6 +37,7 @@ out/
 .vscode/
 
 ### my ignore ###
+.kotlin
 application*.properties
 scripts/*.sh
 
