@@ -35,7 +35,7 @@ class AdminPlaceService (
     }
 
     @Transactional
-    open fun updatePlaceBasic(placeId: Long, requestDto: AdminCreatePlaceRequestDto) {
+    fun updatePlaceBasic(placeId: Long, requestDto: AdminCreatePlaceRequestDto) {
         adminPlaceValidator.validatePlaceBasicUpdate(placeId, requestDto)
         adminPlaceManager.updatePlaceBasic(placeId, requestDto)
     }
@@ -45,7 +45,7 @@ class AdminPlaceService (
     }
 
     @Transactional
-    open fun updatePlaceImage(placeId: Long, imageDtoList: List<ImageDto>) {
+    fun updatePlaceImage(placeId: Long, imageDtoList: List<ImageDto>) {
         adminPlaceValidator.validatePlaceImageUpdate(placeId, imageDtoList)
         adminPlaceManager.updatePlaceImage(placeId, imageDtoList)
     }
@@ -55,7 +55,7 @@ class AdminPlaceService (
     }
 
     @Transactional
-    open fun updateMenu(placeId: Long, menuDtoList: List<MenuDto>) {
+    fun updateMenu(placeId: Long, menuDtoList: List<MenuDto>) {
         adminPlaceValidator.validateMenuUpdate(placeId, menuDtoList)
         adminPlaceManager.updateMenu(placeId, menuDtoList)
     }
@@ -104,7 +104,7 @@ class AdminPlaceService (
     }
 
     @Transactional
-    open fun togglePlaceApprove(placeId: Long, approve: Boolean) {
+    fun togglePlaceApprove(placeId: Long, approve: Boolean) {
         adminPlaceValidator.validatePlaceApprovalIfNeeded(placeId, approve)
         adminPlaceManager.togglePlaceApprove(placeId, approve)
     }

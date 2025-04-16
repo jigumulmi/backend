@@ -123,7 +123,7 @@ class AdminBannerManager (
     }
 
     @Transactional(readOnly = true)
-    open fun getMappedPlaceList(
+    fun getMappedPlaceList(
         pageable: Pageable,
         bannerId: Long
     ): AdminPagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto> {
@@ -141,14 +141,14 @@ class AdminBannerManager (
     }
 
     @Transactional
-    open fun updateBannerBasic(bannerId: Long, requestDto: UpdateBannerRequestDto) {
+    fun updateBannerBasic(bannerId: Long, requestDto: UpdateBannerRequestDto) {
         val banner = getBannerEntity(bannerId)
 
         banner.updateBasic(requestDto.title, requestDto.isActive)
     }
 
     @Transactional
-    open fun updateBannerOuterImage(bannerId: Long): AdminUpdateBannerImageS3KeyDto {
+    fun updateBannerOuterImage(bannerId: Long): AdminUpdateBannerImageS3KeyDto {
         val banner = getBannerEntity(bannerId)
         val oldS3Key = banner.outerImageS3Key
 
@@ -162,7 +162,7 @@ class AdminBannerManager (
     }
 
     @Transactional
-    open fun updateBannerInnerImage(bannerId: Long): AdminUpdateBannerImageS3KeyDto {
+    fun updateBannerInnerImage(bannerId: Long): AdminUpdateBannerImageS3KeyDto {
         val banner = getBannerEntity(bannerId)
         val oldS3Key = banner.innerImageS3Key
 
@@ -176,7 +176,7 @@ class AdminBannerManager (
     }
 
     @Transactional
-    open fun deleteBanner(bannerId: Long): List<String?> {
+    fun deleteBanner(bannerId: Long): List<String?> {
         val banner = getBannerEntity(bannerId)
 
         val outerImageS3Key = banner.outerImageS3Key
@@ -189,7 +189,7 @@ class AdminBannerManager (
     }
 
     @Transactional(readOnly = true)
-    open fun getCandidatePlaceList(
+    fun getCandidatePlaceList(
         pageable: Pageable,
         requestDto: GetCandidatePlaceListRequestDto
     ): AdminPagedResponseDto<AdminBannerPlaceListResponseDto.BannerPlaceDto> {

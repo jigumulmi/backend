@@ -34,7 +34,7 @@ class AdminPlaceValidator(
     }
 
     @Transactional(readOnly = true)
-    open fun validatePlaceApprovalIfNeeded(placeId: Long, approve: Boolean) {
+    fun validatePlaceApprovalIfNeeded(placeId: Long, approve: Boolean) {
         if (!approve) {
             return
         }
