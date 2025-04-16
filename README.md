@@ -51,7 +51,7 @@
 ### [노션 페이지](https://developerjoseph.notion.site/6aec3d72c3d641c4a98ba4a55d069536?v=f9513eb4d2644809927f5ab0ca5236ff)
 
 ## 기술 스택
-- `Java21, SpringBoot3, Spring Security, Springdoc`
+- `Java, Kotlin, Spring Boot, Spring Security, Springdoc`
 - `JPA, QueryDSL`
 - `JUnit5, Mockito`
 - `Docker, FluentBit, Loki, Prometheus, Grafana`
@@ -75,6 +75,5 @@
 - 
 
 ## 개발 기간 및 구성 인원
-2024.03.29 ~
-
-마케팅1, 기획1, 프론트엔드1, 백엔드1
+- 2024.03 ~ 2025.03
+- 마케팅1, 기획1, 프론트엔드1, 백엔드1
