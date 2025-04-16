@@ -48,7 +48,7 @@ class AdminPlaceManager(
 
     ) {
     @Transactional(readOnly = true)
-    open fun getPlaceList(
+    fun getPlaceList(
         pageable: Pageable,
         requestDto: AdminGetPlaceListRequestDto
     ): AdminPagedResponseDto<PlaceDto> {
@@ -61,14 +61,14 @@ class AdminPlaceManager(
     }
 
     @Transactional(readOnly = true)
-    open fun getPlaceBasic(placeId: Long): AdminPlaceBasicResponseDto {
+    fun getPlaceBasic(placeId: Long): AdminPlaceBasicResponseDto {
         return placeRepository.findById(placeId)
             .map(AdminPlaceBasicResponseDto.Companion::from)
             .orElseThrow { CustomException(CommonErrorCode.RESOURCE_NOT_FOUND) }
     }
 
     @Transactional
-    open fun updatePlaceBasic(placeId: Long, requestDto: AdminCreatePlaceRequestDto) {
+    fun updatePlaceBasic(placeId: Long, requestDto: AdminCreatePlaceRequestDto) {
         val place = placeRepository.findById(placeId)
             .orElseThrow { CustomException(CommonErrorCode.RESOURCE_NOT_FOUND) }
 
@@ -125,7 +125,7 @@ class AdminPlaceManager(
     }
 
     @Transactional
-    open fun updatePlaceImage(placeId: Long, imageDtoList: List<ImageDto>) {
+    fun updatePlaceImage(placeId: Long, imageDtoList: List<ImageDto>) {
         val place = placeRepository.findById(placeId)
             .orElseThrow { CustomException(CommonErrorCode.RESOURCE_NOT_FOUND) }
         placeImageRepository.deleteAllByPlace(place)
@@ -150,7 +150,7 @@ class AdminPlaceManager(
     }
 
     @Transactional
-    open fun updateMenu(placeId: Long, menuDtoList: List<MenuDto>) {
+    fun updateMenu(placeId: Long, menuDtoList: List<MenuDto>) {
         val place = placeRepository.findById(placeId)
             .orElseThrow { CustomException(CommonErrorCode.RESOURCE_NOT_FOUND) }
         menuRepository.deleteAllByPlace(place)
@@ -164,7 +164,7 @@ class AdminPlaceManager(
     }
 
     @Transactional
-    open fun updateFixedBusinessHour(placeId: Long, requestDto: WeeklyBusinessHourDto) {
+    fun updateFixedBusinessHour(placeId: Long, requestDto: WeeklyBusinessHourDto) {
         val place = placeRepository.findById(placeId)
             .orElseThrow { CustomException(CommonErrorCode.RESOURCE_NOT_FOUND) }
         fixedBusinessHourRepository.deleteAllByPlace(place)
@@ -217,7 +217,7 @@ class AdminPlaceManager(
     }
 
     @Transactional
-    open fun updateTemporaryBusinessHour(
+    fun updateTemporaryBusinessHour(
         hourId: Long,
         requestDto: AdminCreateTemporaryBusinessHourRequestDto
     ) {
@@ -269,7 +269,7 @@ class AdminPlaceManager(
     }
 
     @Transactional
-    open fun createPlace(
+    fun createPlace(
         requestDto: AdminCreatePlaceRequestDto,
         member: Member
     ): AdminCreatePlaceResponseDto {
@@ -336,7 +336,7 @@ class AdminPlaceManager(
     }
 
     @Transactional
-    open fun togglePlaceApprove(placeId: Long, approve: Boolean) {
+    fun togglePlaceApprove(placeId: Long, approve: Boolean) {
         val place = placeRepository.findById(placeId)
             .orElseThrow { CustomException((CommonErrorCode.RESOURCE_NOT_FOUND)) }
 
