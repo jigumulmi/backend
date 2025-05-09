@@ -5,7 +5,6 @@ import com.jigumulmi.place.domain.SubwayStationPlace
 import com.jigumulmi.place.dto.PositionDto
 import com.jigumulmi.place.vo.Region
 import java.time.LocalDateTime
-import java.util.stream.Collectors
 
 data class AdminPlaceBasicResponseDto(
     val createdAt: LocalDateTime? = null,
@@ -27,20 +26,17 @@ data class AdminPlaceBasicResponseDto(
 ) {
     companion object {
         fun from(place: Place): AdminPlaceBasicResponseDto {
-            val categoryList = place.categoryMappingList.stream()
-                .map(PlaceCategoryDto::fromPlaceCategoryMapping)
-                .toList()
+            val categoryList =
+                place.categoryMappingList.map(PlaceCategoryDto::fromPlaceCategoryMapping)
 
-            val subwayStationList = place.subwayStationPlaceList
-                .stream()
-                .map { subwayStationPlace: SubwayStationPlace ->
+            val subwayStationList =
+                place.subwayStationPlaceList.map { subwayStationPlace: SubwayStationPlace ->
                     SubwayStationResponseDto.builder()
                         .id(subwayStationPlace.subwayStation.id)
                         .stationName(subwayStationPlace.subwayStation.stationName)
                         .isMain(subwayStationPlace.isMain)
                         .build()
                 }
-                .collect(Collectors.toList())
 
             return AdminPlaceBasicResponseDto(
                 createdAt = place.createdAt,

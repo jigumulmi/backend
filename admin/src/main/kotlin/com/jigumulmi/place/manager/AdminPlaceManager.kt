@@ -19,7 +19,6 @@ import com.jigumulmi.place.dto.response.*
 import com.jigumulmi.place.dto.response.AdminPlaceBusinessHourResponseDto.TemporaryBusinessHourDto
 import com.jigumulmi.place.dto.response.AdminPlaceListResponseDto.PlaceDto
 import com.jigumulmi.place.repository.*
-import com.jigumulmi.place.vo.District
 import com.jigumulmi.place.vo.Region
 import jakarta.validation.constraints.NotBlank
 import org.springframework.data.domain.Pageable
@@ -28,8 +27,6 @@ import org.springframework.transaction.annotation.Transactional
 import software.amazon.awssdk.core.exception.SdkException
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier
 import java.time.DayOfWeek
-import java.util.stream.Collectors
-import java.util.stream.IntStream
 
 
 @Component
@@ -85,24 +82,15 @@ class AdminPlaceManager(
 
         val subwayStationIdList = requestDto.subwayStationIdList
         val subwayStationList = subwayStationRepository.findAllById(subwayStationIdList)
-            .stream()
-            .sorted(
-                Comparator.comparingInt { station: SubwayStation ->
-                    subwayStationIdList.indexOf(
-                        station.id
-                    )
-                })
-            .toList()
+            .sortedBy { station -> subwayStationIdList.indexOf(station.id) }
 
-        val subwayStationPlaceList = IntStream.range(0, subwayStationList.size)
-            .mapToObj { i: Int ->
-                SubwayStationPlace.builder()
-                    .subwayStation(subwayStationList[i])
-                    .place(place)
-                    .isMain(i == 0)
-                    .build()
-            }
-            .collect(Collectors.toList())
+        val subwayStationPlaceList = subwayStationList.indices.map { i ->
+            SubwayStationPlace.builder()
+                .subwayStation(subwayStationList[i])
+                .place(place)
+                .isMain(i == 0)
+                .build()
+        }
 
         val categoryMappingList = ArrayList<PlaceCategoryMapping>()
         for (categoryRequestDto in requestDto.categoryList) {
@@ -120,8 +108,7 @@ class AdminPlaceManager(
     }
 
     fun getPlaceImage(placeId: Long): List<ImageDto> {
-        return placeImageRepository.findByPlace_Id(placeId).stream()
-            .map(ImageDto::from).toList()
+        return placeImageRepository.findByPlace_Id(placeId).map(ImageDto::from)
     }
 
     @Transactional
@@ -145,8 +132,7 @@ class AdminPlaceManager(
     }
 
     fun getMenu(placeId: Long): List<MenuDto> {
-        return menuRepository.findAllByPlaceId(placeId).stream()
-            .map(MenuDto::from).toList()
+        return menuRepository.findAllByPlaceId(placeId).map(MenuDto::from)
     }
 
     @Transactional
@@ -293,30 +279,16 @@ class AdminPlaceManager(
             .build()
 
         val subwayStationIdList = requestDto.subwayStationIdList
-        val subwayStationList = subwayStationRepository.findAllById(
-            subwayStationIdList
-        )
-            .stream()
-            .sorted(
-                Comparator.comparingInt { station: SubwayStation ->
-                    subwayStationIdList.indexOf(
-                        station.id
-                    )
-                })
-            .toList()
+        val subwayStationList = subwayStationRepository.findAllById(subwayStationIdList)
+            .sortedBy { station -> subwayStationIdList.indexOf(station.id) }
 
-        val subwayStationPlaceList = IntStream.range(
-            0,
-            subwayStationList.size
-        )
-            .mapToObj { i: Int ->
-                SubwayStationPlace.builder()
-                    .subwayStation(subwayStationList[i])
-                    .place(place)
-                    .isMain(i == 0)
-                    .build()
-            }
-            .collect(Collectors.toList())
+        val subwayStationPlaceList = subwayStationList.indices.map { i ->
+            SubwayStationPlace.builder()
+                .subwayStation(subwayStationList[i])
+                .place(place)
+                .isMain(i == 0)
+                .build()
+        }
 
         val categoryMappingList: MutableList<PlaceCategoryMapping> = ArrayList()
         for (categoryRequestDto in requestDto.categoryList) {
@@ -350,9 +322,8 @@ class AdminPlaceManager(
     fun deleteMenuImageFileList(placeId: Long) {
         try {
             val menuList = menuRepository.findAllByPlaceId(placeId)
-            val objectIdentifierList = menuList.stream()
-                .map { m: Menu -> ObjectIdentifier.builder().key(m.imageS3Key).build() }
-                .toList()
+            val objectIdentifierList =
+                menuList.map { m -> ObjectIdentifier.builder().key(m.imageS3Key).build() }
 
             s3Manager.deleteObjects(s3Manager.bucket, objectIdentifierList)
         } catch (e: SdkException) {
@@ -361,10 +332,9 @@ class AdminPlaceManager(
     }
 
     fun getDistrictListOrderByName(region: Region): List<DistrictResponseDto> {
-        return region.districtList.stream()
-            .sorted(Comparator.comparing { obj: District -> obj.title })
-            .map { district: District? -> DistrictResponseDto.fromDistrict(district) }
-            .toList()
+        return region.districtList
+            .sortedBy { it.title }
+            .map(DistrictResponseDto::fromDistrict)
     }
 
     fun createMenuImageS3PutPresignedUrl(placeId: Long): AdminS3PutPresignedUrlResponseDto {

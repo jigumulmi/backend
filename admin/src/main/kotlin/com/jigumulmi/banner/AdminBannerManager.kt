@@ -24,16 +24,14 @@ import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.core.exception.SdkException
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier
 import java.io.IOException
-import java.util.*
-import java.util.stream.Collectors
 
 @Component
-class AdminBannerManager (
+class AdminBannerManager(
     private val s3Manager: S3Manager,
 
     private val bannerRepository: BannerRepository,
     private val adminCustomBannerRepository: AdminCustomBannerRepository
-){
+) {
 
     fun saveBannerImageFile(image: MultipartFile?, s3Key: String?) {
         if (image == null) {
@@ -67,10 +65,9 @@ class AdminBannerManager (
         }
 
         try {
-            val objectIdentifierList = s3KeyList.stream()
-                .filter { obj: String? -> Objects.nonNull(obj) }
-                .map { key: String? -> ObjectIdentifier.builder().key(key).build() }
-                .collect(Collectors.toList())
+            val objectIdentifierList = s3KeyList
+                .filterNotNull()
+                .map { key -> ObjectIdentifier.builder().key(key).build() }
 
             s3Manager.deleteObjects(s3Manager.bucket, objectIdentifierList)
         } catch (e: SdkException) {
@@ -102,8 +99,8 @@ class AdminBannerManager (
         )
     }
 
-    fun getBannerList(): List<AdminBannerResponseDto> = bannerRepository.findAll().stream()
-        .map { banner: Banner -> AdminBannerResponseDto.from(banner) }.toList()
+    fun getBannerList(): List<AdminBannerResponseDto> =
+        bannerRepository.findAll().map { banner -> AdminBannerResponseDto.from(banner) }
 
     fun addBannerPlace(bannerId: Long, placeIdList: List<Long>) {
         adminCustomBannerRepository.batchInsertBannerPlace(bannerId, placeIdList)

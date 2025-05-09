@@ -14,7 +14,6 @@ import com.jigumulmi.place.vo.Region
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 
 @Service
@@ -115,7 +114,7 @@ class AdminPlaceService (
         adminPlaceManager.deleteMenuImageFileList(placeId)
     }
 
-    fun getRegionList(): List<Region> = Arrays.stream(Region.entries.toTypedArray()).toList()
+    fun getRegionList(): List<Region> = Region.entries.toList()
 
     fun getDistrictList(region: Region): List<DistrictResponseDto> {
         return adminPlaceManager.getDistrictListOrderByName(region)

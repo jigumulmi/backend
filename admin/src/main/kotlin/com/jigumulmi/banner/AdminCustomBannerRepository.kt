@@ -35,20 +35,17 @@ class AdminCustomBannerRepository(
         val sql = "INSERT INTO banner_place_mapping (banner_id, place_id) " +
                 "VALUES (:bannerId, :placeId)"
 
-        val batch = placeIdList.stream()
-            .map { placeId: Long ->
-                MapSqlParameterSource()
-                    .addValue("bannerId", bannerId)
-                    .addValue("placeId", placeId)
-            }
-            .toList()
-            .toTypedArray()
+        val batch = placeIdList.map { placeId: Long ->
+            MapSqlParameterSource()
+                .addValue("bannerId", bannerId)
+                .addValue("placeId", placeId)
+        }.toTypedArray()
 
         jdbcTemplate.batchUpdate(sql, batch)
     }
 
     @Transactional
-    open fun deleteBannerPlaceByBannerIdAndPlaceIdList(bannerId: Long, placeIdList: List<Long>) {
+    fun deleteBannerPlaceByBannerIdAndPlaceIdList(bannerId: Long, placeIdList: List<Long>) {
         queryFactory
             .delete(bannerPlaceMapping)
             .where(
@@ -85,7 +82,7 @@ class AdminCustomBannerRepository(
     }
 
     @Transactional
-    open fun deleteBannerPlaceByBannerId(bannerId: Long?) {
+    fun deleteBannerPlaceByBannerId(bannerId: Long?) {
         queryFactory
             .delete(bannerPlaceMapping)
             .where(bannerPlaceMapping.banner.id.eq(bannerId))
