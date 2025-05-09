@@ -72,17 +72,13 @@ class AdminPlaceValidator(
     }
 
     private fun checkMenu(menuList: List<MenuDto>) {
-        if (menuList.isEmpty() || menuList.stream()
-                .allMatch { menu: MenuDto -> menu.name.isBlank() }
-        ) {
+        if (menuList.isEmpty() || menuList.all { it.name.isBlank() }) {
             throw CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "메뉴 누락")
         }
     }
 
     private fun checkCategory(categoryList: List<PlaceCategoryDto>) {
-        if (categoryList.isEmpty() || categoryList.stream()
-                .allMatch { dto: PlaceCategoryDto -> dto.categoryGroup == null }
-        ) {
+        if (categoryList.isEmpty() || categoryList.all { it.categoryGroup == null }) {
             throw CustomException(AdminErrorCode.INVALID_PLACE_APPROVAL, "카테고리 누락")
         }
     }
