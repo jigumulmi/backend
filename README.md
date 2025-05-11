@@ -9,6 +9,7 @@
 ![jigumulmi architecture](https://github.com/user-attachments/assets/b487d00b-a19b-4a7e-945a-f108164da081)
 
 ## 코드 아키텍처
+### 계층 구조
 > [Manager 계층 도입 배경](https://developerjoseph.notion.site/19c519c54f54803fbc94eecba5d173da?pvs=74)
 - **Controller**: 클라이언트 요청 및 응답 핸들링
   - 요청 데이터 검증 및 적절한 형태로 서비스 계층에 전달
@@ -19,6 +20,13 @@
   - 서비스 계층의 부품이 되어 여러 도메인의 비즈니스 로직에 재사용되는 계층
 - **Repository**: Data Access Object (DAO)
   - 다양한 데이터 자원(주로 RDB)에 접근하여 처리하는 계층
+ 
+### 모듈 구조
+> 사용자 기능(core)과 관리자 기능(admin) 모듈 분리 ([분리 과정](https://developerjoseph.notion.site/Spring-1b4519c54f54806aa8e0e01d48844e8e))
+
+![jigumulmi multi module](https://github.com/user-attachments/assets/1f2e3bf1-fa18-424a-9b76-e9f3fa2f740c)
+- core가 admin을 런타임 의존하여 어플리케이션 하나로 구동
+- 프로젝트 root에서 테스트 실행하여 모든 모듈을 대상으로 진행
 
 ## 브랜치 전략
 ![gitflow drawio](https://github.com/user-attachments/assets/985708a6-f7dd-4d7b-be58-7db9d65e710c)
@@ -43,7 +51,7 @@
 ### [노션 페이지](https://developerjoseph.notion.site/6aec3d72c3d641c4a98ba4a55d069536?v=f9513eb4d2644809927f5ab0ca5236ff)
 
 ## 기술 스택
-- `Java21, SpringBoot3, Spring Security, Springdoc`
+- `Java, Kotlin, Spring Boot, Spring Security, Springdoc`
 - `JPA, QueryDSL`
 - `JUnit5, Mockito`
 - `Docker, FluentBit, Loki, Prometheus, Grafana`
@@ -67,6 +75,5 @@
 - 
 
 ## 개발 기간 및 구성 인원
-2024.03.29 ~
-
-마케팅1, 기획1, 프론트엔드1, 백엔드1
+- 2024.03 ~ 2025.03
+- 마케팅1, 기획1, 프론트엔드1, 백엔드1
